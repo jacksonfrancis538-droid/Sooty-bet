@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS wallet_ledger (
 CREATE INDEX IF NOT EXISTS withdrawals_status_created_idx ON withdrawals(status, created_at DESC);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_reviewed_at TIMESTAMPTZ;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_note TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_note TEXT;\nALTER TABLE users ADD COLUMN IF NOT EXISTS full_name TEXT;\nALTER TABLE users ADD COLUMN IF NOT EXISTS country TEXT NOT NULL DEFAULT 'NG';\nALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT;\nALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS virtual_matches (
  id BIGSERIAL PRIMARY KEY,
@@ -367,14 +367,18 @@ app.get('/api/virtual/history',async(_req,res)=>{
 app.get('/health', (_req,res)=>res.json({ok:true,service:'sooty-bet-api'}));
 app.post('/api/auth/register', async (req,res) => {
  try {
-  const email = cleanText(req.body.email,254).toLowerCase() || null;
-  const phone = cleanText(req.body.phone,20) || null;
-  const password = typeof req.body.password === 'string' ? req.body.password : '';
-  if ((!email && !phone) || password.length < 12) return res.status(400).json({error:'Enter a valid email or phone and a password of at least 12 characters.'});
-  const password_hash = await bcrypt.hash(password,12);
-  const q = await pool.query('INSERT INTO users(email,phone,password_hash) VALUES($1,$2,$3) RETURNING id,email,phone,role,status,balance_kobo', [email,phone,password_hash]);
+  const fullName=cleanText(req.body.fullName,120);
+  const email=cleanText(req.body.email,254).toLowerCase();
+  const phone=cleanText(req.body.phone,20).replace(/[\\s()-]/g,'');
+  const country=cleanText(req.body.country,2).toUpperCase()||'NG';
+  const referralCode=cleanText(req.body.referralCode,20)||null;
+  const password=typeof req.body.password==='string'?req.body.password:'';
+  if(fullName.length<2||!/^\\S+@\\S+\\.\\S+$/.test(email)||!/^\\+?[1-9]\\d{7,14}$/.test(phone)||country!=='NG'||password.length<12||req.body.acceptedTerms!==true)
+   return res.status(400).json({error:'Check your name, email, Nigerian phone number, password and acceptance of the terms.'});
+  const password_hash=await bcrypt.hash(password,12);
+  const q=await pool.query('INSERT INTO users(email,phone,password_hash,full_name,country,referral_code,terms_accepted_at) VALUES($1,$2,$3,$4,$5,$6,NOW()) RETURNING id,email,phone,full_name,country,role,status,balance_kobo',[email,phone,password_hash,fullName,country,referralCode]);
   const u=q.rows[0];
-  res.status(201).json({token:tokenFor(u),user:{id:u.id,email:u.email,phone:u.phone,role:u.role,status:u.status}});
+  res.status(201).json({token:tokenFor(u),user:{id:u.id,email:u.email,phone:u.phone,fullName:u.full_name,country:u.country,role:u.role,status:u.status}});
  } catch(e) { res.status(e.code==='23505'?409:500).json({error:e.code==='23505'?'That email or phone is already registered.':'Could not create account.'}); }
 });
 app.post('/api/auth/login', async (req,res) => {
