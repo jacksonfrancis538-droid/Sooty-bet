@@ -151,7 +151,7 @@ body{background:#edf2f7;color:#172b42}
 </head>
 <body>
 <header class="top">
- <div><div class="brand">SOOTY<span> BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div><span class="balance" id="balance">₦ 0.00</span>
+ <div><div class="brand">SOOTY<span> BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div><span class="balance" id="balance" style="display:none">₦ 0.00</span>
  <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="logout()">Log out</button></div>
 </header>
 <div class="sportsbar"><div class="sportsbar-inner"><span class="sportsbar-label">SPORTS</span><span class="sportsbar-item active">⚽ Football</span><span class="sportsbar-item">🏀 Basketball</span><span class="sportsbar-item">🎾 Tennis</span><span class="sportsbar-item">🏐 Volleyball</span><span class="sportsbar-item">🏓 Table Tennis</span><span class="sportsbar-item">🎮 Esports</span><span class="sportsbar-item">🥊 Boxing</span><span class="sportsbar-item">🏒 Hockey</span></div></div>
@@ -265,7 +265,7 @@ async function submitAuth(){
 }
 function syncSession(){
  const saved=user||JSON.parse(localStorage.getItem('sooty_user')||'null');user=saved;
- document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';
+ document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';document.getElementById('balance').style.display=token?'inline-flex':'none';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';
  document.getElementById('accounttext').textContent=token?`Signed in as ${saved?.email||saved?.phone||'account'} · Status: ${saved?.status||'active'} · Role: ${saved?.role||'user'}`:'Log in or create an account to view your profile.';
  if(!token){document.getElementById('balance').textContent='₦ 0.00';document.getElementById('walletbal').textContent='₦0.00'}
 }
@@ -324,3 +324,17 @@ render();syncSession();loadPayoutDetails();checkApi();setInterval(refreshSports,
 /* Bold wallet balance at the left side of the header */
 .balance{font-weight:950;font-size:15px;letter-spacing:.25px;text-shadow:0 1px 2px #0008;white-space:nowrap}
 @media(max-width:680px){.top{justify-content:flex-start;gap:8px}.top>.balance{font-size:13px;padding:7px 9px;margin-left:auto}.top-actions{margin-left:auto}.top-actions .balance{display:none!important}}
+
+/* Refined signed-out and signed-in header states */
+.top-actions #loginbtn,.top-actions #joinbtn,.top-actions #logoutbtn,.top-actions #settingsbtn{border-radius:9px;min-height:38px;padding:9px 15px;font-weight:900;letter-spacing:.15px}
+.top-actions #loginbtn{background:#202a36;border:1px solid #52657a;color:#f2f6fb}
+.top-actions #joinbtn{background:linear-gradient(135deg,#f4c64f,#d99b22);border:1px solid #f7d77a;color:#17130a;box-shadow:0 3px 12px #d99b2233}
+.top-actions #logoutbtn{background:#202a36;border:1px solid #52657a;color:#f2f6fb}
+@media(max-width:680px){
+ .top{gap:8px}
+ .top-actions{gap:6px}
+ .top-actions #loginbtn,.top-actions #joinbtn{display:inline-flex!important;align-items:center;justify-content:center;padding:8px 10px;font-size:11px;min-height:35px}
+ .top-actions #settingsbtn{display:none!important}
+ .top-actions #logoutbtn{padding:8px 10px;font-size:11px;min-height:35px}
+ .top>.balance{margin-left:0}
+}
