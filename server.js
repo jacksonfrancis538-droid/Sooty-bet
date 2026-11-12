@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pg from 'pg';
+import crypto from 'node:crypto';
 
 const { Pool } = pg;
 const app = express();
@@ -64,6 +65,31 @@ CREATE INDEX IF NOT EXISTS withdrawals_status_created_idx ON withdrawals(status,
 ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_reviewed_at TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_note TEXT;
+
+CREATE TABLE IF NOT EXISTS virtual_matches (
+ id BIGSERIAL PRIMARY KEY,
+ match_code TEXT NOT NULL UNIQUE,
+ sport TEXT NOT NULL CHECK (sport IN ('football','basketball','tennis','racing')),
+ league TEXT NOT NULL,
+ home TEXT NOT NULL,
+ away TEXT NOT NULL,
+ participants JSONB NOT NULL DEFAULT '[]'::jsonb,
+ status TEXT NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled','live','completed')),
+ duration_seconds INTEGER NOT NULL,
+ scheduled_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+ started_at TIMESTAMPTZ,
+ completed_at TIMESTAMPTZ,
+ home_score INTEGER,
+ away_score INTEGER,
+ result JSONB NOT NULL DEFAULT '{}'::jsonb,
+ events JSONB NOT NULL DEFAULT '[]'::jsonb,
+ seed_hash TEXT NOT NULL,
+ seed_secret TEXT NOT NULL,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS virtual_matches_sport_status_idx ON virtual_matches(sport,status,scheduled_at);
+CREATE INDEX IF NOT EXISTS virtual_matches_completed_idx ON virtual_matches(completed_at DESC);
+
 `);
 
 const adminHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
@@ -148,6 +174,134 @@ app.get('/api/sports/upcoming', async (_req, res) => {
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message || 'Could not load upcoming fixtures.' });
   }
+});
+
+
+const VIRTUAL_TEAMS = {
+ football: [['Lagos City FC','Abuja United'],['Port Harcourt Stars','Kano Warriors'],['Jos Mountain FC','Ibadan Athletic'],['Enugu Rangers','Kaduna Royals'],['Benin City FC','Ilorin Town'],['Calabar Mariners','Sokoto Eagles']],
+ basketball: [['Lagos Titans','Abuja Hoopers'],['Kano Flyers','Rivers Dunkers'],['Jos Peaks','Ibadan Flames'],['Enugu Storm','Kaduna Kings']],
+ tennis: [['Ayo Okafor','Tunde Bello'],['Chika Nwosu','Emeka Obi'],['Zara James','Musa Danjuma'],['Ife Adeyemi','David Udo']],
+ racing: [['Virtual Grand Prix','Virtual Grand Prix']]
+};
+const RACE_RUNNERS = ['Thunderbolt','Blue Comet','Desert Flame','Silver Arrow','Midnight Star','Golden Dash'];
+function makeSeedRandom(seed) {
+ let counter=0;
+ return () => {
+  const bytes=crypto.createHash('sha256').update(seed+':'+counter++).digest();
+  return bytes.readUInt32BE(0)/4294967296;
+ };
+}
+function makeVirtualSimulation(sport,seed) {
+ const rand=makeSeedRandom(seed), events=[];
+ if(sport==='football'){
+  let h=0,a=0;
+  for(let second=3;second<88;second+=1){
+   const n=rand();
+   if(n<0.014){const side=rand()<0.5?'home':'away';if(side==='home')h++;else a++;events.push({second,type:'goal',side,text:(side==='home'?'Home':'Away')+' team scores',homeScore:h,awayScore:a});}
+   else if(n<0.055)events.push({second,type:rand()<0.5?'save':'chance',side:rand()<0.5?'home':'away',text:rand()<0.5?'A dangerous attack is stopped':'A shot narrowly misses'});
+   else if(n<0.061)events.push({second,type:'yellow',side:rand()<0.5?'home':'away',text:'Yellow card shown'});
+  }
+  return {duration:90,homeScore:h,awayScore:a,participants:[],events,result:{winner:h===a?'draw':h>a?'home':'away',summary:h+' - '+a}};
+ }
+ if(sport==='basketball'){
+  let h=0,a=0;
+  for(let second=2;second<47;second+=1){
+   if(rand()<0.66){const side=rand()<0.5?'home':'away',points=rand()<0.34?3:2;if(side==='home')h+=points;else a+=points;events.push({second,type:'score',side,points,text:(side==='home'?'Home':'Away')+' scores '+points+' points',homeScore:h,awayScore:a,quarter:Math.min(4,Math.floor(second/12)+1)});}
+   else if(rand()<0.12)events.push({second,type:'foul',side:rand()<0.5?'home':'away',text:'Foul called',quarter:Math.min(4,Math.floor(second/12)+1)});
+  }
+  return {duration:48,homeScore:h,awayScore:a,participants:[],events,result:{winner:h===a?'draw':h>a?'home':'away',summary:h+' - '+a}};
+ }
+ if(sport==='tennis'){
+  const first=rand()<0.5?'home':'away',sets=[];
+  let homeSets=0,awaySets=0;
+  for(let set=1;set<=3;set++){
+   const winner=rand()<0.5?'home':'away',games=6+Math.floor(rand()*2);
+   if(winner==='home')homeSets++;else awaySets++;
+   sets.push({set,winner,games});
+   events.push({second:Math.round(set*26),type:'set',side:winner,text:(winner==='home'?'Home':'Away')+' player wins set '+set,homeSets,awaySets});
+   if(homeSets===2||awaySets===2)break;
+  }
+  return {duration:78,homeScore:homeSets,awayScore:awaySets,participants:[],events,result:{winner:homeSets===awaySets?'draw':homeSets>awaySets?'home':'away',sets,summary:homeSets+' sets - '+awaySets+' sets'}};
+ }
+ const runners=RACE_RUNNERS.map((name,index)=>({name,index,pace:rand()}));
+ const order=[...runners].sort((x,y)=>y.pace-x.pace);
+ for(let second=5;second<=40;second+=5){
+  const progress=Math.min(99,Math.round(second/45*100));
+  const positions=[...runners].sort((x,y)=>(y.pace*progress+rand()*12)-(x.pace*progress+rand()*12)).map(x=>x.name);
+  events.push({second,type:'race',progress,positions,text:'Runners pass the '+progress+'% mark'});
+ }
+ const finish=order.map((x,i)=>({position:i+1,name:x.name}));
+ events.push({second:45,type:'finish',finish,text:finish[0].name+' wins the race'});
+ return {duration:45,homeScore:0,awayScore:0,participants:RACE_RUNNERS.map(name=>({name})),events,result:{winner:finish[0].name,finish,summary:finish[0].name+' wins'}};
+}
+function publicVirtualMatch(row,now=new Date()) {
+ const started=row.started_at?new Date(row.started_at):null;
+ const elapsed=started?Math.max(0,Math.floor((now-started)/1000)):0;
+ const visibleEvents=row.status==='scheduled'?[]:(row.events||[]).filter(e=>e.second<=elapsed);
+ const lastScore=[...visibleEvents].reverse().find(e=>Number.isInteger(e.homeScore)||Number.isInteger(e.awayScore));
+ const completed=row.status==='completed';
+ return {
+  id:row.id,code:row.match_code,sport:row.sport,league:row.league,home:row.home,away:row.away,
+  participants:row.participants||[],status:row.status,durationSeconds:row.duration_seconds,elapsedSeconds:Math.min(elapsed,row.duration_seconds),
+  homeScore:completed?row.home_score:(lastScore?.homeScore??0),awayScore:completed?row.away_score:(lastScore?.awayScore??0),
+  events:visibleEvents,seedHash:row.seed_hash,seedReveal:completed?row.seed_secret:null,
+  result:completed?row.result:null,scheduledAt:row.scheduled_at,startedAt:row.started_at,completedAt:row.completed_at
+ };
+}
+async function ensureVirtualFixtures(sport) {
+ const count=await pool.query("SELECT count(*)::int n FROM virtual_matches WHERE sport=$1 AND status='scheduled'",[sport]);
+ const needed=Math.max(0,4-count.rows[0].n);
+ for(let i=0;i<needed;i++){
+  const pair=VIRTUAL_TEAMS[sport][Math.floor(Math.random()*VIRTUAL_TEAMS[sport].length)];
+  const seed=crypto.randomBytes(32).toString('hex'),code='SV-'+crypto.randomBytes(5).toString('hex').toUpperCase();
+  const raceParticipants=sport==='racing'?RACE_RUNNERS.map(name=>({name})): [];
+  await pool.query("INSERT INTO virtual_matches(match_code,sport,league,home,away,participants,duration_seconds,scheduled_at,seed_hash,seed_secret) VALUES($1,$2,$3,$4,$5,$6,$7,NOW()+($8 * INTERVAL '1 minute'),$9,$10) ON CONFLICT(match_code) DO NOTHING",
+   [code,sport,sport==='racing'?'SOOTY VIRTUAL GRAND PRIX':'SOOTY VIRTUAL '+sport.toUpperCase(),pair[0],pair[1],JSON.stringify(raceParticipants),sport==='football'?90:sport==='basketball'?48:sport==='tennis'?78:45,i*2,crypto.createHash('sha256').update(seed).digest('hex'),seed]);
+ }
+}
+async function completeVirtualMatchIfDue(row) {
+ if(row.status!=='live'||!row.started_at)return row;
+ if(Date.now()-new Date(row.started_at).getTime()<row.duration_seconds*1000)return row;
+ const updated=await pool.query("UPDATE virtual_matches SET status='completed',completed_at=NOW() WHERE id=$1 AND status='live' RETURNING *",[row.id]);
+ return updated.rows[0]||row;
+}
+app.get('/api/virtual/matches',async(req,res)=>{
+ try{
+  const sport=cleanText(req.query.sport,20).toLowerCase();
+  if(!Object.hasOwn(VIRTUAL_TEAMS,sport))return res.status(400).json({error:'Choose football, basketball, tennis or racing.'});
+  await ensureVirtualFixtures(sport);
+  const q=await pool.query("SELECT * FROM virtual_matches WHERE sport=$1 AND status<>'completed' ORDER BY CASE status WHEN 'live' THEN 0 ELSE 1 END,scheduled_at,id LIMIT 12",[sport]);
+  const rows=await Promise.all(q.rows.map(completeVirtualMatchIfDue));
+  res.set('Cache-Control','no-store');res.json({sport,matches:rows.filter(x=>x.status!=='completed').map(x=>publicVirtualMatch(x))});
+ }catch(e){res.status(500).json({error:'Could not load virtual fixtures.'});}
+});
+app.post('/api/virtual/matches/:id/start',async(req,res)=>{
+ try{
+  const q=await pool.query('SELECT * FROM virtual_matches WHERE id=$1',[req.params.id]);
+  if(!q.rowCount)return res.status(404).json({error:'Virtual match not found.'});
+  let row=q.rows[0];
+  if(row.status==='scheduled'){
+   const sim=makeVirtualSimulation(row.sport,row.seed_secret);
+   const u=await pool.query("UPDATE virtual_matches SET status='live',started_at=NOW(),home_score=$2,away_score=$3,events=$4,result=$5,participants=$6 WHERE id=$1 AND status='scheduled' RETURNING *",
+    [row.id,sim.homeScore,sim.awayScore,JSON.stringify(sim.events),JSON.stringify(sim.result),JSON.stringify(sim.participants)]);
+   row=u.rows[0]||row;
+  }
+  res.set('Cache-Control','no-store');res.json({match:publicVirtualMatch(row)});
+ }catch(e){res.status(500).json({error:'Could not start virtual match.'});}
+});
+app.get('/api/virtual/matches/:id',async(req,res)=>{
+ try{
+  const q=await pool.query('SELECT * FROM virtual_matches WHERE id=$1',[req.params.id]);
+  if(!q.rowCount)return res.status(404).json({error:'Virtual match not found.'});
+  const row=await completeVirtualMatchIfDue(q.rows[0]);
+  res.set('Cache-Control','no-store');res.json({match:publicVirtualMatch(row)});
+ }catch(e){res.status(500).json({error:'Could not load virtual match.'});}
+});
+app.get('/api/virtual/history',async(_req,res)=>{
+ try{
+  const q=await pool.query("SELECT * FROM virtual_matches WHERE status='completed' ORDER BY completed_at DESC LIMIT 100");
+  res.set('Cache-Control','no-store');res.json({matches:q.rows.map(x=>publicVirtualMatch(x))});
+ }catch(e){res.status(500).json({error:'Could not load virtual match history.'});}
 });
 
 app.get('/health', (_req,res)=>res.json({ok:true,service:'sooty-bet-api'}));
