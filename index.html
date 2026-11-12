@@ -692,19 +692,7 @@ function placeBet(){
  showPage('mybets',null);loadBets();
 }
 function viewTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const unit=t.unit==='points'?' points':'',stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printTestTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake (test only)</span><b>'+stakeText+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return (not payable)</span><b>'+returnText+'</b></div><p class="muted">Sandbox receipt only. No real wager, wallet debit, or cash payout occurred.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
-function printTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return}w.document.write('<html><head><title>SORTBET NG Test Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SORTBET NG</h1><small>TEST BET RECEIPT · SANDBOX ONLY</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+t.selections.map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('')+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">TEST RECEIPT ONLY. No real money was wagered, debited, or paid.</div><script>window.onload=()=>window.print()<\/script></body></html>
-<style>
-/* Expanded match-market groups */
-.market-group{border-top:1px solid #e1e8f0;padding:7px 0 2px}
-.market-group-title{width:100%;display:flex;justify-content:space-between;align-items:center;background:transparent;color:#23415f;padding:5px 2px;font-size:12px;text-align:left}
-.market-group-title span{font-size:17px;color:#71869b}
-.market-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:3px 0 7px}
-.market-odd{min-width:0;min-height:43px;padding:6px 3px!important}
-.market-odd small{font-size:10px!important;white-space:normal;line-height:1.15;min-height:22px;display:block}
-.market-odd b{font-size:12px}
-@media(max-width:680px){.market-options{grid-template-columns:repeat(2,minmax(0,1fr))}.market-odd{min-height:45px}}
-</style>
-');w.document.close();}
+function printTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return}w.document.write('<html><head><title>SORTBET NG Test Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SORTBET NG</h1><small>TEST BET RECEIPT · SANDBOX ONLY</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+t.selections.map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('')+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">TEST RECEIPT ONLY. No real money was wagered, debited, or paid.</div><script>window.onload=()=>window.print()<\/script></body></html>');w.document.close();}
 let virtualSport='football',virtualMatch=null,virtualPoll=null,virtualFrame=null;
 const virtualNames={football:'Football',basketball:'Basketball',tennis:'Tennis',racing:'Horse Racing'};
 async function loadVirtuals(){
@@ -851,7 +839,16 @@ render();syncSession();updateVirtualPointsUI();if(!token)openModal('login');load
 @media(max-width:680px){.header-brand .brand{font-size:22px;letter-spacing:1.2px}}
 </style>
 <!-- deployment refresh: 2026-11-12 -->
-</body></html>
+<style>/* Expanded match-market groups */
+.market-group{border-top:1px solid #e1e8f0;padding:7px 0 2px}
+.market-group-title{width:100%;display:flex;justify-content:space-between;align-items:center;background:transparent;color:#23415f;padding:5px 2px;font-size:12px;text-align:left}
+.market-group-title span{font-size:17px;color:#71869b}
+.market-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:3px 0 7px}
+.market-odd{min-width:0;min-height:43px;padding:6px 3px!important}
+.market-odd small{font-size:10px!important;white-space:normal;line-height:1.15;min-height:22px;display:block}
+.market-odd b{font-size:12px}
+@media(max-width:680px){.market-options{grid-template-columns:repeat(2,minmax(0,1fr))}.market-odd{min-height:45px}}
+</style></body></html>
 
 <style>
 .total-odds-circle{width:43px;height:43px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#07549a;color:#fff;border:2px solid #f5c400;font-size:11px;font-weight:900;box-shadow:0 0 0 3px #07549a18}
