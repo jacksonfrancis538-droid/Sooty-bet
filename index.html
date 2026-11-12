@@ -87,6 +87,66 @@ body{background:#edf2f7;color:#172b42}
 .modal-card{background:#fff;border-color:#d5dee8;color:#172b42}
 .stat{background:#edf3f9}.stat b{color:#07549a}
 @media(max-width:680px){.top{background:#07549a}.betslip{background:#fff}}
+
+/* Mobile-first dark sports home inspired by modern sportsbook navigation */
+.mobile-home{display:none}
+.mobile-bottom{display:none}
+@media(max-width:680px){
+ body{background:#0d1015;color:#f4f6fa;padding-bottom:76px}
+ .top{height:58px;background:#090b0f;padding:0 12px;display:flex;gap:8px}
+ .top>div:first-child{position:absolute;left:50%;transform:translateX(-50%);text-align:center}
+ .brand{font-size:21px;letter-spacing:1px;color:#fff}.brand span{color:#55a8ff}
+ .tag{display:none}
+ .top-actions{margin-left:auto;gap:5px}
+ .top-actions .balance{order:-1;background:#17222e;border:1px solid #30465b;color:#b9dcff;font-size:11px}
+ .top-actions #settingsbtn{display:inline-block!important;font-size:0;padding:8px 10px}
+ .top-actions #settingsbtn:after{content:"⋮";font-size:19px}
+ .top-actions #loginbtn,.top-actions #joinbtn,.top-actions #logoutbtn{display:none!important}
+ .sportsbar{display:none}
+ .layout{display:block;padding:10px 10px 20px}
+ .side{display:none}
+ .betslip{display:none}
+ .mobile-tabs{display:none}
+ .mobile-home{display:block}
+ .mobile-home-head,.mobile-section-head{display:flex;align-items:center;justify-content:space-between;margin:15px 2px 10px}
+ .mobile-home-head h1{font-size:23px;margin:0;color:#fff}
+ .mobile-home-head button,.mobile-section-head button{background:#1c2733;color:#dce9f7;border:1px solid #2c3b4b;border-radius:20px;padding:6px 12px;font-size:11px}
+ .sport-categories{display:flex;overflow-x:auto;gap:18px;padding:4px 2px 14px;scrollbar-width:none}
+ .sport-cat{background:none;border:0;color:#9ca9b8;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:54px;padding:0;font-size:10px}
+ .sport-cat b{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:#1b2530;font-size:21px;border:1px solid #2d3b4a}
+ .sport-cat.active{color:#6cb8ff}.sport-cat.active b{background:#123b60;border:1px solid #278ce0}
+ .promo-row{display:flex;gap:10px;overflow-x:auto;padding:2px 0 16px;scrollbar-width:none}
+ .promo{position:relative;flex:0 0 215px;height:112px;border-radius:12px;padding:12px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 5px 15px #0007}
+ .promo span{font-size:9px;letter-spacing:1.2px;font-weight:900;opacity:.9}
+ .promo strong{font-size:19px;max-width:145px;line-height:1.05}
+ .promo small{font-size:10px;opacity:.9}
+ .promo-virtual{background:radial-gradient(circle at 80% 25%,#e8c15a 0 5%,transparent 6%),linear-gradient(120deg,#073c7a,#126ab2 55%,#172f61)}
+ .promo-virtual strong{font-size:39px;color:#ffdc7a;text-shadow:0 2px 5px #0008}
+ .promo-bonus{background:linear-gradient(115deg,#693b16,#bd6a20 60%,#322016)}
+ .promo-team{background:linear-gradient(115deg,#6b1735,#183c78 60%,#10233f)}
+ .promo-paris{background:linear-gradient(115deg,#142b58,#70223e)}
+ .mobile-section-head{margin-top:7px}.mobile-section-head h2{font-size:17px;margin:0;color:#fff}
+ .mobile-section-head em{font-style:normal;background:#0c666a;color:#b9ffff;border-radius:15px;padding:4px 7px;font-size:9px;margin-left:5px}
+ .game-row{display:flex;gap:14px;overflow-x:auto;padding:7px 0 17px;scrollbar-width:none}
+ .game-icon{flex:0 0 66px;text-align:center;font-size:34px;background:linear-gradient(145deg,#27364a,#151d28);border:1px solid #34465a;border-radius:13px;padding:9px 4px 7px;min-height:76px}
+ .game-icon small{display:block;font-size:9px;line-height:1.2;color:#d4deea;margin-top:5px}
+ .event-row{display:flex;align-items:center;gap:12px;background:#171f2a;border:1px solid #273444;border-radius:10px;padding:12px;margin:8px 0;color:#e8edf5;font-size:13px}
+ .event-row>span:last-child{margin-left:auto;color:#8092a6;font-size:20px}
+ .event-ball{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;font-size:19px}
+ .event-ball.purple{background:#392a64}.event-ball.orange{background:#69401d}
+ #sports>.hero{margin-top:12px}
+ .mobile-bottom{position:fixed;z-index:50;bottom:0;left:0;right:0;height:66px;background:#101722;border-top:1px solid #293849;display:flex;justify-content:space-around;align-items:center;padding:5px 4px calc(5px + env(safe-area-inset-bottom))}
+ .mobile-bottom button{background:none;color:#8796a8;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;min-width:50px}
+ .mobile-bottom button b{font-size:19px;line-height:22px}
+ .mobile-bottom button.active{color:#65b4ff}
+ .mobile-bottom .bottom-slip b{background:#1678d1;color:white;border-radius:50%;width:43px;height:43px;display:grid;place-items:center;font-size:20px;margin-top:-23px;border:4px solid #101722}
+ .mobile-bottom .bottom-slip span{color:#dce8f6}
+ #settings.page.active,#wallet.page.active,#account.page.active,#mybets.page.active,#live.page.active,#upcoming.page.active,#admin.page.active{padding-bottom:15px}
+ #settings .panel,#wallet .panel,#account .panel,#mybets .panel{background:#151e29;border-color:#2a3949;color:#edf4fb}
+ #settings .muted,#wallet .muted,#account .muted{color:#a1b0c0}
+ #settings .field,#wallet .field{background:#0c131c;border-color:#34475b;color:#fff}
+}
+
 </style>
 </head>
 <body>
@@ -103,6 +163,24 @@ body{background:#edf2f7;color:#172b42}
  <main>
   <div class="mobile-tabs"><span class="chip active">⚽ Football</span><span class="chip">🔴 Live</span><span class="chip">🏀 Basketball</span><span class="chip">🎾 Tennis</span><span class="chip">🎮 Esports</span></div>
   <section id="sports" class="page active">
+
+   <div class="mobile-home">
+    <div class="mobile-home-head"><h1>Sports</h1><button onclick="showPage('upcoming',null)">All ☰</button></div>
+    <div class="sport-categories">
+     <button class="sport-cat active" onclick="showPage('sports',null)"><b>⚽</b><span>Football</span></button><button class="sport-cat" onclick="showPage('upcoming',null)"><b>🎾</b><span>Tennis</span></button><button class="sport-cat"><b>🏀</b><span>Basketball</span></button><button class="sport-cat"><b>🏒</b><span>Ice Hockey</span></button><button class="sport-cat"><b>🏐</b><span>Volleyball</span></button><button class="sport-cat"><b>🏓</b><span>Table Tennis</span></button>
+    </div>
+    <div class="promo-row">
+     <article class="promo promo-virtual"><span>VIRTUAL SPORT</span><strong>GR</strong><small>⚽  ✨  🪙</small></article>
+     <article class="promo promo-bonus"><span>SOOTY BET</span><strong>Welcome Bonus</strong><small>Special offers for eligible members</small></article>
+     <article class="promo promo-team"><span>FOOTBALL ZONE</span><strong>Match day</strong><small>Follow your favourite teams</small></article>
+     <article class="promo promo-paris"><span>TOP MATCHES</span><strong>Paris Nights</strong><small>Explore upcoming fixtures</small></article>
+    </div>
+    <div class="mobile-section-head"><h2>Game zone <em>SOOTY GAMES</em></h2><button onclick="showPage('sports',null)">All ›</button></div>
+    <div class="game-row"><div class="game-icon">🧜‍♀️<small>Heads or Tails</small></div><div class="game-icon">🍎<small>Apple Of Fortune</small></div><div class="game-icon">🐉<small>Dragon's Gold</small></div><div class="game-icon">🧟<small>Midgard Zombies</small></div><div class="game-icon">🤠<small>Western Slot</small></div></div>
+    <div class="mobile-section-head"><h2>TOP-EVENTS</h2><button onclick="showPage('upcoming',null)">All ›</button></div>
+    <div class="event-row" onclick="showPage('upcoming',null)"><span class="event-ball purple">⚽</span><b>UEFA Champions League</b><span>›</span></div>
+    <div class="event-row" onclick="showPage('upcoming',null)"><span class="event-ball orange">⚽</span><b>Europa League</b><span>›</span></div>
+   </div>
    <div class="hero"><div class="eyebrow">WELCOME TO SOOTY BET</div><h1>Make every moment<br>count.</h1><p>Follow the action, explore the markets and build your betslip in one place.</p><button class="btn primary" onclick="document.getElementById('matches').scrollIntoView({behavior:'smooth'})">Explore matches →</button></div>
    <div class="chips"><button class="chip active">All sports</button><button class="chip">Football</button><button class="chip">Basketball</button><button class="chip">Tennis</button><button class="chip">Esports</button></div>
    <div class="panel" id="matches"><div class="panel-title"><h3>Featured matches</h3><span class="muted" id="sportsupdated">Connecting to live sports feed…</span></div><div id="matchlist"></div></div>
