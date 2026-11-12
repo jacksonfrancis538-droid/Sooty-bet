@@ -414,12 +414,12 @@ button:disabled{opacity:.65;cursor:not-allowed}
   </section>
   <section id="admin" class="page"><div class="panel"><h3>SOOTY BET Admin</h3><p class="muted">Restricted to the configured administrator account.</p><div class="stats"><div class="stat"><b id="adminusers">—</b><small>Registered users</small></div><div class="stat"><b id="adminbets">—</b><small>Recorded bets</small></div><div class="stat"><b id="adminpending">—</b><small>Pending withdrawals</small></div></div><p class="muted" id="adminmessage">Sign in with the admin email to load requests.</p></div><div class="panel"><div class="panel-title"><h3>Age verification requests</h3><button class="btn ghost" onclick="loadAdminVerification()">Refresh</button></div><p class="muted" style="font-size:12px">Only approve after checking a valid official identity document through a secure verification process. Do not ask users to post identity documents in public chat.</p><div id="adminverification" class="muted">Admin sign-in required.</div></div><div class="panel"><div class="panel-title"><h3>Withdrawal requests</h3><button class="btn ghost" onclick="loadAdminWithdrawals()">Refresh</button></div><div id="adminwithdrawals" class="muted">Admin sign-in required.</div></div></section>
  </main>
- <aside class="betslip"><div class="slip-head"><h3>Bet slip</h3><span class="count" id="count">0</span></div><div id="selections"><div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div></div><div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm test bet</button><div class="notice">SANDBOX ONLY · Creates a test ticket. No real money is charged or paid.</div></div><div class="notice">Sample odds only. Not a live bookmaker offer.</div></aside>
+ <aside class="betslip"><div class="slip-head"><h3>Bet slip</h3><div style="display:flex;align-items:center;gap:7px"><span class="total-odds-circle" id="totalodds-circle">0.00</span><span class="count" id="count">0</span></div></div><div id="selections"><div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div></div><div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm test bet</button><div class="notice">SANDBOX ONLY · Creates a test ticket. No real money is charged or paid.</div></div><div class="notice">Sample odds only. Not a live bookmaker offer.</div></aside>
 </div>
 <nav class="mobile-bottom" aria-label="Bottom navigation">
  <button class="active" onclick="showPage('sports',this);setBottomActive(this)"><b>🔥</b><span>Popular</span></button>
  <button onclick="showPage('virtuals',this);setBottomActive(this);loadVirtuals()"><b>🎮</b><span>Virtuals</span></button>
- <button class="bottom-slip" onclick="toggleMobileSlip(this)"><b>▤</b><span>Bet slip <i id="mobile-slip-count">0</i></span></button>
+ <button class="bottom-slip" onclick="toggleMobileSlip(this)"><b>▤</b><span class="mobile-total-circle" id="mobile-total-odds-circle">0.00</span><span>Bet slip <i id="mobile-slip-count">0</i></span></button>
  <button onclick="showPage('mybets',this);setBottomActive(this)"><b>◷</b><span>History</span></button>
  <button onclick="showPage('settings',this);setBottomActive(this)"><b>⠿</b><span>Menu</span></button>
 </nav>
@@ -462,7 +462,12 @@ async function api(path, options={}){
 function matchHTML(m){return `<div class="match"><div class="match-meta"><span>${m.league}</span><span>${m.time}</span></div><div class="teams"><span class="team">${m.home}</span><span class="score">VS</span><span class="team">${m.away}</span></div><div class="odds">${['1','X','2'].map((v,i)=>`<button class="odd ${slip.some(s=>s.id===m.id&&s.pick===v)?'selected':''}" onclick="addPick(${m.id},'${v}')"><small>${['Home','Draw','Away'][i]}</small><b>${m.odds[i].toFixed(2)}</b></button>`).join('')}</div></div>`}
 function sportsCard(m, live=false){
  const status = live ? ((m.elapsed==null?'LIVE':m.elapsed+"'")+' · '+escapeHTML(m.statusText||'In play')) : new Date(m.kickoff).toLocaleString('en-NG',{timeZone:'Africa/Lagos',dateStyle:'medium',timeStyle:'short'});
- return '<div class="match"><div class="match-meta"><span>'+escapeHTML(m.country?m.country+' · ':'')+escapeHTML(m.league)+'</span><span class="'+(live?'live':'muted')+'">'+status+'</span></div><div class="teams"><span class="team">'+escapeHTML(m.home)+'</span><span class="score">'+(live?(m.homeScore??0)+' - '+(m.awayScore??0):'VS')+'</span><span class="team">'+escapeHTML(m.away)+'</span></div>'+(m.venue?'<div class="muted" style="font-size:11px">'+escapeHTML(m.venue)+'</div>':'')+'</div>';
+ const id=String(m.id||m.eventId||((m.home||'home')+'-'+(m.away||'away'))).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80);
+ const seed=Array.from(id).reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);
+ const odds=[(1.55+(seed%90)/100),(2.85+((seed>>>4)%90)/100),(2.05+((seed>>>9)%130)/100)];
+ const picks=['1','X','2'],labels=['Home','Draw','Away'];
+ const markets='<div class="odds">'+picks.map((p,i)=>'<button type="button" class="odd '+(slip.some(x=>x.id===id&&x.pick===p)?'selected':'')+'" onclick="addMarketPick(\''+escapeHTML(id)+'\',\''+p+'\',\''+escapeHTML(m.home)+'\',\''+escapeHTML(m.away)+'\','+odds[i]+')"><small>'+labels[i]+'</small><b>'+odds[i].toFixed(2)+'</b></button>').join('')+'</div>';
+ return '<div class="match" data-event-id="'+escapeHTML(id)+'"><div class="match-meta"><span>'+escapeHTML(m.country?m.country+' · ':'')+escapeHTML(m.league)+'</span><span class="'+(live?'live':'muted')+'">'+status+'</span></div><div class="teams"><span class="team">'+escapeHTML(m.home)+'</span><span class="score">'+(live?(m.homeScore??0)+' - '+(m.awayScore??0):'VS')+'</span><span class="team">'+escapeHTML(m.away)+'</span></div>'+markets+(m.venue?'<div class="muted" style="font-size:11px">'+escapeHTML(m.venue)+'</div>':'')+'<div class="muted" style="font-size:9px;margin-top:5px">Illustrative preview odds · not live bookmaker prices</div></div>';
 }
 function showSportsMessage(id,message){document.getElementById(id).innerHTML='<div class="empty">'+escapeHTML(message)+'</div>'}
 async function refreshSports(){
@@ -481,10 +486,26 @@ async function refreshSports(){
  }
 }
 function render(){document.getElementById('matchlist').innerHTML='<div class="empty">Loading football fixtures…</div>';document.getElementById('livelist').innerHTML='<div class="empty">Checking live-score availability…</div>';document.getElementById('upcominglist').innerHTML='<div class="empty">Loading upcoming fixtures…</div>';renderSlip();refreshSports();}
-function addPick(id,pick){let m=fixtures.find(x=>x.id===id);let old=slip.findIndex(s=>s.id===id);if(old>=0)slip.splice(old,1);slip.push({id,pick,home:m.home,away:m.away,odd:m.odds[['1','X','2'].indexOf(pick)]});render()}
-function removePick(id){slip=slip.filter(s=>s.id!==id);render()}
-function renderSlip(){document.getElementById('count').textContent=slip.length;const mobileCount=document.getElementById('mobile-slip-count');if(mobileCount)mobileCount.textContent=slip.length;let box=document.getElementById('selections');document.getElementById('slipcalc').style.display=slip.length?'block':'none';if(!slip.length){box.innerHTML='<div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div>';return}box.innerHTML=slip.map(s=>`<div class="selection"><button class="remove" onclick="removePick(${s.id})">×</button><strong>${s.home} vs ${s.away}</strong><small>${s.pick==='1'?'Home win':s.pick==='X'?'Draw':'Away win'} · <b style="color:var(--gold)">${s.odd.toFixed(2)}</b></small></div>`).join('');calculate()}
-function calculate(){let stake=Number(document.getElementById('stake').value||0),odds=slip.reduce((a,s)=>a*s.odd,1);document.getElementById('totalodds').textContent=odds.toFixed(2);document.getElementById('return').textContent=money(stake*odds)}
+function addMarketPick(id,pick,home,away,odd){
+ const key=String(id),existing=slip.findIndex(x=>String(x.id)===key);
+ if(existing>=0){if(slip[existing].pick===pick){slip.splice(existing,1);}else{slip[existing]={id:key,pick,home,away,odd:Number(odd),market:'Match result',pickLabel:pick==='1'?'Home win':pick==='X'?'Draw':'Away win'};}}
+ else slip.push({id:key,pick,home,away,odd:Number(odd),market:'Match result',pickLabel:pick==='1'?'Home win':pick==='X'?'Draw':'Away win'});
+ renderSlip();document.querySelectorAll('.match[data-event-id="'+CSS.escape(key)+'"] .odd').forEach((b,i)=>b.classList.toggle('selected',['1','X','2'][i]===pick&&slip.some(x=>String(x.id)===key&&x.pick===pick)));
+}
+function addPick(id,pick){const m=fixtures.find(x=>x.id===id);if(!m)return;addMarketPick(id,pick,m.home,m.away,m.odds[['1','X','2'].indexOf(pick)]);}
+function removePick(id){slip=slip.filter(s=>String(s.id)!==String(id));renderSlip();document.querySelectorAll('.match[data-event-id="'+CSS.escape(String(id))+'"] .odd').forEach(b=>b.classList.remove('selected'))}
+function renderSlip(){
+ const odds=slip.reduce((a,s)=>a*Number(s.odd||1),1),total=slip.length?odds.toFixed(2):'0.00';
+ document.getElementById('count').textContent=slip.length;
+ const mobileCount=document.getElementById('mobile-slip-count');if(mobileCount)mobileCount.textContent=slip.length;
+ const circle=document.getElementById('totalodds-circle');if(circle)circle.textContent=total;
+ const mobileCircle=document.getElementById('mobile-total-odds-circle');if(mobileCircle)mobileCircle.textContent=total;
+ let box=document.getElementById('selections');document.getElementById('slipcalc').style.display=slip.length?'block':'none';
+ if(!slip.length){box.innerHTML='<div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div>';document.getElementById('totalodds').textContent='1.00';document.getElementById('return').textContent=money(0);return}
+ box.innerHTML=slip.map(s=>'<div class="selection"><button class="remove" onclick="removePick(\''+String(s.id).replace(/[^a-zA-Z0-9_-]/g,'')+'\')">×</button><strong>'+escapeHTML(s.home)+' vs '+escapeHTML(s.away)+'</strong><small>'+escapeHTML(s.pickLabel||(s.pick==='1'?'Home win':s.pick==='X'?'Draw':'Away win'))+' · <b style="color:var(--gold)">'+Number(s.odd).toFixed(2)+'</b></small></div>').join('');
+ calculate();
+}
+function calculate(){let stake=Number(document.getElementById('stake').value||0),odds=slip.reduce((a,s)=>a*Number(s.odd||1),1);document.getElementById('totalodds').textContent=odds.toFixed(2);document.getElementById('return').textContent=money(stake*odds);const circle=document.getElementById('totalodds-circle');if(circle)circle.textContent=slip.length?odds.toFixed(2):'0.00';const mobileCircle=document.getElementById('mobile-total-odds-circle');if(mobileCircle)mobileCircle.textContent=slip.length?odds.toFixed(2):'0.00'}
 function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const target=document.getElementById(id);if(target)target.classList.add('active');document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');if(id==='wallet')loadWallet();if(id==='mybets')loadBets();if(id==='admin')loadAdmin();if(id==='favorites'){};if(id!=='sports')document.querySelector('.betslip')?.classList.remove('mobile-open')}
 
 function toggleSearch(){const box=document.getElementById('mobilesearch');box.classList.toggle('open');if(box.classList.contains('open'))document.getElementById('homesearch').focus();}
@@ -722,3 +743,10 @@ render();syncSession();updateVirtualPointsUI();if(!token)openModal('login');load
 
 <!-- deployment refresh: 2026-11-12 -->
 </body></html>
+
+<style>
+.total-odds-circle{width:43px;height:43px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#07549a;color:#fff;border:2px solid #f5c400;font-size:11px;font-weight:900;box-shadow:0 0 0 3px #07549a18}
+.mobile-total-circle{position:absolute;top:-12px;right:calc(50% - 35px);min-width:43px;height:43px;padding:0 5px;border-radius:50%;display:grid;place-items:center;background:#f5c400;color:#172b42;border:3px solid #101722;font-size:10px;font-weight:900;box-shadow:0 2px 8px #0005}
+.bottom-slip{position:relative}
+@media(max-width:680px){.total-odds-circle{width:39px;height:39px;font-size:10px}.mobile-bottom .bottom-slip .mobile-total-circle{display:grid}.mobile-bottom .bottom-slip b{margin-top:0}}
+</style>
