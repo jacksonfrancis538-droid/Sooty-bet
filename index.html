@@ -319,7 +319,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
   <h4 style="margin-top:24px">Sports</h4><div class="navitem" onclick="selectHomeSport('football',this)">⚽ Football</div><div class="navitem" onclick="selectHomeSport('basketball',this)">🏀 Basketball</div><div class="navitem" onclick="selectHomeSport('tennis',this)">🎾 Tennis</div><div class="navitem" onclick="selectHomeSport('volleyball',this)">🏐 Volleyball</div><div class="navitem" onclick="selectHomeSport('esports',this)">🎮 Esports</div>
  </aside>
  <main>
-  <div class="mobile-tabs"><span class="chip active">⚽ Football</span><span class="chip">🔴 Live</span><span class="chip">🏀 Basketball</span><span class="chip">🎾 Tennis</span><span class="chip">🎮 Esports</span></div>
+  <div class="mobile-tabs"><button class="chip active" type="button" onclick="selectHomeSport('football',this)">⚽ Football</button><button class="chip" type="button" onclick="showPage('live',this)">🔴 Live</button><button class="chip" type="button" onclick="selectHomeSport('basketball',this)">🏀 Basketball</button><button class="chip" type="button" onclick="selectHomeSport('tennis',this)">🎾 Tennis</button><button class="chip" type="button" onclick="selectHomeSport('esports',this)">🎮 Esports</button></div>
   <section id="sports" class="page active">
 
    <div class="mobile-home">
@@ -335,15 +335,15 @@ button:disabled{opacity:.65;cursor:not-allowed}
     </div>
     <div class="mobile-section-head"><h2>Game zone <em>Sortbet NG Games</em></h2><button onclick="showPage('casino',null)">All ›</button></div>
     <div class="game-row"><button class="game-icon" onclick="openCasinoGame('coin')">🪙<small>Heads or Tails</small></button><button class="game-icon" onclick="openCasinoGame('dice')">🎲<small>Dice</small></button><button class="game-icon" onclick="openCasinoGame('roulette')">🎡<small>Roulette</small></button><button class="game-icon" onclick="openCasinoGame('slots')">🎰<small>Slots</small></button><button class="game-icon" onclick="openCasinoGame('crash')">🚀<small>Sky Rocket</small></button></div><div class="mobile-section-head"><h2>TOP-EVENTS</h2><button onclick="showPage('upcoming',null)">All ›</button></div>
-    <div class="event-row" onclick="showPage('upcoming',null)"><span class="event-ball purple">⚽</span><b>UEFA Champions League</b><span>›</span></div>
-    <div class="event-row" onclick="showPage('upcoming',null)"><span class="event-ball orange">⚽</span><b>Europa League</b><span>›</span></div>
+    <div class="event-row" role="button" tabindex="0" onclick="openCompetition('champions league')" onkeydown="if(event.key==='Enter'||event.key===' ')openCompetition('champions league')"><span class="event-ball purple">⚽</span><b>UEFA Champions League</b><span>›</span></div>
+    <div class="event-row" role="button" tabindex="0" onclick="openCompetition('europa league')" onkeydown="if(event.key==='Enter'||event.key===' ')openCompetition('europa league')"><span class="event-ball orange">⚽</span><b>Europa League</b><span>›</span></div>
    </div>
    <div class="hero"><div class="eyebrow">WELCOME TO SORTBET NG</div><h1>Make every moment<br>count.</h1><p>Follow the action, explore the markets and build your betslip in one place.</p><button class="btn primary" onclick="document.getElementById('matches').scrollIntoView({behavior:'smooth'})">Explore matches →</button></div>
    <div class="chips"><button class="chip active" onclick="selectHomeSport('all',this)">All sports</button><button class="chip" onclick="selectHomeSport('football',this)">Football</button><button class="chip" onclick="selectHomeSport('basketball',this)">Basketball</button><button class="chip" onclick="selectHomeSport('tennis',this)">Tennis</button><button class="chip" onclick="selectHomeSport('esports',this)">Esports</button></div>
    <div class="panel" id="matches"><div class="panel-title"><h3>Featured matches</h3><span class="muted" id="sportsupdated">Connecting to live sports feed…</span></div><div id="matchlist"></div></div>
   </section>
   <section id="live" class="page"><div class="panel"><div class="panel-title"><h3>Live sports centre</h3><span class="live">● LIVE SCORES</span></div><p class="muted">Live scores require a premium data feed. Free fixtures are shown below.</p><div id="livelist"></div></div></section>
-  <section id="upcoming" class="page"><div class="panel"><h3>Upcoming football</h3><p class="muted">Scheduled fixtures shown in Nigeria time. Odds are not enabled until a separate approved odds feed is connected.</p><div id="upcominglist"></div></div></section>
+  <section id="upcoming" class="page"><div class="panel"><div class="panel-title"><h3 id="upcoming-title">Upcoming football</h3><button class="chip" type="button" onclick="openCompetition('all')">All competitions</button></div><p class="muted" id="competition-note">Scheduled fixtures shown in Nigeria time. Odds are not enabled until a separate approved odds feed is connected.</p><div id="upcominglist"></div></div></section>
 
   <section id="virtuals" class="page virtual-page">
    <div class="virtual-hero"><div class="eyebrow">SORTBET NG ORIGINALS</div><h2>Virtual Sports Arena</h2><p>Fresh server-generated games, simulated odds and practice stakes. These points are separate from your cash wallet and have no cash value.</p><div class="virtual-points">Practice points: <b id="virtual-points-balance">10,000</b></div></div>
@@ -478,18 +478,21 @@ function sportsCard(m, live=false){
  return '<div class="match" data-event-id="'+escapeHTML(id)+'"><div class="match-meta"><span>'+escapeHTML(m.country?m.country+' · ':'')+escapeHTML(m.league)+'</span><span class="'+(live?'live':'muted')+'">'+status+'</span></div><div class="teams"><span class="team">'+h+'</span><span class="score">'+(live?(m.homeScore??0)+' - '+(m.awayScore??0):'VS')+'</span><span class="team">'+a+'</span></div>'+marketHtml+(m.venue?'<div class="muted" style="font-size:11px">'+escapeHTML(m.venue)+'</div>':'')+'<div class="muted" style="font-size:9px;margin-top:7px">Expanded market preview · illustrative odds, not live bookmaker prices</div></div>';
 }
 function showSportsMessage(id,message){document.getElementById(id).innerHTML='<div class="empty">'+escapeHTML(message)+'</div>'}
+let cachedLiveMatches=[],cachedUpcomingMatches=[],activeCompetition='all';
+function openCompetition(name){activeCompetition=name||'all';showPage('upcoming',null);renderCompetition();document.getElementById('upcoming')?.scrollIntoView({behavior:'smooth',block:'start'});}
+function renderCompetition(){const title=document.getElementById('upcoming-title'),note=document.getElementById('competition-note'),box=document.getElementById('upcominglist');if(!box)return;const label=activeCompetition==='all'?'Upcoming football':activeCompetition.replace(/\b\w/g,c=>c.toUpperCase());if(title)title.textContent=label;if(note)note.textContent=activeCompetition==='all'?'Scheduled fixtures shown in Nigeria time. Markets are preview prices until a verified bookmaker odds feed is connected.':'Showing fixtures tagged by the connected sports feed. If none appear, the provider has not returned this competition yet.';const rows=activeCompetition==='all'?cachedUpcomingMatches:cachedUpcomingMatches.filter(m=>String(m.league||m.competition||'').toLowerCase().includes(activeCompetition));box.innerHTML=rows.length?rows.map(m=>sportsCard(m,false)).join(''):'<div class="empty">No '+escapeHTML(label)+' fixtures are currently available from the connected sports feed. Try All competitions or check again after the next feed refresh.</div>';}
 async function refreshSports(){
  const updated=document.getElementById('sportsupdated');
  try{
   const [liveResult,nextResult]=await Promise.all([api('/api/sports/live'),api('/api/sports/upcoming')]);
-  const liveMatches=liveResult.matches||[], nextMatches=nextResult.matches||[];
+  const liveMatches=liveResult.matches||[], nextMatches=nextResult.matches||[];cachedLiveMatches=liveMatches;cachedUpcomingMatches=nextMatches;
   document.getElementById('livelist').innerHTML=liveMatches.length?liveMatches.map(m=>sportsCard(m,true)).join(''):'<div class="empty">There are no live football matches right now.</div>';
-  document.getElementById('upcominglist').innerHTML=nextMatches.length?nextMatches.map(m=>sportsCard(m,false)).join(''):'<div class="empty">No upcoming fixtures were returned by the provider.</div>';
+  renderCompetition();
   document.getElementById('matchlist').innerHTML=(liveMatches.length?liveMatches:nextMatches.slice(0,8)).map(m=>sportsCard(m,liveMatches.length>0)).join('')||'<div class="empty">No fixtures available right now.</div>';
   if(updated)updated.textContent='Fixtures updated '+new Date(nextResult.updatedAt).toLocaleTimeString('en-NG');
  }catch(e){
   const message=e.message||'Could not load sports data.';
-  showSportsMessage('livelist',message);showSportsMessage('upcominglist',message);showSportsMessage('matchlist',message);
+  cachedLiveMatches=[];cachedUpcomingMatches=[];showSportsMessage('livelist',message);showSportsMessage('upcominglist',message);showSportsMessage('matchlist',message);
   if(updated)updated.textContent='Sports feed not connected';
  }
 }
@@ -531,7 +534,7 @@ else if(casinoGame==='crash'){const target={safe:1.5,bold:2,moon:3}[choice],cras
 else{const gem=String(1+Math.floor(Math.random()*3));finish(choice===gem,2.7,'Lucky gem was number '+gem+'.')}}
 function initCasino(){setCasinoBalance(casinoBalance())}
 
-function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const target=document.getElementById(id);if(target)target.classList.add('active');document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');if(id==='wallet')loadWallet();if(id==='mybets')loadBets();if(id==='admin')loadAdmin();if(id==='favorites'){};if(id==='casino')initCasino();if(id!=='sports')document.querySelector('.betslip')?.classList.remove('mobile-open')}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const target=document.getElementById(id);if(target)target.classList.add('active');document.querySelectorAll('.navitem,.home-tab,.mobile-bottom button').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');if(id==='wallet')loadWallet();if(id==='mybets')loadBets();if(id==='admin')loadAdmin();if(id==='casino')initCasino();if(id==='upcoming')renderCompetition();if(id==='live')refreshSports();if(id!=='sports')document.querySelector('.betslip')?.classList.remove('mobile-open')}
 
 function selectHomeSport(sport,el){showPage('sports',null);document.querySelectorAll('.sport-cat,.chips .chip,.sportsbar-item').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');const home=document.querySelector('.mobile-home');if(home)home.style.display='block';if(sport==='all'||sport==='football'){refreshSports();return;}const name=sport.replace(/\b\w/g,c=>c.toUpperCase());document.getElementById('matchlist').innerHTML='<div class="empty">'+name+' fixtures are not connected to the current sports provider yet. Football fixtures remain available; this category will populate when its feed is connected.</div>';const u=document.getElementById('sportsupdated');if(u)u.textContent=name+' feed not connected';}
 function toggleSearch(){const box=document.getElementById('mobilesearch');box.classList.toggle('open');if(box.classList.contains('open'))document.getElementById('homesearch').focus();}
