@@ -88,6 +88,66 @@ function adminOnly(req,res,next) {
 function cleanText(v,max=100) { return typeof v === 'string' ? v.trim().slice(0,max) : ''; }
 function ref() { return 'SWD-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,7).toUpperCase(); }
 
+
+// Live football data is proxied server-side so the provider key is never exposed to browsers.
+const footballCache = new Map();
+async function footballRequest(path, cacheKey, ttlMs) {
+  const apiKey = process.env.API_FOOTBALL_KEY;
+  if (!apiKey) {
+    const error = new Error('Live sports data is not configured yet. Add API_FOOTBALL_KEY in the Render API environment.');
+    error.status = 503;
+    throw error;
+  }
+  const cached = footballCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < ttlMs) return cached.data;
+  const response = await fetch('https://v3.football.api-sports.io' + path, {
+    headers: { 'x-apisports-key': apiKey }
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok || (body.errors && Object.keys(body.errors).length)) {
+    console.error('Football provider error:', response.status, body.errors || body.message || 'Unknown error');
+    const error = new Error('Sports data provider is temporarily unavailable. Please try again shortly.');
+    error.status = 502;
+    throw error;
+  }
+  const data = (body.response || []).map(item => ({
+    id: item.fixture?.id,
+    league: item.league?.name || 'Football',
+    country: item.league?.country || '',
+    home: item.teams?.home?.name || 'Home',
+    away: item.teams?.away?.name || 'Away',
+    homeLogo: item.teams?.home?.logo || null,
+    awayLogo: item.teams?.away?.logo || null,
+    homeScore: item.goals?.home,
+    awayScore: item.goals?.away,
+    status: item.fixture?.status?.short || 'NS',
+    statusText: item.fixture?.status?.long || '',
+    elapsed: item.fixture?.status?.elapsed ?? null,
+    kickoff: item.fixture?.date || null,
+    venue: item.fixture?.venue?.name || ''
+  }));
+  footballCache.set(cacheKey, { at: Date.now(), data });
+  return data;
+}
+app.get('/api/sports/live', async (_req, res) => {
+  try {
+    const matches = await footballRequest('/fixtures?live=all&timezone=Africa%2FLagos', 'live', 15000);
+    res.set('Cache-Control', 'no-store');
+    res.json({ matches, updatedAt: new Date().toISOString(), provider: 'API-Football' });
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message || 'Could not load live matches.' });
+  }
+});
+app.get('/api/sports/upcoming', async (_req, res) => {
+  try {
+    const matches = await footballRequest('/fixtures?next=30&timezone=Africa%2FLagos', 'upcoming', 300000);
+    res.set('Cache-Control', 'no-store');
+    res.json({ matches, updatedAt: new Date().toISOString(), provider: 'API-Football' });
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.message || 'Could not load upcoming matches.' });
+  }
+});
+
 app.get('/health', (_req,res)=>res.json({ok:true,service:'sooty-bet-api'}));
 app.post('/api/auth/register', async (req,res) => {
  try {
