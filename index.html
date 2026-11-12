@@ -582,9 +582,23 @@ async function loadVirtuals(){
  box.innerHTML='<div class="empty">Loading server-generated matches…</div>';
  try{const data=await api('/api/virtual/matches?sport='+encodeURIComponent(virtualSport));
  box.innerHTML=data.matches.length?data.matches.map(m=>{
- const markets=m.sport==='racing'?(m.runnerOdds||[]).map(r=>({key:r.name,label:r.name,odd:r.odd})):[
+ const markets=m.sport==='racing'?(m.runnerOdds||[]).map(r=>({key:r.name,label:r.name,odd:r.odd})):m.sport==='football'?[
+  {key:'home',label:'1 · '+m.home,odd:m.odds.home},
+  {key:'draw',label:'X · Draw',odd:m.odds.draw},
+  {key:'away',label:'2 · '+m.away,odd:m.odds.away},
+  {key:'btts_yes',label:'BTTS · Yes',odd:1.85},
+  {key:'btts_no',label:'BTTS · No',odd:1.95},
+  {key:'over_1_5',label:'Over 1.5 Goals',odd:1.28},
+  {key:'under_1_5',label:'Under 1.5 Goals',odd:3.35},
+  {key:'over_2_5',label:'Over 2.5 Goals',odd:1.82},
+  {key:'under_2_5',label:'Under 2.5 Goals',odd:1.96},
+  {key:'over_3_5',label:'Over 3.5 Goals',odd:2.75},
+  {key:'under_3_5',label:'Under 3.5 Goals',odd:1.38},
+  {key:'double_1x',label:'Double Chance · 1X',odd:1.28},
+  {key:'double_x2',label:'Double Chance · X2',odd:1.34},
+  {key:'double_12',label:'Double Chance · 12',odd:1.30}
+ ]:[
   {key:'home',label:m.home,odd:m.odds.home},
-  ...(m.sport==='football'?[{key:'draw',label:'Draw',odd:m.odds.draw}]:[]),
   {key:'away',label:m.away,odd:m.odds.away}
  ];
  const choices=markets.map((o,i)=>'<button type="button" class="virtual-market '+(i===0?'selected':'')+'" data-market="'+escapeHTML(o.key)+'" onclick="selectVirtualPick('+m.id+',this)">'+escapeHTML(o.label)+' <b>'+Number(o.odd).toFixed(2)+'</b></button>').join('');
@@ -622,7 +636,16 @@ function settleVirtualStake(match){
  const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]'),bet=pending.find(x=>x.matchId===match.id);
  if(!bet)return;
  const winner=match.result?.winner;
- const won=winner===bet.outcome;
+ const goals=Number(match.homeScore||0)+Number(match.awayScore||0);
+ const home=Number(match.homeScore||0),away=Number(match.awayScore||0);
+ let won=winner===bet.outcome;
+ if(bet.outcome==='btts_yes')won=home>0&&away>0;
+ else if(bet.outcome==='btts_no')won=home===0||away===0;
+ else if(/^over_[0-9]+_[0-9]+$/.test(bet.outcome))won=goals>Number(bet.outcome.split('_')[1]+'.'+bet.outcome.split('_')[2]);
+ else if(/^under_[0-9]+_[0-9]+$/.test(bet.outcome))won=goals<Number(bet.outcome.split('_')[1]+'.'+bet.outcome.split('_')[2]);
+ else if(bet.outcome==='double_1x')won=home>=away;
+ else if(bet.outcome==='double_x2')won=away>=home;
+ else if(bet.outcome==='double_12')won=home!==away;
  const payout=won?Math.floor(bet.stake*bet.odd):0;
  if(payout)localStorage.setItem('sooty_virtual_points',String(getVirtualPoints()+payout));
  localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending.filter(x=>x.matchId!==match.id)));
