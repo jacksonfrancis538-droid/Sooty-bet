@@ -1,0 +1,29 @@
+databases:
+  - name: sooty-bet-db
+    databaseName: sooty_bet_db
+    user: sooty_bet_db_user
+    plan: free
+    region: singapore
+
+services:
+  - type: web
+    name: sooty-bet-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sooty-bet-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: jacksonfrancis538@gmail.com
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FRONTEND_ORIGIN
+        value: https://sooty-bet.onrender.com
