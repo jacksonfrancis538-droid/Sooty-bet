@@ -25,7 +25,5 @@ services:
         value: jacksonfrancis538@gmail.com
       - key: ADMIN_PASSWORD
         sync: false
-      - key: API_FOOTBALL_KEY
-        sync: false
       - key: FRONTEND_ORIGIN
         value: https://sooty-bet.onrender.com
