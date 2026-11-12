@@ -373,11 +373,11 @@ app.post('/api/auth/register', async (req,res) => {
  try {
   const fullName=cleanText(req.body.fullName,120);
   const email=cleanText(req.body.email,254).toLowerCase();
-  const phone=cleanText(req.body.phone,20).replace(/[\\s()-]/g,'');
+  const phone=cleanText(req.body.phone,20).replace(/[\s()-]/g,'');
   const country=cleanText(req.body.country,2).toUpperCase()||'NG';
   const referralCode=cleanText(req.body.referralCode,20)||null;
   const password=typeof req.body.password==='string'?req.body.password:'';
-  if(fullName.length<2||!/^\\S+@\\S+\\.\\S+$/.test(email)||!/^\\+?[1-9]\\d{7,14}$/.test(phone)||country!=='NG'||password.length<12||req.body.acceptedTerms!==true)
+  if(fullName.length<2||!/^\S+@\S+\.\S+$/.test(email)||!/^\+?[1-9]\d{7,14}$/.test(phone)||country!=='NG'||password.length<12||req.body.acceptedTerms!==true)
    return res.status(400).json({error:'Check your name, email, Nigerian phone number, password and acceptance of the terms.'});
   const password_hash=await bcrypt.hash(password,12);
   const q=await pool.query('INSERT INTO users(email,phone,password_hash,full_name,country,referral_code,terms_accepted_at) VALUES($1,$2,$3,$4,$5,$6,NOW()) RETURNING id,email,phone,full_name,country,role,status,balance_kobo',[email,phone,password_hash,fullName,country,referralCode]);
