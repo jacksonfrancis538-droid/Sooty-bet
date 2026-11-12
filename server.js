@@ -240,8 +240,11 @@ function publicVirtualMatch(row,now=new Date()) {
  const visibleEvents=row.status==='scheduled'?[]:(row.events||[]).filter(e=>e.second<=elapsed);
  const lastScore=[...visibleEvents].reverse().find(e=>Number.isInteger(e.homeScore)||Number.isInteger(e.awayScore)||Number.isInteger(e.homeSets)||Number.isInteger(e.awaySets));
  const completed=row.status==='completed';
+ const market=crypto.createHash('sha256').update(row.match_code).digest();
+ const odds={home:Number((1.55+market[0]/100).toFixed(2)),draw:Number((2.8+market[1]/50).toFixed(2)),away:Number((1.65+market[2]/100).toFixed(2))};
+ const runnerOdds=(row.participants||[]).map((runner,index)=>({name:runner.name,odd:Number((2.1+market[(index+3)%market.length]/35).toFixed(2))}));
  return {
-  id:row.id,code:row.match_code,sport:row.sport,league:row.league,home:row.home,away:row.away,
+  id:row.id,code:row.match_code,sport:row.sport,league:row.league,home:row.home,away:row.away,odds,runnerOdds,
   participants:row.participants||[],status:row.status,durationSeconds:row.duration_seconds,elapsedSeconds:Math.min(elapsed,row.duration_seconds),
   homeScore:completed?row.home_score:(lastScore?.homeScore??lastScore?.homeSets??0),awayScore:completed?row.away_score:(lastScore?.awayScore??lastScore?.awaySets??0),
   events:visibleEvents,seedHash:row.seed_hash,seedReveal:completed?row.seed_secret:null,
@@ -259,6 +262,19 @@ async function ensureVirtualFixtures(sport) {
    [code,sport,sport==='racing'?'SOOTY VIRTUAL GRAND PRIX':'SOOTY VIRTUAL '+sport.toUpperCase(),pair[0],pair[1],JSON.stringify(raceParticipants),sport==='football'?90:sport==='basketball'?48:sport==='tennis'?78:45,i*2,crypto.createHash('sha256').update(seed).digest('hex'),seed]);
  }
 }
+async function createVirtualFixture(sport,offset=0) {
+ const pair=VIRTUAL_TEAMS[sport][Math.floor(Math.random()*VIRTUAL_TEAMS[sport].length)];
+ const seed=crypto.randomBytes(32).toString('hex'),code='SV-'+crypto.randomBytes(5).toString('hex').toUpperCase();
+ const raceParticipants=sport==='racing'?RACE_RUNNERS.map(name=>({name})): [];
+ await pool.query("INSERT INTO virtual_matches(match_code,sport,league,home,away,participants,duration_seconds,scheduled_at,seed_hash,seed_secret) VALUES($1,$2,$3,$4,$5,$6,$7,NOW()+($8 * INTERVAL '1 second'),$9,$10) ON CONFLICT(match_code) DO NOTHING",
+  [code,sport,sport==='racing'?'SOOTY VIRTUAL GRAND PRIX':'SOOTY VIRTUAL '+sport.toUpperCase(),pair[0],pair[1],JSON.stringify(raceParticipants),sport==='football'?90:sport==='basketball'?48:sport==='tennis'?78:45,offset,crypto.createHash('sha256').update(seed).digest('hex'),seed]);
+}
+async function generateVirtualBatch() {
+ for(const sport of Object.keys(VIRTUAL_TEAMS)) for(let i=0;i<5;i++) await createVirtualFixture(sport,i*2);
+}
+generateVirtualBatch().catch(e=>console.error('Initial virtual batch generation failed:',e.message));
+const virtualBatchTimer=setInterval(()=>generateVirtualBatch().catch(e=>console.error('Virtual batch generation failed:',e.message)),60000);
+virtualBatchTimer.unref();
 async function completeVirtualMatchIfDue(row) {
  if(row.status!=='live'||!row.started_at)return row;
  if(Date.now()-new Date(row.started_at).getTime()<row.duration_seconds*1000)return row;
@@ -270,7 +286,7 @@ app.get('/api/virtual/matches',async(req,res)=>{
   const sport=cleanText(req.query.sport,20).toLowerCase();
   if(!Object.hasOwn(VIRTUAL_TEAMS,sport))return res.status(400).json({error:'Choose football, basketball, tennis or racing.'});
   await ensureVirtualFixtures(sport);
-  const q=await pool.query("SELECT * FROM virtual_matches WHERE sport=$1 AND status<>'completed' ORDER BY CASE status WHEN 'live' THEN 0 ELSE 1 END,scheduled_at,id LIMIT 12",[sport]);
+  const q=await pool.query("SELECT * FROM virtual_matches WHERE sport=$1 AND status<>'completed' ORDER BY CASE status WHEN 'live' THEN 0 ELSE 1 END,scheduled_at DESC,id DESC LIMIT 20",[sport]);
   const rows=await Promise.all(q.rows.map(completeVirtualMatchIfDue));
   res.set('Cache-Control','no-store');res.json({sport,matches:rows.filter(x=>x.status!=='completed').map(x=>publicVirtualMatch(x))});
  }catch(e){res.status(500).json({error:'Could not load virtual fixtures.'});}
