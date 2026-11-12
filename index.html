@@ -342,7 +342,18 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .crown-shortcuts{display:grid;grid-template-columns:repeat(3,1fr);background:#2b2c31;border-radius:13px;margin-top:22px;padding:13px 4px}.crown-shortcuts button{background:transparent;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;font-size:24px;padding:8px 3px}.crown-shortcuts button+button{border-left:1px solid #555}.crown-shortcuts span{font-size:12px;text-align:center;line-height:1.3}
 .crown-account-list{background:#f4f4f7}.crown-account-list button{width:100%;min-height:68px;padding:0 18px;display:flex;align-items:center;gap:17px;background:transparent;border-bottom:1px solid #d4d4d8;color:#17181c;text-align:left;font-size:18px}.crown-account-list button>span{width:27px;text-align:center;font-size:22px}.crown-account-list button>b{margin-left:auto;font-size:26px;color:#777}.crown-account-list button small{margin-left:auto;color:#74767b;font-size:13px}.crown-signin{padding:20px}
 @media(min-width:800px){.crown-me-page{max-width:850px;margin:0 auto;border-radius:12px;overflow:hidden}.crown-profile{padding:30px}.crown-account-list button{padding:0 30px}}
-</style></head>
+</style>
+<meta name="theme-color" content="#091525">
+<meta name="application-name" content="SORTBET NG">
+<meta name="apple-mobile-web-app-title" content="SORTBET NG">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="/icons/sortbet-icon.svg">
+<link rel="apple-touch-icon" href="/icons/sortbet-icon.svg">
+</head>
 <body>
 <header class="top">
  <button class="deposit-shortcut" id="depositbtn" type="button" onclick="showPage('wallet',null)" aria-label="Open deposit"><span class="deposit-plus">+</span><span class="balance" id="balance">₦0.00</span></button>
@@ -1215,4 +1226,24 @@ button.primary,.btn.primary,.place{background:linear-gradient(135deg,#13b96c,#07
  .home-tabs{padding-inline:clamp(15px,3vw,45px)!important}
  .side{position:sticky;top:12px;align-self:start}
 }
+</style>
+<script>
+// Installable SORTBET NG app shell. API requests are intentionally never cached.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(() => {});
+  });
+}
+</script>
+<style id="sortbet-installed-app-polish">
+html{min-height:100%;background:#091525;-webkit-text-size-adjust:100%;overscroll-behavior-y:contain}
+body{min-height:100dvh;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:contain}
+button,a,[role="button"]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+@media(max-width:680px){
+ body{padding-top:env(safe-area-inset-top);padding-bottom:calc(72px + env(safe-area-inset-bottom))!important}
+ .top{height:calc(62px + env(safe-area-inset-top))!important;min-height:calc(62px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)!important}
+ .mobile-bottom{height:calc(72px + env(safe-area-inset-bottom))!important;padding-bottom:calc(5px + env(safe-area-inset-bottom))!important}
+ .auth-screen{padding-top:calc(12px + env(safe-area-inset-top));padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+}
+@media(display-mode:standalone){body{user-select:none;-webkit-user-select:none}input,textarea,[contenteditable="true"]{user-select:text;-webkit-user-select:text}}
 </style>
