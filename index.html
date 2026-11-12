@@ -275,13 +275,24 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .auth-notice{display:none;margin-top:12px;padding:10px;border:1px solid #3c5672;border-radius:8px;background:#10243a;color:#c4d9ee;font-size:12px;line-height:1.5}
 .auth-notice.show{display:block}
 @media(max-width:480px){.auth-screen{padding:18px 14px}.auth-card{padding:26px 21px;border-radius:15px}.auth-brand{font-size:25px}.auth-subtitle{margin-bottom:22px}}
+
+/* Logout confirmation dialog */
+.logout-confirm{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:20px;background:#020812d9;backdrop-filter:blur(5px)}
+.logout-confirm.show{display:flex}
+.logout-confirm-card{width:min(390px,100%);padding:26px 22px;border:1px solid #2d4967;border-radius:16px;background:#101d2d;color:#f4f8ff;box-shadow:0 20px 70px #0009;text-align:center}
+.logout-confirm-card h2{font-size:21px;margin:0 0 9px}
+.logout-confirm-card p{font-size:14px;line-height:1.55;color:#aebfd1;margin:0 0 22px}
+.logout-confirm-actions{display:flex;gap:10px}
+.logout-confirm-actions button{flex:1;min-height:46px;border-radius:9px;font-weight:800}
+.logout-cancel{background:#20344b;color:#e5effa;border:1px solid #38516d}
+.logout-yes{background:#0879df;color:#fff}
 </style>
 </head>
 <body>
 <header class="top">
  <button class="deposit-shortcut" id="depositbtn" type="button" onclick="showPage('wallet',null)" aria-label="Open deposit"><span class="deposit-plus">+</span><span class="balance" id="balance">—— ₦</span></button>
  <div class="header-brand"><div class="brand">SOOTY<span>BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
- <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="search-toggle" type="button" onclick="toggleSearch()" aria-label="Search">⌕</button><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="logout()">Log out</button></div>
+ <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="search-toggle" type="button" onclick="toggleSearch()" aria-label="Search">⌕</button><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="requestLogout()">Log out</button></div>
 </header>
 <div class="mobile-search" id="mobilesearch"><input id="homesearch" type="search" placeholder="Search teams, leagues or games" oninput="filterHomeSearch(this.value)"><button type="button" onclick="toggleSearch()">Close</button></div>
 <nav class="home-tabs" aria-label="Main navigation">
@@ -383,7 +394,18 @@ button:disabled{opacity:.65;cursor:not-allowed}
 </nav>
 <footer class="footer">© 2026 SOOTY BET · Your Game. Your Odds. Your Victory. · 18+ · Please gamble responsibly.<br>Preview environment — not licensed for real-money betting.</footer>
 <section class="auth-screen" id="authscreen" aria-label="SOOTY BET account access"><div class="auth-wrap"><button class="auth-back" type="button" onclick="closeModal()">← Back to SOOTY BET</button><div class="auth-card"><div class="auth-brand">SOOTY<span>BET</span></div><p class="auth-subtitle" id="authsubtitle">Welcome back. Log in to your account.</p><form onsubmit="event.preventDefault();submitAuth()"><label for="email">Email or Phone</label><input class="field" id="email" type="text" autocomplete="username" required placeholder="Enter your email or phone number"><label for="password">Password</label><input class="field" id="password" type="password" autocomplete="current-password" required placeholder="Enter your password"><button class="auth-forgot" type="button" onclick="showAuthNotice('Password reset is not connected yet. Please contact SOOTY BET support for help recovering access.')">Forgot password?</button><button class="auth-login-btn" id="authbutton" type="submit">Log in</button></form><p class="auth-message" id="autherror" role="alert"></p><div class="auth-notice" id="authnotice"></div><button class="auth-bio" type="button" onclick="showAuthNotice('Face ID or biometric sign-in is not enabled in this web version yet.')"><span class="auth-bio-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M9 10v2m6-2v2m-6 4q3 3 6 0"/></svg></span><span>Use Face ID / Biometrics</span></button><p class="auth-switch" id="authswitchtext">Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button></p><p class="auth-foot">SOOTY BET · 18+ · Please gamble responsibly</p></div></div></section>
-<script>
+
+<section class="logout-confirm" id="logout-confirm" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title">
+ <div class="logout-confirm-card">
+  <h2 id="logout-confirm-title">Log out?</h2>
+  <p>Are you sure you want to log out of your SOOTY BET account?</p>
+  <div class="logout-confirm-actions">
+   <button class="logout-cancel" type="button" onclick="cancelLogout()">Cancel</button>
+   <button class="logout-yes" type="button" onclick="logoutNow()">Yes, log out</button>
+  </div>
+ </div>
+</section>
+\n<script>
 // Configure this URL to match the deployed API. For local development: http://localhost:4000
 const API_BASE = 'https://sooty-bet-api.onrender.com';
 const fixtures=[
@@ -473,7 +495,9 @@ function clearSootyCache(){localStorage.removeItem(SOOTY_SETTINGS_KEY);loadAppSe
 
 function savePayoutDetails(){const bank=document.getElementById("savedbank").value.trim();const name=document.getElementById("savedname").value.trim();const account=document.getElementById("savedaccount").value.trim();if(!bank||!name||!/^\d{10}$/.test(account)){document.getElementById("savedetailsmessage").textContent="Enter all details and a valid 10-digit account number.";return;}localStorage.setItem("sooty_payout_details",JSON.stringify({bank,name,account}));document.getElementById("savedetailsmessage").textContent="Details saved on this device.";}
 function loadPayoutDetails(){try{const d=JSON.parse(localStorage.getItem("sooty_payout_details")||"null");if(d){document.getElementById("savedbank").value=d.bank||"";document.getElementById("savedname").value=d.name||"";document.getElementById("savedaccount").value=d.account||"";document.getElementById("withdrawbank").value=d.bank||"";document.getElementById("withdrawname").value=d.name||"";document.getElementById("withdrawaccount").value=d.account||"";}}catch(e){}}
-function logout(){token=null;user=null;try{localStorage.removeItem('sooty_token');localStorage.removeItem('sooty_user')}catch(e){};document.getElementById('balance').textContent='₦0.00';document.getElementById('walletbal').textContent='₦0.00';document.getElementById('walletentries').textContent='Sign in to view your wallet.';document.getElementById('betsmessage').textContent='Sign in to load your bet history.';document.getElementById('betslist').textContent='No bets loaded';document.getElementById('withdrawhistory').textContent='Sign in to view withdrawal requests.';syncSession();showPage('sports',null);openModal('login');}
+function requestLogout(){const box=document.getElementById("logout-confirm");box.classList.add("show");document.body.style.overflow="hidden";}
+function cancelLogout(){document.getElementById("logout-confirm").classList.remove("show");document.body.style.overflow="";}
+function logoutNow(){cancelLogout();token=null;user=null;try{localStorage.removeItem('sooty_token');localStorage.removeItem('sooty_user')}catch(e){};document.getElementById('balance').textContent='₦0.00';document.getElementById('walletbal').textContent='₦0.00';document.getElementById('walletentries').textContent='Sign in to view your wallet.';document.getElementById('betsmessage').textContent='Sign in to load your bet history.';document.getElementById('betslist').textContent='No bets loaded';document.getElementById('withdrawhistory').textContent='Sign in to view withdrawal requests.';syncSession();showPage('sports',null);openModal('login');}
 async function loadWallet(){if(!token){document.getElementById('walletentries').textContent='Sign in to view your wallet.';return}try{const w=await api('/api/wallet');const bal=Number(w.balanceKobo)/100;document.getElementById('balance').textContent=money(bal);document.getElementById('walletbal').textContent=money(bal);document.getElementById('walletentries').innerHTML='<h4>Recent wallet ledger</h4>'+(w.entries.length?w.entries.map(e=>`<div class="calc"><span>${escapeHTML(e.type)} · ${new Date(e.createdAt).toLocaleString()}</span><b>${money(Number(e.amountKobo)/100)}</b></div>`).join(''):'No wallet entries yet.');}catch(e){document.getElementById('walletentries').textContent=e.message}}
 async function loadBets(){if(!token){document.getElementById('betsmessage').textContent='Sign in to load your bet history.';return}try{const bets=await api('/api/bets');document.getElementById('betsmessage').textContent=`${bets.length} recorded bet(s).`;document.getElementById('betslist').innerHTML=bets.length?bets.map(b=>`<div class="match"><b>${escapeHTML(b.reference||b.id)}</b><div class="match-meta"><span>${escapeHTML(b.status)}</span><span>${new Date(b.createdAt).toLocaleString()}</span></div><div class="calc"><span>Stake</span><b>${money(Number(b.stakeKobo)/100)}</b></div><div class="calc"><span>Potential return</span><b>${money(Number(b.potentialKobo)/100)}</b></div></div>`).join(''):'No bets recorded.';}catch(e){document.getElementById('betsmessage').textContent=e.message}}
 async function loadAdminVerification(){
