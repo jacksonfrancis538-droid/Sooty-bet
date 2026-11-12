@@ -721,7 +721,7 @@ function syncSession(){
  document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';const adminEntry=document.getElementById('adminmenuentry');if(adminEntry)adminEntry.style.display=token&&saved?.role==='admin'?'flex':'none';document.getElementById('balance').style.display='inline-flex';document.getElementById('balance').textContent='₦0.00';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';loadDemoWalletUI();
  loadAppSettings();
  if(token)loadWallet().catch(()=>{});
- document.getElementById('accounttext').textContent=token?`Signed in as ${saved?.email||saved?.phone||'account'} · Status: ${saved?.status||'active'} · Role: ${saved?.role||'user'}`:'Log in or create an account to view your profile.';
+ const accountText=document.getElementById('accounttext');if(accountText)accountText.textContent=token?`Signed in as ${saved?.email||saved?.phone||'account'} · Status: ${saved?.status||'active'} · Role: ${saved?.role||'user'}`:'Log in or create an account to view your profile.';
  if(!token){document.getElementById('balance').textContent='₦0.00';document.getElementById('walletbal').textContent='₦0.00';}
 }
 
