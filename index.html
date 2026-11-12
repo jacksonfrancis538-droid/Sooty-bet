@@ -220,6 +220,34 @@ body{background:#edf2f7;color:#172b42}
 .settings-logout{color:#ff777d}.settings-logout .settings-icon{background:#3a2025;color:#ff858a}
 @media(max-width:680px){.settings-page{padding:0 1px}.settings-title h2{font-size:21px}.settings-row{padding:10px 12px;gap:10px;min-height:60px}.settings-copy b{font-size:12px}.settings-copy small{font-size:10px}.settings-select{max-width:108px;font-size:11px}.settings-icon{width:32px;height:32px;flex-basis:32px}.settings-status{font-size:10px}}
 
+
+/* Readability and usability polish — preserve the existing SOOTY BET design */
+body{line-height:1.55}
+p{line-height:1.6}
+button,.navitem,.chip,.odd{ -webkit-tap-highlight-color:transparent }
+button{min-height:40px}
+.field,.stake,.mobile-search input{min-height:44px;font-size:14px;line-height:1.4}
+.match-meta,.odd small,.selection small,.stat small,.tag,.eyebrow,.section-head,.side h4{font-size:11px;line-height:1.45}
+.muted,.notice,.empty{line-height:1.55}
+.panel-title h3,.slip-head h3{line-height:1.35}
+.team{line-height:1.4;overflow-wrap:anywhere}
+.odd{min-height:44px}
+.navitem{min-height:40px;align-items:center}
+.chip{min-height:38px;display:inline-flex;align-items:center;justify-content:center}
+.btn,.place{line-height:1.35}
+input,select,textarea{font:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.navitem:focus-visible,.odd:focus-visible{outline:3px solid #2388df;outline-offset:2px}
+button:disabled{opacity:.65;cursor:not-allowed}
+@media(max-width:680px){
+ body{font-size:14px;line-height:1.55}
+ .mobile-bottom button{min-height:48px;font-size:10px;line-height:1.35}
+ .sport-cat{min-height:60px}
+ .promo{min-height:112px}
+ .event-row{line-height:1.45}
+ .mobile-section-head h2{line-height:1.35}
+ .match-meta,.odd small,.selection small{font-size:11px}
+ .top-actions .balance{font-size:12px!important}
+}
 </style>
 </head>
 <body>
