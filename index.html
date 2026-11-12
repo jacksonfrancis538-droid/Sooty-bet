@@ -333,6 +333,15 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .bets-history-page{background:#f5f5f8!important;color:#17181c!important;min-height:calc(100vh - 150px);padding:0 0 35px!important}.bets-topbar{height:62px;background:#292a2e;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 18px}.cashout-help,.bets-balance{background:transparent;color:#fff;font-size:15px;display:flex;align-items:center;gap:9px}.bets-balance b{color:#f4e900}.bets-tabs{display:grid;grid-template-columns:1fr 1fr;background:#292a2e;padding:0 9%;gap:8px}.bets-tabs button{padding:16px 5px;background:#44454a;color:white;border-radius:13px 13px 0 0;font-weight:700;font-size:15px}.bets-tabs button.active{background:#f5f5f8;color:#17181c}.bets-message{padding:18px 20px;text-align:center;color:#6e7076}.bets-list{padding:12px 14px}.bets-empty{text-align:center;padding:100px 20px 140px;color:#1b1c20}.bets-empty>div{font-size:68px;margin-bottom:20px}.bets-empty h3{font-size:21px;margin:0 0 8px}.bets-empty p{font-size:15px;color:#707279;max-width:380px;margin:0 auto 22px}.bets-signin{background:#ed0028;color:#fff;border-radius:28px;padding:13px 38px;font-weight:700}.bet-ticket-card{background:#fff;border:1px solid #dedee2;border-radius:12px;padding:15px;margin-bottom:12px;box-shadow:0 2px 6px #0000000a}.bet-ticket-head,.bet-ticket-summary{display:flex;justify-content:space-between;gap:12px;align-items:center}.bet-ticket-head{margin-bottom:5px}.bet-ticket-card>small,.bet-ticket-leg small{display:block;color:#777982;font-size:12px}.bet-status{font-size:11px;font-weight:700;border-radius:20px;padding:5px 9px}.bet-status.open{background:#e4f7ed;color:#087b42}.bet-status.settled{background:#eeeef1;color:#54565c}.bet-ticket-summary{padding:10px 0;border-bottom:1px solid #eee;color:#53555b;font-size:13px}.bet-ticket-leg{padding:10px 0;border-bottom:1px solid #eee}.bet-ticket-leg b{font-size:13px}.ticket-detail-btn{margin-top:12px;background:#ed0028;color:#fff;border-radius:7px;padding:10px 14px;font-weight:700}
 #azmenu{padding:18px}.azmenu-head h2{margin:0;font-size:24px}.azmenu-head p{color:var(--muted);margin:4px 0 18px}.azmenu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.azmenu-grid button{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:14px 11px;display:flex;align-items:center;gap:10px;text-align:left;color:var(--white);font-size:22px;min-width:0}.azmenu-grid button span{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}.azmenu-grid button b{font-size:13px}.azmenu-grid button small{font-size:10px;color:var(--muted);font-weight:400}
 @media(min-width:800px){.mobile-bottom{display:none}.bets-history-page{max-width:850px;margin:0 auto;border-radius:12px;overflow:hidden}.azmenu-grid{grid-template-columns:repeat(3,1fr)}}
+</style><style id="crown-account-screen">
+.crown-me-page{padding:0!important;background:#f4f4f7!important;color:#191a1e!important;min-height:calc(100vh - 150px)}
+.crown-profile{background:#171b1e;color:#fff;padding:26px 18px 18px}
+.crown-profile-main{display:flex;align-items:center;gap:13px}.crown-avatar{width:65px;height:65px;border-radius:50%;display:grid;place-items:center;background:#e8e8eb;font-size:36px;border:3px solid #555}.crown-profile-name{flex:1;min-width:0}.crown-profile-name h2{font-size:20px;margin:0 0 6px;overflow-wrap:anywhere}.crown-profile-name p{color:#96999d;margin:0;font-size:14px}.crown-settings{background:transparent;color:#fff;font-size:26px;padding:8px}
+.crown-total{display:flex;align-items:center;gap:13px;margin:48px 0 25px;font-size:16px}.crown-total strong{font-size:29px;margin-left:auto}.crown-total button{background:transparent;color:#fff;font-size:23px}
+.crown-wallet-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.crown-wallet-actions button{height:58px;border-radius:9px;background:#007b2d;color:white;font-weight:800;font-size:16px}.crown-wallet-actions button+button{background:transparent;border:1px solid #008b39;color:#00933e}
+.crown-shortcuts{display:grid;grid-template-columns:repeat(3,1fr);background:#2b2c31;border-radius:13px;margin-top:22px;padding:13px 4px}.crown-shortcuts button{background:transparent;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;font-size:24px;padding:8px 3px}.crown-shortcuts button+button{border-left:1px solid #555}.crown-shortcuts span{font-size:12px;text-align:center;line-height:1.3}
+.crown-account-list{background:#f4f4f7}.crown-account-list button{width:100%;min-height:68px;padding:0 18px;display:flex;align-items:center;gap:17px;background:transparent;border-bottom:1px solid #d4d4d8;color:#17181c;text-align:left;font-size:18px}.crown-account-list button>span{width:27px;text-align:center;font-size:22px}.crown-account-list button>b{margin-left:auto;font-size:26px;color:#777}.crown-account-list button small{margin-left:auto;color:#74767b;font-size:13px}.crown-signin{padding:20px}
+@media(min-width:800px){.crown-me-page{max-width:850px;margin:0 auto;border-radius:12px;overflow:hidden}.crown-profile{padding:30px}.crown-account-list button{padding:0 30px}}
 </style></head>
 <body>
 <header class="top">
@@ -436,7 +445,24 @@ button:disabled{opacity:.65;cursor:not-allowed}
 <div class="wallet-section"><div class="panel-title"><h3>Transaction history</h3><button class="btn ghost" type="button" onclick="loadWallet()">Refresh</button></div><div id="walletentries" class="muted">Sign in to view transactions.</div></div>
 <div class="wallet-section"><h3>Withdrawal history</h3><div id="withdrawhistory" class="muted">Sign in to view withdrawal requests.</div></div>
 </div></section>
-  <section id="account" class="page"><div class="panel"><h3>My account</h3><p class="muted" id="accounttext">Log in or create an account to view your profile.</p><button class="btn primary" onclick="openModal('login')">Log in</button></div></section>
+  <section id="account" class="page crown-me-page">
+ <div class="crown-profile">
+  <div class="crown-profile-main"><div class="crown-avatar">👤</div><div class="crown-profile-name"><h2 id="me-name">Welcome</h2><p id="me-country">Account · Nigeria</p></div><button class="crown-settings" onclick="showPage('settings',null)" aria-label="Settings">⚙</button></div>
+  <div class="crown-total"><span>Total Balance</span><strong id="me-balance">₦0.00</strong><button onclick="toggleMeBalance()" aria-label="Show or hide balance">◎</button></div>
+  <div class="crown-wallet-actions"><button onclick="showPage('wallet',null);loadWallet()">▣ &nbsp; Deposit</button><button onclick="showPage('wallet',null);loadWallet()">↗ &nbsp; Withdraw</button></div>
+  <div class="crown-shortcuts"><button onclick="showPage('mybets',null);selectBetTab('open')">🎟<span>Sports Bet History</span></button><button onclick="showPage('wallet',null);loadWallet()">⟳<span>Transaction Records</span></button><button onclick="showPage('azmenu',null)">🎁<span>Gifts &amp; Rewards</span></button></div>
+ </div>
+ <div class="crown-account-list">
+  <button onclick="showPage('mybets',null);selectBetTab('open')"><span>🏆</span>My Matches <b>›</b></button>
+  <button onclick="showPage('wallet',null);loadWallet()"><span>▣</span>My Wallet <b>›</b></button>
+  <button onclick="showPage('settings',null)"><span>♙</span>My Account <small>Country &amp; email</small><b>›</b></button>
+  <button onclick="showPage('settings',null)"><span>♧</span>Customer Service <b>›</b></button>
+  <button onclick="showPage('azmenu',null)"><span>♡</span>Promotions <b>›</b></button>
+  <button onclick="showPage('wallet',null);loadWallet()"><span>◷</span>Transaction History <b>›</b></button>
+  <button onclick="requestLogout()"><span>⇥</span>Log Out <b>›</b></button>
+ </div>
+ <div class="crown-signin" id="me-signin" style="display:none"><button class="btn primary" onclick="openModal('login')">Sign in</button></div>
+ </section>
   <section id="settings" class="page settings-page">
    <div class="settings-title"><h2>Settings</h2><p class="muted">Manage your account, security and app preferences</p></div>
    <div class="settings-group"><h3>ACCOUNT MANAGEMENT</h3>
@@ -656,7 +682,7 @@ else if(casinoGame==='crash'){const target={safe:1.5,bold:2,moon:3}[choice],cras
 else{const gem=String(1+Math.floor(Math.random()*3));finish(choice===gem,2.7,'Lucky gem was number '+gem+'.')}}
 function initCasino(){setCasinoBalance(casinoBalance())}
 
-function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const target=document.getElementById(id);if(target)target.classList.add('active');document.querySelectorAll('.navitem,.home-tab,.mobile-bottom button').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');if(id==='wallet')loadWallet();if(id==='mybets')loadBets();if(id==='admin')loadAdmin();if(id==='casino')initCasino();if(id==='upcoming')renderCompetition();if(id==='live')refreshSports();if(id!=='sports')document.querySelector('.betslip')?.classList.remove('mobile-open')}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const target=document.getElementById(id);if(target)target.classList.add('active');document.querySelectorAll('.navitem,.home-tab,.mobile-bottom button').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');if(id==='wallet')loadWallet();if(id==='mybets')loadBets();if(id==='admin')loadAdmin();if(id==='casino')initCasino();if(id==='upcoming')renderCompetition();if(id==='live')refreshSports();if(id!=='sports')document.querySelector('.betslip')?.classList.remove('mobile-open');if(id==='account')loadMeProfile();}
 
 function selectHomeSport(sport,el){showPage('sports',null);document.querySelectorAll('.sport-cat,.chips .chip,.sportsbar-item').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');const home=document.querySelector('.mobile-home');if(home)home.style.display='block';if(sport==='all'||sport==='football'){refreshSports();return;}const name=sport.replace(/\b\w/g,c=>c.toUpperCase());document.getElementById('matchlist').innerHTML='<div class="empty">'+name+' fixtures are not connected to the current sports provider yet. Football fixtures remain available; this category will populate when its feed is connected.</div>';const u=document.getElementById('sportsupdated');if(u)u.textContent=name+' feed not connected';}
 function toggleSearch(){const box=document.getElementById('mobilesearch');box.classList.toggle('open');if(box.classList.contains('open'))document.getElementById('homesearch').focus();}
@@ -786,6 +812,8 @@ async function setWithdrawalStatus(id,status){
 
 function copyDepositAccount(){alert('Real-money deposits are disabled in testing mode.');}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+// One-time cleanup of old locally stored practice/test tickets at the user's request.
+try{if(!localStorage.getItem('sortbet_ticket_cleanup_v1')){localStorage.removeItem('sooty_test_tickets_v1');localStorage.setItem('sortbet_ticket_cleanup_v1','done');}}catch(e){}
 function getTestTickets(){try{return JSON.parse(localStorage.getItem('sooty_test_tickets_v1')||'[]')}catch(e){return[]}}
 function saveTestTickets(rows){localStorage.setItem('sooty_test_tickets_v1',JSON.stringify(rows))}
 async function placeVirtualAccumulator(){
@@ -1006,6 +1034,18 @@ function startVirtualAnimation(){
 
 async function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
 render();syncSession();updateVirtualPointsUI();if(!token)openModal('login');loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}setInterval(()=>{if(token)loadWallet()},15000);window.addEventListener('focus',()=>{if(token)loadWallet()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)loadWallet()});
+
+let meBalanceVisible=true;
+function toggleMeBalance(){meBalanceVisible=!meBalanceVisible;const el=document.getElementById('me-balance');if(el)el.textContent=meBalanceVisible?(el.dataset.amount||'₦0.00'):'••••••';}
+async function loadMeProfile(){
+ const name=document.getElementById('me-name'),country=document.getElementById('me-country'),sign=document.getElementById('me-signin');
+ if(!token){if(name)name.textContent='Welcome';if(country)country.textContent='Account · Nigeria';if(sign)sign.style.display='block';document.getElementById('me-balance').textContent='₦0.00';return;}
+ if(sign)sign.style.display='none';
+ const full=user?.fullName||user?.name||user?.email||'My Account';
+ if(name)name.textContent=full;
+ if(country)country.textContent='Account · Nigeria';
+ try{const data=await api('/api/wallet');const amount=money(Number(data.balanceKobo||0)/100);const el=document.getElementById('me-balance');el.dataset.amount=amount;el.textContent=meBalanceVisible?amount:'••••••';}catch(e){document.getElementById('me-balance').textContent='₦—';}
+}
 </script>
 
 <style>
