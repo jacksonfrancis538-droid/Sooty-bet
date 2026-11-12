@@ -429,12 +429,11 @@ app.patch('/api/admin/users/:id/verification',auth,adminOnly,async(req,res)=>{
  res.json({ok:true,user:q.rows[0],message:decision==='approved'?'Age verified. Account activated.':'Verification rejected.'});
 });
 app.get('/api/admin/overview',auth,adminOnly,async(_req,res)=>{
- const [users,bets,pending]=await Promise.all([
-  pool.query('SELECT count(*)::int n FROM users WHERE role=\'user\''),
-  pool.query('SELECT 0::int n'),
-  pool.query("SELECT count(*)::int n FROM users WHERE role='user' AND status='pending_verification'")
+ const [users,pendingWithdrawals]=await Promise.all([
+  pool.query("SELECT count(*)::int n FROM users WHERE role='user'"),
+  pool.query("SELECT count(*)::int n FROM withdrawals WHERE status IN ('pending','approved')")
  ]);
- res.json({users:users.rows[0].n,bets:bets.rows[0].n,pendingVerification:pending.rows[0].n,note:'Withdrawal requests are managed below. No automated payouts are connected.'});
+ res.json({users:users.rows[0].n,bets:0,pendingWithdrawals:pendingWithdrawals.rows[0].n,note:'Customer accounts, wallet ledger and withdrawal operations are available. No sportsbook bets are recorded in the server ledger yet.'});
 });
 app.post('/api/withdrawals',auth,async(req,res)=>{
  const amountNaira=Number(req.body.amount);
@@ -484,5 +483,24 @@ app.patch('/api/admin/withdrawals/:id',auth,adminOnly,async(req,res)=>{
   res.json({ok:true,status,message:status==='paid'?'Marked paid. Confirm the bank transfer has actually succeeded.':status==='approved'?'Approved. Make the bank transfer manually before marking paid.':'Rejected; reserved wallet funds returned.'});
  } catch { await client.query('ROLLBACK'); res.status(500).json({error:'Could not update request.'}); }
  finally { client.release(); }
+});
+app.get('/api/admin/finance',auth,adminOnly,async(_req,res)=>{
+ try{
+  const [wallet,credits,debits,pending,paid,recent]=await Promise.all([
+   pool.query('SELECT COALESCE(SUM(balance_kobo),0)::text total FROM users WHERE role=\'user\''),
+   pool.query("SELECT COALESCE(SUM(amount_kobo),0)::text total FROM wallet_ledger WHERE amount_kobo>0"),
+   pool.query("SELECT COALESCE(SUM(ABS(amount_kobo)),0)::text total FROM wallet_ledger WHERE amount_kobo<0"),
+   pool.query("SELECT count(*)::int n FROM withdrawals WHERE status IN ('pending','approved')"),
+   pool.query("SELECT count(*)::int n FROM withdrawals WHERE status='paid'"),
+   pool.query("SELECT l.id,l.type,l.amount_kobo,l.reference,l.description,l.created_at,u.email,u.phone FROM wallet_ledger l JOIN users u ON u.id=l.user_id ORDER BY l.created_at DESC LIMIT 60")
+  ]);
+  res.json({walletLiabilityKobo:wallet.rows[0].total,totalCreditsKobo:credits.rows[0].total,totalDebitsKobo:debits.rows[0].total,pendingWithdrawals:pending.rows[0].n,paidWithdrawals:paid.rows[0].n,recentTransactions:recent.rows});
+ }catch(e){console.error('Admin finance overview failed:',e.message);res.status(500).json({error:'Could not load financial overview.'});}
+});
+app.get('/api/admin/customers',auth,adminOnly,async(_req,res)=>{
+ try{
+  const q=await pool.query("SELECT id,full_name,email,phone,country,status,balance_kobo,created_at FROM users WHERE role='user' ORDER BY created_at DESC LIMIT 250");
+  res.json(q.rows);
+ }catch(e){res.status(500).json({error:'Could not load customer accounts.'});}
 });
 app.listen(PORT,'0.0.0.0',()=>console.log('SOOTY BET API listening on '+PORT));
