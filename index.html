@@ -149,7 +149,7 @@ body{background:#edf2f7;color:#172b42}
 
 
 /* Requested SOOTYBET mobile top-page layout */
-.header-brand{position:absolute;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+.header-brand{position:static;transform:none;text-align:left;white-space:nowrap}
 .header-brand .brand{font-size:23px;letter-spacing:1px;color:#fff}
 .header-brand .brand span{color:#fff}
 .deposit-shortcut{display:flex;align-items:center;gap:7px;background:transparent;color:#fff;padding:0;z-index:1}
@@ -169,7 +169,7 @@ body{background:#edf2f7;color:#172b42}
 @media(max-width:680px){
  body{padding-bottom:78px}
  .top{height:58px;padding:0 10px;display:flex;justify-content:space-between;gap:5px}
- .header-brand{left:50%;transform:translateX(-50%)}
+ .header-brand{position:absolute;left:50%;transform:translateX(-50%);text-align:center}
  .header-brand .brand{font-size:21px}
  .header-brand .tag{display:none}
  .deposit-shortcut{gap:5px;min-width:0}
