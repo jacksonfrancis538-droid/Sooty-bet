@@ -61,6 +61,9 @@ CREATE TABLE IF NOT EXISTS wallet_ledger (
  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS withdrawals_status_created_idx ON withdrawals(status, created_at DESC);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_reviewed_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_note TEXT;
 `);
 
 const adminHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
@@ -176,11 +179,38 @@ app.get('/api/wallet',auth,async(req,res)=>{
  res.json({balanceKobo:q.rows[0]?.balance_kobo||0,entries:entries.rows.map(x=>({type:x.type,amountKobo:x.amount_kobo,reference:x.reference,description:x.description,createdAt:x.created_at}))});
 });
 app.get('/api/bets',auth,(_req,res)=>res.json([]));
+app.get('/api/admin/users/pending-verification',auth,adminOnly,async(_req,res)=>{
+ const q=await pool.query("SELECT id,email,phone,created_at FROM users WHERE role='user' AND status='pending_verification' ORDER BY created_at ASC LIMIT 200");
+ res.json(q.rows);
+});
+app.patch('/api/admin/users/:id/verification',auth,adminOnly,async(req,res)=>{
+ const decision=cleanText(req.body.decision,20);
+ const evidenceChecked=req.body.evidenceChecked===true;
+ const note=cleanText(req.body.note,300);
+ if(!['approved','rejected'].includes(decision)) return res.status(400).json({error:'Choose approve or reject.'});
+ if(!evidenceChecked) return res.status(400).json({error:'Confirm that you reviewed valid age evidence before submitting.'});
+ let dob=null;
+ if(decision==='approved'){
+  const raw=cleanText(req.body.dateOfBirth,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return res.status(400).json({error:'Enter the date of birth shown on the verified identity document.'});
+  const parsed=new Date(raw+'T00:00:00Z');
+  if(Number.isNaN(parsed.getTime())||parsed.toISOString().slice(0,10)!==raw) return res.status(400).json({error:'Enter a valid date of birth.'});
+  const today=new Date(); let age=today.getUTCFullYear()-parsed.getUTCFullYear();
+  const month=today.getUTCMonth()-parsed.getUTCMonth();
+  if(month<0||(month===0&&today.getUTCDate()<parsed.getUTCDate())) age--;
+  if(age<18) return res.status(403).json({error:'This user is under 18 and cannot be approved.'});
+  dob=raw;
+ }
+ const status=decision==='approved'?'active':'verification_rejected';
+ const q=await pool.query("UPDATE users SET status=$1,date_of_birth=$2,verification_reviewed_at=NOW(),verification_note=$3 WHERE id=$4 AND role='user' AND status='pending_verification' RETURNING id,email,phone,status,verification_reviewed_at",[status,dob,note||('Age verification '+decision),req.params.id]);
+ if(!q.rowCount) return res.status(404).json({error:'Pending user not found. Refresh the list.'});
+ res.json({ok:true,user:q.rows[0],message:decision==='approved'?'Age verified. Account activated.':'Verification rejected.'});
+});
 app.get('/api/admin/overview',auth,adminOnly,async(_req,res)=>{
  const [users,bets,pending]=await Promise.all([
   pool.query('SELECT count(*)::int n FROM users WHERE role=\'user\''),
   pool.query('SELECT 0::int n'),
-  pool.query("SELECT count(*)::int n FROM withdrawals WHERE status='pending'")
+  pool.query("SELECT count(*)::int n FROM users WHERE role='user' AND status='pending_verification'")
  ]);
  res.json({users:users.rows[0].n,bets:bets.rows[0].n,pendingVerification:pending.rows[0].n,note:'Withdrawal requests are managed below. No automated payouts are connected.'});
 });
