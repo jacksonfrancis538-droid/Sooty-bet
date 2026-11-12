@@ -411,7 +411,15 @@ button:disabled{opacity:.65;cursor:not-allowed}
   </section>
   <section id="admin" class="page"><div class="panel"><h3>SORTBET NG Admin</h3><p class="muted">Restricted to the configured administrator account.</p><div class="stats"><div class="stat"><b id="adminusers">—</b><small>Registered users</small></div><div class="stat"><b id="adminbets">—</b><small>Recorded bets</small></div><div class="stat"><b id="adminpending">—</b><small>Pending withdrawals</small></div></div><p class="muted" id="adminmessage">Sign in with the admin email to load requests.</p></div><div class="panel"><div class="panel-title"><h3>Age verification requests</h3><button class="btn ghost" onclick="loadAdminVerification()">Refresh</button></div><p class="muted" style="font-size:12px">Only approve after checking a valid official identity document through a secure verification process. Do not ask users to post identity documents in public chat.</p><div id="adminverification" class="muted">Admin sign-in required.</div></div><div class="panel"><div class="panel-title"><h3>Withdrawal requests</h3><button class="btn ghost" onclick="loadAdminWithdrawals()">Refresh</button></div><div id="adminwithdrawals" class="muted">Admin sign-in required.</div></div></section>
  </main>
- <aside class="betslip"><div class="slip-head"><h3>Bet slip</h3><div style="display:flex;align-items:center;gap:7px"><span class="total-odds-circle" id="totalodds-circle">0.00</span><span class="count" id="count">0</span><button type="button" class="slip-collapse" onclick="closeMobileSlip()" aria-label="Minimise betslip">⌄ Minimise</button></div></div><div id="selections"><div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div></div><div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm test bet</button><div class="notice">SANDBOX ONLY · Creates a test ticket. No real money is charged or paid.</div></div><div class="notice">Sample odds only. Not a live bookmaker offer.</div></aside>
+ <aside class="betslip"><div class="slip-head"><h3>Bet slip</h3><div style="display:flex;align-items:center;gap:7px"><span class="total-odds-circle" id="totalodds-circle">0.00</span><span class="count" id="count">0</span><button type="button" class="slip-collapse" onclick="closeMobileSlip()" aria-label="Minimise betslip">⌄ Minimise</button></div></div><div id="selections"><div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div></div>
+<div class="slip-code-tools">
+ <div class="slip-code-title">Betslip ID · share or load</div>
+ <button type="button" class="slip-code-create" onclick="createBetslipCode()">Generate 5-character load code</button>
+ <div id="betslip-code-result" class="slip-code-result" aria-live="polite">Your code will appear here.</div>
+ <div class="slip-code-load"><input id="betslip-code-input" type="text" maxlength="5" autocomplete="off" placeholder="Enter code e.g. ER2T3" aria-label="Betslip load code"><button type="button" onclick="loadBetslipCode()">Load</button></div>
+ <small class="slip-code-help">Share the code so another person can load these selections. Codes expire after 30 days.</small>
+</div>
+<div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm test bet</button><div class="notice">SANDBOX ONLY · Creates a test ticket. No real money is charged or paid.</div></div><div class="notice">Sample odds only. Not a live bookmaker offer.</div></aside>
 </div>
 <nav class="mobile-bottom" aria-label="Bottom navigation">
  <button class="active" onclick="showPage('sports',this);setBottomActive(this)"><b>🔥</b><span>Popular</span></button>
@@ -514,6 +522,34 @@ function renderSlip(){
  if(!slip.length){box.innerHTML='<div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div>';document.getElementById('totalodds').textContent='1.00';document.getElementById('return').textContent=money(0);return}
  box.innerHTML=slip.map(s=>'<div class="selection"><button class="remove" onclick="removePick(\''+String(s.id).replace(/[^a-zA-Z0-9_-]/g,'')+'\')">×</button><strong>'+escapeHTML(s.home)+' vs '+escapeHTML(s.away)+'</strong><small>'+escapeHTML(s.pickLabel||(s.pick==='1'?'Home win':s.pick==='X'?'Draw':'Away win'))+' · <b style="color:var(--gold)">'+Number(s.odd).toFixed(2)+'</b></small></div>').join('');
  calculate();
+}
+async function createBetslipCode(){
+ if(!slip.length){alert('Add selections to your betslip first.');return;}
+ const button=document.querySelector('.slip-code-create'),result=document.getElementById('betslip-code-result');
+ if(button){button.disabled=true;button.textContent='Creating code…';}
+ if(result)result.textContent='Creating your share code…';
+ try{
+  const data=await api('/api/betslip-codes',{method:'POST',body:JSON.stringify({selections:slip})});
+  if(result)result.innerHTML='<b class="slip-code-value">'+escapeHTML(data.code)+'</b> <button type="button" class="slip-code-copy" onclick="copyBetslipCode(\''+escapeHTML(data.code)+'\')">Copy code</button>';
+ }catch(e){if(result)result.textContent=e.message;else alert(e.message);}
+ finally{if(button){button.disabled=false;button.textContent='Generate 5-character load code';}}
+}
+async function copyBetslipCode(code){
+ try{await navigator.clipboard.writeText(code);const result=document.getElementById('betslip-code-result');if(result)result.insertAdjacentText('beforeend',' · Copied');}
+ catch(e){const field=document.getElementById('betslip-code-input');if(field){field.value=code;field.focus();field.select();document.execCommand('copy');alert('Betslip code copied: '+code);}}
+}
+async function loadBetslipCode(){
+ const field=document.getElementById('betslip-code-input'),code=String(field?.value||'').trim().toUpperCase(),result=document.getElementById('betslip-code-result');
+ if(!/^[A-HJ-NP-Z2-9]{5}$/.test(code)){alert('Enter a valid 5-character code, for example ER2T3.');return;}
+ if(result)result.textContent='Loading betslip…';
+ try{
+  const data=await api('/api/betslip-codes/'+encodeURIComponent(code));
+  if(!Array.isArray(data.selections)||!data.selections.length)throw new Error('This code has no selections.');
+  slip=data.selections.map(x=>({...x,odd:Number(x.odd)}));
+  renderSlip();
+  if(result)result.innerHTML='Loaded betslip <b class="slip-code-value">'+escapeHTML(data.code)+'</b>';
+  document.querySelector('.betslip')?.classList.add('mobile-open');
+ }catch(e){if(result)result.textContent=e.message;else alert(e.message);}
 }
 function calculate(){let stake=Number(document.getElementById('stake').value||0),odds=slip.reduce((a,s)=>a*Number(s.odd||1),1);document.getElementById('totalodds').textContent=odds.toFixed(2);document.getElementById('return').textContent=money(stake*odds);const circle=document.getElementById('totalodds-circle');if(circle)circle.textContent=slip.length?odds.toFixed(2):'0.00';const mobileCircle=document.getElementById('mobile-total-odds-circle');if(mobileCircle)mobileCircle.textContent=slip.length?odds.toFixed(2):'0.00'}
 const CASINO_KEY='sooty_casino_practice_v1';
@@ -697,7 +733,20 @@ function placeBet(){
  showPage('mybets',null);loadBets();
 }
 function viewTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const unit=t.unit==='points'?' points':t.unit==='practice-naira'?' simulated funds':'',stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printTestTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake (test only)</span><b>'+stakeText+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return (not payable)</span><b>'+returnText+'</b></div><p class="muted">Sandbox receipt only. No real wager, wallet debit, or cash payout occurred.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
-function printTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return}w.document.write('<html><head><title>SORTBET NG Test Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SORTBET NG</h1><small>TEST BET RECEIPT · SANDBOX ONLY</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+t.selections.map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('')+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">TEST RECEIPT ONLY. No real money was wagered, debited, or paid.</div><script>window.onload=()=>window.print()<\/script></body></html>');w.document.close();}
+function printTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return}w.document.write('<html><head><title>SORTBET NG Test Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SORTBET NG</h1><small>TEST BET RECEIPT · SANDBOX ONLY</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+t.selections.map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('')+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">TEST RECEIPT ONLY. No real money was wagered, debited, or paid.</div><script>window.onload=()=>window.print()<\/script></body>
+<style id="betslip-share-codes">
+.slip-code-tools{margin:12px 0;padding:12px;background:#f1f6fb;border:1px solid #d6e2ef;border-radius:9px;color:#203b56}
+.slip-code-title{font-size:11px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.slip-code-create,.slip-code-load button,.slip-code-copy{background:#07549a;color:#fff;border-radius:6px;padding:9px 11px;font-size:11px;font-weight:800}
+.slip-code-create{width:100%}.slip-code-create:disabled{opacity:.65}
+.slip-code-result{min-height:27px;padding:8px 2px;font-size:11px;color:#536b83;overflow-wrap:anywhere}
+.slip-code-value{font-size:20px;letter-spacing:3px;color:#07549a;font-weight:950;vertical-align:middle}
+.slip-code-copy{margin-left:8px;padding:6px 9px}
+.slip-code-load{display:flex;gap:6px}.slip-code-load input{min-width:0;flex:1;border:1px solid #cbd8e5;border-radius:6px;padding:9px 10px;text-transform:uppercase;color:#17324a;background:#fff;font-size:12px}
+.slip-code-load button{min-width:65px}.slip-code-help{display:block;margin-top:7px;color:#708196;font-size:10px;line-height:1.35}
+@media(max-width:680px){.betslip.mobile-open .slip-code-tools{background:#1c2a39;border-color:#354b61;color:#edf5ff}.betslip.mobile-open .slip-code-result{color:#b7c8da}.betslip.mobile-open .slip-code-value{color:#78beff}.betslip.mobile-open .slip-code-load input{background:#0e1722;border-color:#3c5268;color:#fff}.betslip.mobile-open .slip-code-help{color:#a2b3c5}}
+</style>
+</html>');w.document.close();}
 let virtualSport='football',virtualMatch=null,virtualPoll=null,virtualFrame=null;
 const virtualNames={football:'Football',basketball:'Basketball',tennis:'Tennis',racing:'Horse Racing'};
 async function loadVirtuals(){
