@@ -151,8 +151,8 @@ body{background:#edf2f7;color:#172b42}
 </head>
 <body>
 <header class="top">
- <div><div class="brand">SOOTY<span> BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
- <div class="top-actions"><span class="balance" id="balance">₦ 0.00</span><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="logout()">Log out</button></div>
+ <div><div class="brand">SOOTY<span> BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div><span class="balance" id="balance">₦ 0.00</span>
+ <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="logout()">Log out</button></div>
 </header>
 <div class="sportsbar"><div class="sportsbar-inner"><span class="sportsbar-label">SPORTS</span><span class="sportsbar-item active">⚽ Football</span><span class="sportsbar-item">🏀 Basketball</span><span class="sportsbar-item">🎾 Tennis</span><span class="sportsbar-item">🏐 Volleyball</span><span class="sportsbar-item">🏓 Table Tennis</span><span class="sportsbar-item">🎮 Esports</span><span class="sportsbar-item">🥊 Boxing</span><span class="sportsbar-item">🏒 Hockey</span></div></div>
 <div class="layout">
@@ -321,3 +321,6 @@ render();syncSession();loadPayoutDetails();checkApi();setInterval(refreshSports,
 
 <!-- deployment refresh: 2026-11-12 -->
 </body></html>
+/* Bold wallet balance at the left side of the header */
+.balance{font-weight:950;font-size:15px;letter-spacing:.25px;text-shadow:0 1px 2px #0008;white-space:nowrap}
+@media(max-width:680px){.top{justify-content:flex-start;gap:8px}.top>.balance{font-size:13px;padding:7px 9px;margin-left:auto}.top-actions{margin-left:auto}.top-actions .balance{display:none!important}}
