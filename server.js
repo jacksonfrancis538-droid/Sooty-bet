@@ -75,7 +75,7 @@ if (!existingAdmin.rowCount) {
 }
 
 function tokenFor(user) {
- return jwt.sign({ sub: String(user.id), role: user.role }, JWT_SECRET, { expiresIn: '12h', issuer: 'sooty-bet' });
+ return jwt.sign({ sub: String(user.id), role: user.role }, JWT_SECRET, { expiresIn: '30d', issuer: 'sooty-bet' });
 }
 function auth(req,res,next) {
  const raw = req.headers.authorization || '';
