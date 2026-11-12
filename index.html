@@ -291,7 +291,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .virtual-page{color:#203b56}.virtual-hero{background:linear-gradient(120deg,#073e70,#0c6db4);color:#fff;border-radius:9px;padding:20px;margin-bottom:13px}
 .virtual-hero h2{margin:0 0 5px;font-size:24px}.virtual-hero p{margin:0;color:#d8eaff;font-size:12px}
 .virtual-tabs{display:flex;gap:7px;overflow:auto;margin:12px 0;padding-bottom:4px}.virtual-tabs button{white-space:nowrap;background:#eaf1f8;border:1px solid #d5e0eb;color:#29445f;border-radius:6px;padding:10px 14px;font-weight:800}.virtual-tabs button.active{background:#07549a;border-color:#07549a;color:#fff}
-.virtual-match-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 2px;border-top:1px solid #e1e8ef}.virtual-match-card:first-child{border-top:0}.virtual-match-meta{font-size:10px;color:#718096;margin-bottom:4px}.virtual-match-names{font-weight:800;color:#203b56}.virtual-match-status{font-size:10px;font-weight:900;color:#07804d;margin-top:4px}.virtual-play{background:#07549a;color:#fff;border-radius:5px;padding:10px 15px;font-weight:800;white-space:nowrap}
+.virtual-match-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 2px;border-top:1px solid #e1e8ef}.virtual-match-card:first-child{border-top:0}.virtual-match-meta{font-size:10px;color:#718096;margin-bottom:4px}.virtual-match-names{font-weight:800;color:#203b56}.virtual-match-status{font-size:10px;font-weight:900;color:#07804d;margin-top:4px}.virtual-markets{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.virtual-market{border:1px solid #cbd8e5;background:#f4f7fa;color:#24435f;border-radius:6px;padding:7px 9px;font-size:10px;font-weight:800}.virtual-market.selected{background:#07549a;color:#fff;border-color:#07549a}.virtual-stake-row{display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin:7px 0 3px}.virtual-stake-row label{font-size:10px;color:#718096;font-weight:700}.virtual-stake-row input{display:block;width:100px;margin-top:3px;padding:8px;border:1px solid #cbd8e5;border-radius:6px;color:#203b56}.virtual-stake-btn{background:#087b4e;color:#fff;border-radius:6px;padding:9px 12px;font-size:11px;font-weight:900}.virtual-points{margin-top:12px;font-size:12px;color:#e1f2ff}.virtual-points b{font-size:18px;color:#ffe08a;margin-left:5px}.virtual-play{background:#07549a;color:#fff;border-radius:5px;padding:10px 15px;font-weight:800;white-space:nowrap}
 .virtual-stage{margin-top:14px;background:#10253b;border-radius:10px;padding:14px;color:#fff}.virtual-stage-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.virtual-scoreline{display:flex;justify-content:center;align-items:center;gap:15px;font-size:17px;font-weight:900;text-align:center}.virtual-scoreline strong{font-size:27px;color:#ffdb72;white-space:nowrap}.virtual-clock{font-size:11px;color:#a9c4df;text-align:center;margin:5px 0 12px}.virtual-canvas-wrap{width:100%;overflow:hidden;border-radius:8px;background:#14633e}#virtual-canvas{width:100%;height:auto;display:block}.virtual-event-feed{max-height:180px;overflow:auto;margin-top:10px;border-top:1px solid #2e4962;padding-top:8px}.virtual-event{font-size:11px;color:#d6e4f2;padding:5px 2px;border-bottom:1px solid #263f56}.virtual-event.goal{color:#ffdc75;font-weight:900}.virtual-proof{font-size:10px;color:#9db6ce;overflow-wrap:anywhere;margin-top:12px}.virtual-final{padding:12px;background:#183b34;border:1px solid #2d795e;border-radius:7px;margin-top:10px;color:#d9ffef}.virtual-history-row{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid #e1e8ef;font-size:11px}.virtual-race-runners{display:flex;flex-direction:column;gap:6px;margin-top:12px}.virtual-runner{height:24px;border-radius:4px;background:#213b54;position:relative;overflow:hidden}.virtual-runner span{position:absolute;left:8px;top:3px;font-size:11px;color:#fff;z-index:1}.virtual-runner i{display:block;height:100%;background:linear-gradient(90deg,#1a9c68,#76dba6);width:0}
 @media(max-width:680px){.virtual-hero{padding:16px}.virtual-hero h2{font-size:21px}.virtual-match-card{align-items:flex-start}.virtual-match-names{font-size:12px}.virtual-play{padding:9px 11px;font-size:11px}.virtual-stage{padding:10px}.virtual-scoreline{font-size:13px;gap:8px}.virtual-scoreline strong{font-size:22px}}
 
@@ -347,7 +347,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
   <section id="upcoming" class="page"><div class="panel"><h3>Upcoming football</h3><p class="muted">Scheduled fixtures shown in Nigeria time. Odds are not enabled until a separate approved odds feed is connected.</p><div id="upcominglist"></div></div></section>
 
   <section id="virtuals" class="page virtual-page">
-   <div class="virtual-hero"><div class="eyebrow">SOOTY BET ORIGINALS</div><h2>Virtual Sports Arena</h2><p>Play simulated sports matches with server-generated results, animated action and a permanent results history. No stakes or real-money betting.</p></div>
+   <div class="virtual-hero"><div class="eyebrow">SOOTY BET ORIGINALS</div><h2>Virtual Sports Arena</h2><p>Fresh server-generated games, simulated odds and practice stakes. These points are separate from your cash wallet and have no cash value.</p><div class="virtual-points">Practice points: <b id="virtual-points-balance">10,000</b></div></div>
    <div class="virtual-tabs" id="virtual-tabs">
     <button class="active" data-sport="football" onclick="selectVirtualSport('football',this)">⚽ Football</button>
     <button data-sport="basketball" onclick="selectVirtualSport('basketball',this)">🏀 Basketball</button>
@@ -581,7 +581,15 @@ async function loadVirtuals(){
  document.getElementById('virtual-list-title').textContent='Available virtual '+virtualNames[virtualSport].toLowerCase();
  box.innerHTML='<div class="empty">Loading server-generated matches…</div>';
  try{const data=await api('/api/virtual/matches?sport='+encodeURIComponent(virtualSport));
- box.innerHTML=data.matches.length?data.matches.map(m=>'<div class="virtual-match-card"><div><div class="virtual-match-meta">'+escapeHTML(m.league)+' · '+escapeHTML(m.status.toUpperCase())+'</div><div class="virtual-match-names">'+(m.sport==='racing'?'Six-runner virtual race':escapeHTML(m.home)+' <span style="color:#8193a6">vs</span> '+escapeHTML(m.away))+'</div><div class="virtual-match-status">'+(m.status==='live'?'● LIVE NOW':'READY TO PLAY')+'</div></div><button class="virtual-play" onclick="startVirtualMatch('+m.id+')">'+(m.status==='live'?'Watch':'Play')+' →</button></div>').join(''):'<div class="empty">No matches available. Refresh in a moment.</div>';
+ box.innerHTML=data.matches.length?data.matches.map(m=>{
+ const markets=m.sport==='racing'?(m.runnerOdds||[]).map(r=>({key:r.name,label:r.name,odd:r.odd})):[
+  {key:'home',label:m.home,odd:m.odds.home},
+  ...(m.sport==='football'?[{key:'draw',label:'Draw',odd:m.odds.draw}]:[]),
+  {key:'away',label:m.away,odd:m.odds.away}
+ ];
+ const choices=markets.map((o,i)=>'<button type="button" class="virtual-market '+(i===0?'selected':'')+'" data-market="'+escapeHTML(o.key)+'" onclick="selectVirtualPick('+m.id+',this)">'+escapeHTML(o.label)+' <b>'+Number(o.odd).toFixed(2)+'</b></button>').join('');
+ return '<div class="virtual-match-card" style="display:block"><div style="display:flex;justify-content:space-between;gap:8px"><div><div class="virtual-match-meta">'+escapeHTML(m.league)+' · '+escapeHTML(m.status.toUpperCase())+'</div><div class="virtual-match-names">'+(m.sport==='racing'?'Six-runner virtual race':escapeHTML(m.home)+' <span style="color:#8193a6">vs</span> '+escapeHTML(m.away))+'</div><div class="virtual-match-status">'+(m.status==='live'?'● LIVE NOW':'READY TO PLAY')+'</div></div><button class="virtual-play" onclick="startVirtualMatch('+m.id+')">'+(m.status==='live'?'Watch':'Watch')+' →</button></div><div class="virtual-markets">'+choices+'</div><div class="virtual-stake-row"><label>Practice stake (points)<input id="virtual-stake-'+m.id+'" type="number" min="10" max="10000" step="10" value="100"></label><button class="virtual-stake-btn" type="button" onclick="placeVirtualStake('+m.id+')">Place stake & play</button></div></div>';
+}).join(''):'<div class="empty">No matches available. New games are generated every minute.</div>';
  }catch(e){box.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}await loadVirtualHistory();
 }
 function selectVirtualSport(sport,el){virtualSport=sport;document.querySelectorAll('#virtual-tabs button').forEach(b=>b.classList.toggle('active',b===el||b.dataset.sport===sport));closeVirtualMatch();loadVirtuals();}
@@ -591,11 +599,40 @@ async function loadVirtualHistory(){
  box.innerHTML=rows.length?rows.slice(0,20).map(m=>'<div class="virtual-history-row"><span><b>'+escapeHTML(m.home)+' vs '+escapeHTML(m.away)+'</b><br><span class="muted">'+escapeHTML(m.league)+' · '+new Date(m.completedAt).toLocaleString('en-NG')+'</span></span><b>'+(m.sport==='racing'?escapeHTML(m.result?.winner||'Finished'):m.homeScore+' - '+m.awayScore)+'</b></div>').join(''):'<div class="empty">No completed '+virtualNames[virtualSport].toLowerCase()+' matches yet.</div>';
  }catch(e){box.textContent=e.message}
 }
+let selectedVirtualPicks={};
+function getVirtualPoints(){const n=Number(localStorage.getItem('sooty_virtual_points'));return Number.isFinite(n)&&n>=0?n:10000;}
+function updateVirtualPointsUI(){const el=document.getElementById('virtual-points-balance');if(el)el.textContent=getVirtualPoints().toLocaleString('en-NG');}
+function selectVirtualPick(id,button){const card=button.closest('.virtual-match-card');card.querySelectorAll('.virtual-market').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');selectedVirtualPicks[id]={outcome:button.dataset.market,odd:Number(button.querySelector('b').textContent)};}
+async function placeVirtualStake(id){
+ const input=document.getElementById('virtual-stake-'+id),stake=Math.floor(Number(input?.value||0)),pick=selectedVirtualPicks[id];
+ if(!pick){alert('Choose an outcome first.');return;}
+ if(!Number.isSafeInteger(stake)||stake<10){alert('Minimum practice stake is 10 points.');return;}
+ const balance=getVirtualPoints();if(stake>balance){alert('Not enough practice points. Your balance is '+balance.toLocaleString('en-NG')+' points.');return;}
+ const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]');
+ if(pending.some(x=>x.matchId===id)){alert('You already have a practice stake on this game.');return;}
+ pending.push({matchId:id,stake,odd:pick.odd,outcome:pick.outcome,createdAt:new Date().toISOString()});
+ localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending));
+ localStorage.setItem('sooty_virtual_points',String(balance-stake));updateVirtualPointsUI();
+ await startVirtualMatch(id);
+}
+function settleVirtualStake(match){
+ if(!match||match.status!=='completed')return;
+ const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]'),bet=pending.find(x=>x.matchId===match.id);
+ if(!bet)return;
+ const winner=match.result?.winner;
+ const won=winner===bet.outcome;
+ const payout=won?Math.floor(bet.stake*bet.odd):0;
+ if(payout)localStorage.setItem('sooty_virtual_points',String(getVirtualPoints()+payout));
+ localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending.filter(x=>x.matchId!==match.id)));
+ updateVirtualPointsUI();
+ const result=document.getElementById('virtual-result');
+ if(result)result.innerHTML+='<div class="virtual-final"><b>Practice stake '+(won?'WON':'NOT WON')+'</b><div>'+bet.stake.toLocaleString('en-NG')+' points · '+escapeHTML(bet.outcome)+' @ '+bet.odd.toFixed(2)+' · '+(won?'Returned '+payout.toLocaleString('en-NG')+' points':'No points returned')+'</div></div>';
+}
 async function startVirtualMatch(id){
  try{const data=await api('/api/virtual/matches/'+id+'/start',{method:'POST'});virtualMatch=data.match;document.getElementById('virtual-stage').hidden=false;document.getElementById('virtual-stage').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('virtual-result').innerHTML='';renderVirtualMatch();startVirtualAnimation();if(virtualPoll)clearInterval(virtualPoll);virtualPoll=setInterval(pollVirtualMatch,1000);}
  catch(e){alert(e.message)}
 }
-async function pollVirtualMatch(){if(!virtualMatch)return;try{const data=await api('/api/virtual/matches/'+virtualMatch.id);virtualMatch=data.match;renderVirtualMatch();if(virtualMatch.status==='completed'){clearInterval(virtualPoll);virtualPoll=null;await loadVirtualHistory();await loadVirtuals();}}catch(e){document.getElementById('virtual-clock').textContent=e.message}}
+async function pollVirtualMatch(){if(!virtualMatch)return;try{const data=await api('/api/virtual/matches/'+virtualMatch.id);virtualMatch=data.match;renderVirtualMatch();if(virtualMatch.status==='completed'){clearInterval(virtualPoll);virtualPoll=null;settleVirtualStake(virtualMatch);await loadVirtualHistory();await loadVirtuals();}}catch(e){document.getElementById('virtual-clock').textContent=e.message}}
 function renderVirtualMatch(){
  const m=virtualMatch;if(!m)return;
  document.getElementById('virtual-league').textContent=m.league;
@@ -629,7 +666,7 @@ function startVirtualAnimation(){
 }
 
 async function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
-render();syncSession();if(!token)openModal('login');loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}setInterval(()=>{if(token)loadWallet()},15000);window.addEventListener('focus',()=>{if(token)loadWallet()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)loadWallet()});
+render();syncSession();updateVirtualPointsUI();if(!token)openModal('login');loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}setInterval(()=>{if(token)loadWallet()},15000);window.addEventListener('focus',()=>{if(token)loadWallet()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)loadWallet()});
 </script>
 
 <!-- deployment refresh: 2026-11-12 -->
