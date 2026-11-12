@@ -8,6 +8,53 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:14px/1.45 Inter,system-ui,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer;border:0}.top{height:68px;background:#101114;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 4%;position:sticky;top:0;z-index:20}.brand{font-weight:950;font-size:24px;letter-spacing:1.5px;color:var(--gold)}.brand span{color:#fff}.tag{font-size:9px;letter-spacing:2px;color:var(--muted);display:block;margin-top:-4px}.top-actions{display:flex;gap:10px;align-items:center}.btn{padding:10px 16px;border-radius:8px;font-weight:800}.primary{background:var(--gold);color:#111}.ghost{background:transparent;border:1px solid #444a54;color:#fff}.balance{color:var(--gold);font-weight:800;padding:8px 12px;background:#242017;border-radius:8px}.layout{max-width:1440px;margin:auto;padding:22px 3%;display:grid;grid-template-columns:190px minmax(0,1fr) 310px;gap:18px}.side,.betslip,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}.side{padding:14px;height:max-content;position:sticky;top:84px}.side h4,.section-head{color:var(--muted);font-size:11px;letter-spacing:1.4px;text-transform:uppercase;margin:7px 8px 12px}.navitem{display:flex;gap:10px;padding:11px 10px;border-radius:8px;color:#c4c8cf;cursor:pointer;margin:2px 0}.navitem:hover,.navitem.active{background:#282319;color:var(--gold)}.hero{background:linear-gradient(115deg,#30240d,#17150f 55%,#14161a);border:1px solid #5b4821;border-radius:14px;padding:25px 26px;margin-bottom:17px;position:relative;overflow:hidden}.hero:after{content:"⚽";position:absolute;right:7%;top:-16px;font-size:125px;opacity:.10}.eyebrow{color:var(--gold);font-size:11px;font-weight:900;letter-spacing:2px}.hero h1{font-size:clamp(25px,4vw,39px);line-height:1.08;margin:9px 0}.hero p{color:#c2bba9;max-width:470px;margin:0 0 17px}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.chip{background:#22252b;border:1px solid var(--line);padding:8px 12px;border-radius:30px;color:#cbd0d8}.chip.active{background:#3b3017;color:var(--gold);border-color:#806322}.panel{padding:16px;margin-bottom:15px}.panel-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.panel-title h3{margin:0;font-size:16px}.muted{color:var(--muted)}.live{font-size:10px;color:#ff7777;font-weight:900;letter-spacing:1px}.match{padding:13px 0;border-top:1px solid var(--line)}.match:first-of-type{border-top:0}.match-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:10px}.teams{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:11px}.team{font-weight:750;flex:1}.team:last-child{text-align:right}.score{font-weight:900;color:var(--gold);white-space:nowrap}.odds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.odd{background:#24282e;border:1px solid #333943;color:#fff;padding:9px 5px;border-radius:7px;text-align:center}.odd small{display:block;color:var(--muted);font-size:10px}.odd b{color:var(--gold2)}.odd:hover,.odd.selected{border-color:var(--gold);background:#342b18}.betslip{padding:15px;height:max-content;position:sticky;top:84px}.slip-head{display:flex;justify-content:space-between;align-items:center}.slip-head h3{margin:0}.count{background:var(--gold);color:#111;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:900}.selection{border-top:1px solid var(--line);padding:12px 0}.selection strong{display:block;font-size:12px}.selection small{color:var(--muted)}.remove{float:right;background:none;color:#9ba1aa;font-size:18px}.stake{width:100%;padding:12px;background:#0c0d10;border:1px solid #3a404a;color:#fff;border-radius:8px;margin:7px 0 12px}.calc{display:flex;justify-content:space-between;margin:9px 0;color:var(--muted)}.calc b{color:#fff}.place{width:100%;padding:13px;background:var(--gold);border-radius:8px;font-weight:900;margin-top:10px}.empty{text-align:center;color:var(--muted);padding:28px 5px}.notice{background:#211d12;border:1px solid #59471e;color:#e5cc8c;border-radius:8px;padding:10px;font-size:11px;margin-top:12px}.footer{text-align:center;color:#747b86;padding:22px;border-top:1px solid var(--line);font-size:11px}.page{display:none}.page.active{display:block}.field{width:100%;background:#0d0f12;border:1px solid var(--line);color:white;padding:12px;border-radius:8px;margin:6px 0 14px}.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:40;padding:15px}.modal.show{display:flex}.modal-card{background:#171a1f;border:1px solid #414751;border-radius:14px;padding:24px;width:min(420px,100%)}.modal-card h2{margin-top:0}.close{float:right;background:none;color:white;font-size:22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#202329;padding:15px;border-radius:9px}.stat b{display:block;color:var(--gold);font-size:20px}.stat small{color:var(--muted)}.table{width:100%;border-collapse:collapse}.table td,.table th{text-align:left;padding:11px;border-bottom:1px solid var(--line)}.table th{color:var(--muted);font-size:11px}.mobile-tabs{display:none}
 @media(max-width:1000px){.layout{grid-template-columns:160px minmax(0,1fr)}.betslip{grid-column:2;position:static}.side{top:80px}}
 @media(max-width:680px){.top{padding:0 4%;height:60px}.brand{font-size:20px}.tag{font-size:8px}.top-actions .ghost{display:none}.layout{display:block;padding:12px 3%}.side{display:none}.betslip{position:static;margin-top:14px}.hero{padding:20px}.hero:after{right:1%;font-size:90px}.stats{grid-template-columns:1fr 1fr}.mobile-tabs{display:flex;overflow:auto;gap:7px;padding:0 0 12px}.mobile-tabs .chip{white-space:nowrap}.top-actions .balance{font-size:11px;padding:7px}.btn{padding:9px 11px;font-size:12px}}
+
+.sportsbar{background:#1d2a38;border-bottom:1px solid #314255;overflow:auto}.sportsbar-inner{max-width:1500px;margin:auto;padding:0 18px;display:flex;align-items:center;gap:4px;min-width:max-content}.sportsbar-label{font-size:10px;font-weight:900;color:#8295aa;letter-spacing:1px;padding:13px 12px 13px 0}.sportsbar-item{padding:12px 13px;font-size:12px;color:#c1cedb;border-bottom:2px solid transparent}.sportsbar-item.active,.sportsbar-item:hover{color:#ffda7c;border-color:#e9b943;background:#263545}@media(max-width:680px){.sportsbar-inner{padding:0 10px}.sportsbar-item{padding:11px 10px;font-size:11px}}
+/* SOOTY BET sportsbook redesign */
+:root{--bg:#10151d;--panel:#19222e;--panel2:#202c3a;--line:#2b3949;--gold:#f0bd45;--gold2:#ffd66b;--muted:#98a8ba;--white:#f4f7fb;--green:#35c98a;--red:#f06470}
+body{background:#10151d;color:#f4f7fb;font-family:Arial,Helvetica,sans-serif}
+.top{height:64px;padding:0 max(18px,calc((100% - 1500px)/2));background:#17212d;border-bottom:1px solid #2a3949;box-shadow:0 3px 14px #0004}
+.brand{font-size:25px;letter-spacing:1px}.tag{letter-spacing:1.4px}
+.top-actions{gap:8px}.balance{background:#263445;border:1px solid #394b60;border-radius:5px;color:#ffd66b}
+.btn{border-radius:5px}.primary{background:#e9b943;color:#171b21}.ghost{border:1px solid #526174}
+.layout{max-width:1500px;padding:16px 18px;grid-template-columns:220px minmax(380px,1fr) 300px;gap:12px;align-items:start}
+.side,.betslip,.panel{background:#19232f;border:1px solid #2b3949;border-radius:7px;box-shadow:0 2px 8px #0002}
+.side{padding:10px;top:76px}.side h4,.section-head{font-size:10px;color:#8092a7;letter-spacing:1.1px;margin:12px 9px 7px}
+.navitem{padding:9px 10px;border-radius:5px;color:#c3cfdb;font-size:13px;margin:1px 0;transition:background .15s}
+.navitem:hover,.navitem.active{background:#29394b;color:#ffd36a}
+.hero{padding:18px 21px;border-radius:7px;background:linear-gradient(105deg,#26394b,#1a2735 60%,#18232f);border:1px solid #354b61;margin-bottom:12px}
+.hero:after{font-size:100px;top:-7px;right:4%;opacity:.13}
+.hero h1{font-size:27px;margin:6px 0}.hero p{font-size:12px;color:#b2c0cf;margin:0 0 12px}
+.eyebrow{font-size:10px;letter-spacing:1.4px}
+.chips{gap:5px;margin-bottom:10px}
+.chip{background:#202d3b;border:1px solid #35475b;border-radius:4px;padding:7px 11px;color:#c4d0dd;font-size:12px}
+.chip.active{background:#3a3424;border-color:#a17d30;color:#ffda7c}
+.panel{padding:13px;margin-bottom:11px}
+.panel-title{margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid #2b3949}
+.panel-title h3{font-size:15px;font-weight:700}
+.match{padding:12px 4px;border-top:1px solid #2b3949}
+.match-meta{font-size:10px;margin-bottom:8px;color:#8fa1b4}
+.teams{margin-bottom:8px;gap:12px}.team{font-size:13px;font-weight:700}.score{font-size:14px;color:#ffd36a}
+.odds{gap:5px}.odd{background:#263546;border:1px solid #34475b;border-radius:4px;padding:8px 5px}
+.odd small{font-size:9px;color:#a9b8c8}.odd b{font-size:13px;color:#ffda7c}
+.odd:hover,.odd.selected{background:#4a3c1e;border-color:#d4a63c}
+.betslip{padding:13px;top:76px}.slip-head{padding-bottom:10px;border-bottom:1px solid #2b3949}.slip-head h3{font-size:15px}
+.count{background:#e9b943;border-radius:4px;padding:3px 8px}
+.selection{padding:11px 0;border-color:#2b3949}.selection strong{font-size:11px}
+.stake{background:#111a24;border:1px solid #3b4d61;border-radius:4px}
+.calc{font-size:12px}.calc b{color:#f5d27c}
+.place{background:#e9b943;color:#151a20;border-radius:5px;padding:12px;font-weight:900}
+.empty{font-size:12px;padding:23px 6px;color:#8fa1b4}
+.notice{background:#272719;border:1px solid #61502b;color:#dfcb91;border-radius:5px}
+.footer{background:#151e29;border-color:#2b3949}
+.field{background:#111a24;border-color:#34475b;border-radius:5px}
+.modal-card{background:#19232f;border-color:#3b4d61;border-radius:8px}
+.stats{gap:8px}.stat{background:#243242;border-radius:5px}.stat b{color:#f3c65c}
+.mobile-tabs{gap:5px}
+@media(min-width:1100px){.layout{grid-template-columns:220px minmax(420px,1fr) 300px}.side,.betslip{max-height:calc(100vh - 84px);overflow:auto}}
+@media(max-width:1000px){.layout{grid-template-columns:175px minmax(0,1fr)}.betslip{grid-column:2}.side{top:74px}}
+@media(max-width:680px){.top{height:58px;padding:0 12px}.layout{display:block;padding:10px}.side{display:none}.betslip{position:static;margin-top:10px}.hero{padding:16px}.hero h1{font-size:23px}.top-actions{gap:5px}.top-actions .balance{font-size:10px}.panel{padding:11px}.mobile-tabs{display:flex}.stats{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -15,6 +62,7 @@
  <div><div class="brand">SOOTY<span> BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
  <div class="top-actions"><span class="balance" id="balance">₦ 0.00</span><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="logout()">Log out</button></div>
 </header>
+<div class="sportsbar"><div class="sportsbar-inner"><span class="sportsbar-label">SPORTS</span><span class="sportsbar-item active">⚽ Football</span><span class="sportsbar-item">🏀 Basketball</span><span class="sportsbar-item">🎾 Tennis</span><span class="sportsbar-item">🏐 Volleyball</span><span class="sportsbar-item">🏓 Table Tennis</span><span class="sportsbar-item">🎮 Esports</span><span class="sportsbar-item">🥊 Boxing</span><span class="sportsbar-item">🏒 Hockey</span></div></div>
 <div class="layout">
  <aside class="side"><h4>Menu</h4>
   <div class="navitem active" onclick="showPage('sports',this)">⚽ Sports</div><div class="navitem" onclick="showPage('live',this)">🔴 Live betting</div><div class="navitem" onclick="showPage('upcoming',this)">📅 Upcoming</div><div class="navitem" onclick="showPage('mybets',this)">🎟 My bets</div><div class="navitem" onclick="showPage('wallet',this)">👛 Wallet</div><div class="navitem" onclick="showPage('account',this)">👤 My account</div><div class="navitem" onclick="showPage('admin',this)">⚙ Admin preview</div>
