@@ -89,62 +89,61 @@ function cleanText(v,max=100) { return typeof v === 'string' ? v.trim().slice(0,
 function ref() { return 'SWD-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,7).toUpperCase(); }
 
 
-// Live football data is proxied server-side so the provider key is never exposed to browsers.
-const footballCache = new Map();
-async function footballRequest(path, cacheKey, ttlMs) {
-  const apiKey = process.env.API_FOOTBALL_KEY;
-  if (!apiKey) {
-    const error = new Error('Live sports data is not configured yet. Add API_FOOTBALL_KEY in the Render API environment.');
-    error.status = 503;
-    throw error;
-  }
-  const cached = footballCache.get(cacheKey);
-  if (cached && Date.now() - cached.at < ttlMs) return cached.data;
-  const response = await fetch('https://v3.football.api-sports.io' + path, {
-    headers: { 'x-apisports-key': apiKey }
-  });
-  const body = await response.json().catch(() => ({}));
-  if (!response.ok || (body.errors && Object.keys(body.errors).length)) {
-    console.error('Football provider error:', response.status, body.errors || body.message || 'Unknown error');
-    const error = new Error('Sports data provider is temporarily unavailable. Please try again shortly.');
+// Free football fixtures from TheSportsDB. Its free tier does not include live scores.
+const sportsCache = new Map();
+async function sportsDay(date) {
+  const key = 'day:' + date;
+  const cached = sportsCache.get(key);
+  if (cached && Date.now() - cached.at < 10 * 60 * 1000) return cached.data;
+  const url = 'https://www.thesportsdb.com/api/v1/json/123/eventsday.php?d=' + encodeURIComponent(date) + '&s=Soccer';
+  const response = await fetch(url, { headers: { accept: 'application/json' } });
+  if (!response.ok) {
+    const error = new Error('The free sports fixtures service is temporarily unavailable.');
     error.status = 502;
     throw error;
   }
-  const data = (body.response || []).map(item => ({
-    id: item.fixture?.id,
-    league: item.league?.name || 'Football',
-    country: item.league?.country || '',
-    home: item.teams?.home?.name || 'Home',
-    away: item.teams?.away?.name || 'Away',
-    homeLogo: item.teams?.home?.logo || null,
-    awayLogo: item.teams?.away?.logo || null,
-    homeScore: item.goals?.home,
-    awayScore: item.goals?.away,
-    status: item.fixture?.status?.short || 'NS',
-    statusText: item.fixture?.status?.long || '',
-    elapsed: item.fixture?.status?.elapsed ?? null,
-    kickoff: item.fixture?.date || null,
-    venue: item.fixture?.venue?.name || ''
-  }));
-  footballCache.set(cacheKey, { at: Date.now(), data });
+  const body = await response.json().catch(() => ({}));
+  const data = (body.events || []).map(item => ({
+    id: item.idEvent,
+    league: item.strLeague || 'Football',
+    country: item.strCountry || '',
+    home: item.strHomeTeam || 'Home',
+    away: item.strAwayTeam || 'Away',
+    homeScore: item.intHomeScore == null ? null : Number(item.intHomeScore),
+    awayScore: item.intAwayScore == null ? null : Number(item.intAwayScore),
+    status: 'NS',
+    statusText: 'Scheduled fixture',
+    elapsed: null,
+    kickoff: item.strTimestamp || (item.dateEvent && item.strTime ? item.dateEvent + 'T' + item.strTime + 'Z' : item.dateEvent || null),
+    venue: item.strVenue || ''
+  })).filter(item => item.home && item.away);
+  sportsCache.set(key, { at: Date.now(), data });
   return data;
 }
-app.get('/api/sports/live', async (_req, res) => {
-  try {
-    const matches = await footballRequest('/fixtures?live=all&timezone=Africa%2FLagos', 'live', 15000);
-    res.set('Cache-Control', 'no-store');
-    res.json({ matches, updatedAt: new Date().toISOString(), provider: 'API-Football' });
-  } catch (e) {
-    res.status(e.status || 500).json({ error: e.message || 'Could not load live matches.' });
-  }
+function dateOffset(days) {
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+app.get('/api/sports/live', (_req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    matches: [],
+    updatedAt: new Date().toISOString(),
+    provider: 'TheSportsDB Free',
+    message: 'Live scores are not included in the free tier.'
+  });
 });
 app.get('/api/sports/upcoming', async (_req, res) => {
   try {
-    const matches = await footballRequest('/fixtures?next=30&timezone=Africa%2FLagos', 'upcoming', 300000);
+    // Three daily requests stay within TheSportsDB free schedule endpoint allowance.
+    const days = await Promise.all([0, 1, 2].map(offset => sportsDay(dateOffset(offset))));
+    const matches = days.flat().sort((a, b) => new Date(a.kickoff || 0) - new Date(b.kickoff || 0));
     res.set('Cache-Control', 'no-store');
-    res.json({ matches, updatedAt: new Date().toISOString(), provider: 'API-Football' });
+    res.json({ matches, updatedAt: new Date().toISOString(), provider: 'TheSportsDB Free' });
   } catch (e) {
-    res.status(e.status || 500).json({ error: e.message || 'Could not load upcoming matches.' });
+    res.status(e.status || 500).json({ error: e.message || 'Could not load upcoming fixtures.' });
   }
 });
 
