@@ -192,7 +192,7 @@ body{background:#edf2f7;color:#172b42}
  .mobile-bottom .bottom-slip b{width:42px;height:42px}
  .mobile-bottom .bottom-slip i{font-style:normal;color:#8ccaff;font-size:9px;margin-left:2px}
  .betslip.mobile-open{display:block!important;position:fixed;z-index:60;left:8px;right:8px;bottom:76px;top:auto;max-height:65vh;overflow:auto;box-shadow:0 10px 40px #000b}
- .betslip.mobile-open .slip-head{position:sticky;top:0;background:#fff;padding:8px 0;z-index:1}
+ .betslip.mobile-open .slip-head{position:sticky;top:0;background:#151e29;padding:8px 0;z-index:1}.slip-collapse{display:inline-flex;align-items:center;gap:3px;background:#26384a;color:#dce8f6;border:1px solid #40566c;border-radius:18px;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer}.betslip.mobile-open{max-height:min(58vh,520px);padding:12px;overscroll-behavior:contain}
 }
 
 
@@ -414,7 +414,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
   </section>
   <section id="admin" class="page"><div class="panel"><h3>SOOTY BET Admin</h3><p class="muted">Restricted to the configured administrator account.</p><div class="stats"><div class="stat"><b id="adminusers">—</b><small>Registered users</small></div><div class="stat"><b id="adminbets">—</b><small>Recorded bets</small></div><div class="stat"><b id="adminpending">—</b><small>Pending withdrawals</small></div></div><p class="muted" id="adminmessage">Sign in with the admin email to load requests.</p></div><div class="panel"><div class="panel-title"><h3>Age verification requests</h3><button class="btn ghost" onclick="loadAdminVerification()">Refresh</button></div><p class="muted" style="font-size:12px">Only approve after checking a valid official identity document through a secure verification process. Do not ask users to post identity documents in public chat.</p><div id="adminverification" class="muted">Admin sign-in required.</div></div><div class="panel"><div class="panel-title"><h3>Withdrawal requests</h3><button class="btn ghost" onclick="loadAdminWithdrawals()">Refresh</button></div><div id="adminwithdrawals" class="muted">Admin sign-in required.</div></div></section>
  </main>
- <aside class="betslip"><div class="slip-head"><h3>Bet slip</h3><div style="display:flex;align-items:center;gap:7px"><span class="total-odds-circle" id="totalodds-circle">0.00</span><span class="count" id="count">0</span></div></div><div id="selections"><div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div></div><div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm test bet</button><div class="notice">SANDBOX ONLY · Creates a test ticket. No real money is charged or paid.</div></div><div class="notice">Sample odds only. Not a live bookmaker offer.</div></aside>
+ <aside class="betslip"><div class="slip-head"><h3>Bet slip</h3><div style="display:flex;align-items:center;gap:7px"><span class="total-odds-circle" id="totalodds-circle">0.00</span><span class="count" id="count">0</span><button type="button" class="slip-collapse" onclick="closeMobileSlip()" aria-label="Minimise betslip">⌄ Minimise</button></div></div><div id="selections"><div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div></div><div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm test bet</button><div class="notice">SANDBOX ONLY · Creates a test ticket. No real money is charged or paid.</div></div><div class="notice">Sample odds only. Not a live bookmaker offer.</div></aside>
 </div>
 <nav class="mobile-bottom" aria-label="Bottom navigation">
  <button class="active" onclick="showPage('sports',this);setBottomActive(this)"><b>🔥</b><span>Popular</span></button>
@@ -513,6 +513,7 @@ function filterHomeSearch(q){const term=String(q||'').trim().toLowerCase();docum
 function selectHomeTab(tab,el){document.querySelectorAll('.home-tab').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');if(tab==='sports'){document.querySelector('.mobile-home').style.display='none';document.querySelector('#sports>.hero').style.display='block';document.querySelector('#sports>.chips').style.display='flex';document.getElementById('matches').style.display='block';}else if(tab==='top'){document.querySelector('.mobile-home').style.display='block';document.querySelector('#sports>.hero').style.display='block';document.querySelector('#sports>.chips').style.display='flex';document.getElementById('matches').style.display='block';}else{document.querySelector('.mobile-home').style.display='block';document.querySelector('#sports>.hero').style.display='none';document.querySelector('#sports>.chips').style.display='none';document.getElementById('matches').style.display='none';const home=document.querySelector('.mobile-home');let note=document.getElementById('tab-placeholder');if(!note){note=document.createElement('div');note.id='tab-placeholder';note.className='event-row';home.appendChild(note);}note.textContent=tab==='esports'?'Esports listings will appear here when the SOOTY BET esports feed is connected.':tab==='casino'?'Casino games are not available in this preview.':'Sooty Games are coming soon.';}}
 function setBottomActive(el){document.querySelectorAll('.mobile-bottom button').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');}
 function toggleMobileSlip(el){const slipBox=document.querySelector('.betslip');slipBox.classList.toggle('mobile-open');setBottomActive(el);}
+function closeMobileSlip(){document.querySelector('.betslip')?.classList.remove('mobile-open');const nav=document.querySelector('.mobile-bottom .bottom-slip');if(nav)nav.classList.remove('active');}
 function openModal(m){mode=m;const login=m==='login';document.querySelector('.auth-back').style.display=token?'':'none';document.getElementById('authsubtitle').textContent=login?'Welcome back. Log in to your account.':'Create your SOOTY BET account.';document.getElementById('authbutton').textContent=login?'Log in':'Create account';document.getElementById('password').setAttribute('autocomplete',login?'current-password':'new-password');document.getElementById('password').placeholder=login?'Enter your password':'Create a password (12+ characters)';document.getElementById('password').minLength=login?1:12;document.getElementById('authswitchtext').innerHTML=login?'Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button>':'Already have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Log in</button>';document.getElementById('autherror').textContent='';document.getElementById('authnotice').classList.remove('show');document.getElementById('authnotice').textContent='';document.getElementById('authscreen').classList.add('show');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById('email').focus(),80)}
 function closeModal(){if(!token)return;document.getElementById('authscreen').classList.remove('show');document.body.style.overflow=''}
 function showAuthNotice(message){const box=document.getElementById('authnotice');box.textContent=message;box.classList.add('show')}
@@ -597,6 +598,7 @@ function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':
 function getTestTickets(){try{return JSON.parse(localStorage.getItem('sooty_test_tickets_v1')||'[]')}catch(e){return[]}}
 function saveTestTickets(rows){localStorage.setItem('sooty_test_tickets_v1',JSON.stringify(rows))}
 function placeBet(){
+ if(slip.some(x=>x.isVirtual)){alert('Virtual selections appear in the combined odds preview. Use the Virtual practice stake button on each match to place practice bets; virtual points remain separate from sports test stakes.');return;}
  const stake=Number(document.getElementById('stake')?.value||0);
  if(!slip.length){alert('Add at least one selection to your betslip.');return}
  if(!Number.isFinite(stake)||stake<100){alert('For this test, enter a stake of at least ₦100.');return}
@@ -656,7 +658,18 @@ async function loadVirtualHistory(){
 let selectedVirtualPicks={};
 function getVirtualPoints(){const n=Number(localStorage.getItem('sooty_virtual_points'));return Number.isFinite(n)&&n>=0?n:10000;}
 function updateVirtualPointsUI(){const el=document.getElementById('virtual-points-balance');if(el)el.textContent=getVirtualPoints().toLocaleString('en-NG');}
-function selectVirtualPick(id,button){const card=button.closest('.virtual-match-card');card.querySelectorAll('.virtual-market').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');selectedVirtualPicks[id]={outcome:button.dataset.market,odd:Number(button.querySelector('b').textContent)};}
+function selectVirtualPick(id,button){
+ const card=button.closest('.virtual-match-card');
+ card.querySelectorAll('.virtual-market').forEach(x=>x.classList.remove('selected'));
+ button.classList.add('selected');
+ const pick={outcome:button.dataset.market,odd:Number(button.querySelector('b').textContent)};
+ selectedVirtualPicks[id]=pick;
+ const home=card.querySelector('.virtual-match-names')?.textContent?.trim()||('Virtual match #'+id);
+ const key='virtual-'+String(id),existing=slip.findIndex(x=>String(x.id)===key);
+ const entry={id:key,matchId:id,pick:pick.outcome,home,away:'Virtual',odd:pick.odd,market:'Virtual market',pickLabel:button.textContent.trim(),isVirtual:true};
+ if(existing>=0)slip[existing]=entry;else slip.push(entry);
+ renderSlip();
+}
 async function placeVirtualStake(id){
  const input=document.getElementById('virtual-stake-'+id),stake=Math.floor(Number(input?.value||0));
  let pick=selectedVirtualPicks[id];
