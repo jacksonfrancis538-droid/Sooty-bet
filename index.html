@@ -147,13 +147,70 @@ body{background:#edf2f7;color:#172b42}
  #settings .field,#wallet .field{background:#0c131c;border-color:#34475b;color:#fff}
 }
 
+
+/* Requested SOOTYBET mobile top-page layout */
+.header-brand{position:absolute;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+.header-brand .brand{font-size:23px;letter-spacing:1px;color:#fff}
+.header-brand .brand span{color:#fff}
+.deposit-shortcut{display:flex;align-items:center;gap:7px;background:transparent;color:#fff;padding:0;z-index:1}
+.deposit-plus{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#20b76b;color:#fff;font-size:24px;font-weight:700;line-height:1}
+.deposit-shortcut .balance{display:inline-flex!important;background:transparent!important;border:0!important;color:#e7eef7!important;padding:0!important;font-size:13px!important;font-weight:800}
+.search-toggle{background:transparent;color:#fff;font-size:25px;line-height:1;padding:5px 8px}
+.home-tabs{display:none}
+.mobile-search{display:none;background:#0c121a;padding:9px 12px;gap:8px}
+.mobile-search.open{display:flex}
+.mobile-search input{flex:1;min-width:0;background:#1b2633;border:1px solid #35485d;border-radius:7px;padding:10px;color:#fff}
+.mobile-search button{background:#26384b;color:#fff;border-radius:7px;padding:0 12px}
+.mobile-head-actions{display:flex;gap:7px}
+.mobile-head-actions button{min-width:42px}
+.promo-bonus{background:radial-gradient(circle at 85% 28%,#f6c06d 0 9%,transparent 10%),linear-gradient(115deg,#74341b,#d18a36 60%,#342016)}
+.promo-team{background:linear-gradient(120deg,#8b183c 0 35%,#183c7c 36% 100%)}
+.promo-paris{background:linear-gradient(115deg,#142b58,#70223e)}
+@media(max-width:680px){
+ body{padding-bottom:78px}
+ .top{height:58px;padding:0 10px;display:flex;justify-content:space-between;gap:5px}
+ .header-brand{left:50%;transform:translateX(-50%)}
+ .header-brand .brand{font-size:21px}
+ .header-brand .tag{display:none}
+ .deposit-shortcut{gap:5px;min-width:0}
+ .deposit-plus{width:28px;height:28px;font-size:22px}
+ .deposit-shortcut .balance{font-size:11px!important;letter-spacing:-.2px}
+ .top-actions{margin-left:auto;gap:2px;z-index:1}
+ .top-actions #sessionlabel,.top-actions #settingsbtn,.top-actions #loginbtn,.top-actions #joinbtn,.top-actions #logoutbtn{display:none!important}
+ .search-toggle{font-size:23px;padding:4px}
+ .home-tabs{display:flex;overflow-x:auto;gap:0;background:#111923;border-bottom:1px solid #273647;padding:0 8px;scrollbar-width:none}
+ .home-tabs::-webkit-scrollbar{display:none}
+ .home-tab{flex:1 0 auto;background:none;color:#9eacbb;padding:13px 15px 11px;font-size:12px;font-weight:700;border-bottom:3px solid transparent}
+ .home-tab.active{color:#fff;border-bottom-color:#278be0}
+ .layout{padding:8px 10px 18px}
+ .mobile-home-head{margin:12px 2px 10px}
+ .mobile-home-head h1{font-size:21px}
+ .mobile-section-head h2{font-size:16px}
+ .promo{flex-basis:205px;height:108px}
+ .mobile-bottom{height:68px;padding-bottom:calc(5px + env(safe-area-inset-bottom))}
+ .mobile-bottom button{min-width:54px;font-size:9px}
+ .mobile-bottom .bottom-slip b{width:42px;height:42px}
+ .mobile-bottom .bottom-slip i{font-style:normal;color:#8ccaff;font-size:9px;margin-left:2px}
+ .betslip.mobile-open{display:block!important;position:fixed;z-index:60;left:8px;right:8px;bottom:76px;top:auto;max-height:65vh;overflow:auto;box-shadow:0 10px 40px #000b}
+ .betslip.mobile-open .slip-head{position:sticky;top:0;background:#fff;padding:8px 0;z-index:1}
+}
+
 </style>
 </head>
 <body>
 <header class="top">
- <div><div class="brand">SOOTY<span> BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div><span class="balance" id="balance" style="display:none">₦ 0.00</span>
- <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="logout()">Log out</button></div>
+ <button class="deposit-shortcut" id="depositbtn" type="button" onclick="showPage('wallet',null)" aria-label="Open deposit"><span class="deposit-plus">+</span><span class="balance" id="balance">—— ₦</span></button>
+ <div class="header-brand"><div class="brand">SOOTY<span>BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
+ <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="search-toggle" type="button" onclick="toggleSearch()" aria-label="Search">⌕</button><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="logout()">Log out</button></div>
 </header>
+<div class="mobile-search" id="mobilesearch"><input id="homesearch" type="search" placeholder="Search teams, leagues or games" oninput="filterHomeSearch(this.value)"><button type="button" onclick="toggleSearch()">Close</button></div>
+<nav class="home-tabs" aria-label="Main navigation">
+ <button class="home-tab active" data-home-tab="top" onclick="selectHomeTab('top',this)">Top</button>
+ <button class="home-tab" data-home-tab="sports" onclick="selectHomeTab('sports',this)">Sports</button>
+ <button class="home-tab" data-home-tab="esports" onclick="selectHomeTab('esports',this)">Esports</button>
+ <button class="home-tab" data-home-tab="casino" onclick="selectHomeTab('casino',this)">Casino</button>
+ <button class="home-tab" data-home-tab="games" onclick="selectHomeTab('games',this)">Sooty Games</button>
+</nav>
 <div class="sportsbar"><div class="sportsbar-inner"><span class="sportsbar-label">SPORTS</span><span class="sportsbar-item active">⚽ Football</span><span class="sportsbar-item">🏀 Basketball</span><span class="sportsbar-item">🎾 Tennis</span><span class="sportsbar-item">🏐 Volleyball</span><span class="sportsbar-item">🏓 Table Tennis</span><span class="sportsbar-item">🎮 Esports</span><span class="sportsbar-item">🥊 Boxing</span><span class="sportsbar-item">🏒 Hockey</span></div></div>
 <div class="layout">
  <aside class="side"><h4>Menu</h4>
@@ -165,15 +222,15 @@ body{background:#edf2f7;color:#172b42}
   <section id="sports" class="page active">
 
    <div class="mobile-home">
-    <div class="mobile-home-head"><h1>Sports</h1><button onclick="showPage('upcoming',null)">All ☰</button></div>
+    <div class="mobile-home-head"><h1>Sports</h1><div class="mobile-head-actions"><button onclick="showPage('upcoming',null)">All</button><button aria-label="Filter sports" onclick="showPage('upcoming',null)">☷</button></div></div>
     <div class="sport-categories">
      <button class="sport-cat active" onclick="showPage('sports',null)"><b>⚽</b><span>Football</span></button><button class="sport-cat" onclick="showPage('upcoming',null)"><b>🎾</b><span>Tennis</span></button><button class="sport-cat"><b>🏀</b><span>Basketball</span></button><button class="sport-cat"><b>🏒</b><span>Ice Hockey</span></button><button class="sport-cat"><b>🏐</b><span>Volleyball</span></button><button class="sport-cat"><b>🏓</b><span>Table Tennis</span></button>
     </div>
     <div class="promo-row">
      <article class="promo promo-virtual"><span>VIRTUAL SPORT</span><strong>GR</strong><small>⚽  ✨  🪙</small></article>
-     <article class="promo promo-bonus"><span>SOOTY BET</span><strong>Welcome Bonus</strong><small>Special offers for eligible members</small></article>
-     <article class="promo promo-team"><span>FOOTBALL ZONE</span><strong>Match day</strong><small>Follow your favourite teams</small></article>
-     <article class="promo promo-paris"><span>TOP MATCHES</span><strong>Paris Nights</strong><small>Explore upcoming fixtures</small></article>
+     <article class="promo promo-bonus"><span>FIRST DEPOSIT OFFER</span><strong>300% Bonus</strong><small>Promotional concept · terms apply</small></article>
+     <article class="promo promo-team"><span>FC BARCELONA</span><strong>Barça Formation</strong><small>Explore football action</small></article>
+     <article class="promo promo-paris"><span>PARIS</span><strong>Paris Matchday</strong><small>Explore upcoming fixtures</small></article>
     </div>
     <div class="mobile-section-head"><h2>Game zone <em>SOOTY GAMES</em></h2><button onclick="showPage('sports',null)">All ›</button></div>
     <div class="game-row"><div class="game-icon">🧜‍♀️<small>Heads or Tails</small></div><div class="game-icon">🍎<small>Apple Of Fortune</small></div><div class="game-icon">🐉<small>Dragon's Gold</small></div><div class="game-icon">🧟<small>Midgard Zombies</small></div><div class="game-icon">🤠<small>Western Slot</small></div></div>
@@ -187,6 +244,7 @@ body{background:#edf2f7;color:#172b42}
   </section>
   <section id="live" class="page"><div class="panel"><div class="panel-title"><h3>Live sports centre</h3><span class="live">● LIVE SCORES</span></div><p class="muted">Live scores require a premium data feed. Free fixtures are shown below.</p><div id="livelist"></div></div></section>
   <section id="upcoming" class="page"><div class="panel"><h3>Upcoming football</h3><p class="muted">Scheduled fixtures shown in Nigeria time. Odds are not enabled until a separate approved odds feed is connected.</p><div id="upcominglist"></div></div></section>
+  <section id="favorites" class="page"><div class="panel"><h3>Favorites</h3><p class="muted">Your favorite teams and events will appear here when favorites are enabled.</p></div></section>
   <section id="mybets" class="page"><div class="panel"><h3>My bets</h3><p class="muted" id="betsmessage">Sign in to load your bet history.</p><div id="betslist" class="empty">No bets loaded</div></div></section>
   <section id="wallet" class="page"><div class="panel"><h3>My wallet</h3><div class="stats"><div class="stat"><b id="walletbal">₦0.00</b><small>Available balance</small></div><div class="stat"><b>₦0.00</b><small>Total deposits</small></div><div class="stat"><b>₦0.00</b><small>Total withdrawals</small></div></div><div class="panel" style="margin-top:16px;background:#1b1e23"><h3>Manual bank transfer details</h3><p class="muted">Minimum deposit: <b style="color:var(--gold)">₦15,000</b>. If you have been instructed by SOOTY BET support to make a transfer, use these account details:</p><div class="calc"><span>Bank</span><b>OPay</b></div><div class="calc"><span>Account name</span><b>Blessing Okpeahior</b></div><div class="calc"><span>Account number</span><b id="depositaccount">8074134267</b></div><button class="btn primary" type="button" onclick="copyDepositAccount()">Copy account number</button><p class="muted" style="font-size:11px;margin-top:12px">Keep your transfer receipt and contact support for verification. Never share your PIN or password.</p></div><div class="panel" style="margin-top:16px;background:#1b1e23"><h3>Request a manual withdrawal</h3><p class="muted">Enter the bank account that belongs to you. Requests are reviewed by the SOOTY BET admin. Approved payments are sent manually.</p><form onsubmit="event.preventDefault();submitWithdrawal()"><label class="muted">Amount (₦)</label><input class="field" id="withdrawamount" type="number" min="100" step="1" required placeholder="Amount to withdraw"><label class="muted">Bank name</label><input class="field" id="withdrawbank" required maxlength="80" placeholder="e.g. Opay, Access Bank"><label class="muted">Account name</label><input class="field" id="withdrawname" required maxlength="100" placeholder="Name on your bank account"><label class="muted">10-digit account number</label><input class="field" id="withdrawaccount" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="0123456789"><button class="place" id="withdrawsubmit" type="submit">Submit withdrawal request</button></form><p id="withdrawmessage" class="muted" style="font-size:12px"></p></div><div id="withdrawhistory" class="muted" style="margin-top:16px"></div><div id="walletentries" class="muted" style="margin-top:16px"></div><div class="notice">Manual process only: submitting a request does not send money. Your available wallet balance is reserved while the request is pending. Admin must approve it, transfer funds through the bank, then mark it paid. Rejected requests return to your wallet. Keep your bank details accurate.</div></div></section>
   <section id="account" class="page"><div class="panel"><h3>My account</h3><p class="muted" id="accounttext">Log in or create an account to view your profile.</p><button class="btn primary" onclick="openModal('login')">Log in</button></div></section>
@@ -195,6 +253,13 @@ body{background:#edf2f7;color:#172b42}
  </main>
  <aside class="betslip"><div class="slip-head"><h3>Bet slip</h3><span class="count" id="count">0</span></div><div id="selections"><div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div></div><div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Log in to place bet</button></div><div class="notice">Preview only: sample odds are not live or offerable. No real bets or payments can be placed.</div></aside>
 </div>
+<nav class="mobile-bottom" aria-label="Bottom navigation">
+ <button class="active" onclick="showPage('sports',this);setBottomActive(this)"><b>🔥</b><span>Popular</span></button>
+ <button onclick="showPage('favorites',this);setBottomActive(this)"><b>☆</b><span>Favorites</span></button>
+ <button class="bottom-slip" onclick="toggleMobileSlip(this)"><b>▤</b><span>Bet slip <i id="mobile-slip-count">0</i></span></button>
+ <button onclick="showPage('mybets',this);setBottomActive(this)"><b>◷</b><span>History</span></button>
+ <button onclick="showPage('settings',this);setBottomActive(this)"><b>⠿</b><span>Menu</span></button>
+</nav>
 <footer class="footer">© 2026 SOOTY BET · Your Game. Your Odds. Your Victory. · 18+ · Please gamble responsibly.<br>Preview environment — not licensed for real-money betting.</footer>
 <div class="modal" id="modal"><div class="modal-card"><button class="close" onclick="closeModal()">×</button><div class="brand">SOOTY<span> BET</span></div><h2 id="modaltitle">Welcome back</h2><form onsubmit="event.preventDefault();submitAuth()"><label class="muted">Email or phone number</label><input class="field" id="email" required placeholder="Enter email or phone"><label class="muted">Password</label><input class="field" id="password" required type="password" minlength="12" placeholder="At least 12 characters"><p id="authhint" class="muted" style="font-size:11px">Use your registered email/phone and password.</p><button class="place" id="authbutton" type="submit">Log in</button></form><p id="autherror" style="color:#fa6b70;font-size:12px"></p><p class="muted" style="font-size:12px;margin-top:14px"><span id="authswitchtext">Already have an account?</span> <button type="button" class="btn ghost" style="padding:5px 9px;color:var(--white)" onclick="switchAuthMode()" id="authswitch">Log in</button></p><p class="muted" style="font-size:11px">Accounts are created in pending-verification status. No wagering or money movement is enabled.</p></div></div>
 <script>
@@ -242,9 +307,15 @@ async function refreshSports(){
 function render(){document.getElementById('matchlist').innerHTML='<div class="empty">Loading football fixtures…</div>';document.getElementById('livelist').innerHTML='<div class="empty">Checking live-score availability…</div>';document.getElementById('upcominglist').innerHTML='<div class="empty">Loading upcoming fixtures…</div>';renderSlip();refreshSports();}
 function addPick(id,pick){let m=fixtures.find(x=>x.id===id);let old=slip.findIndex(s=>s.id===id);if(old>=0)slip.splice(old,1);slip.push({id,pick,home:m.home,away:m.away,odd:m.odds[['1','X','2'].indexOf(pick)]});render()}
 function removePick(id){slip=slip.filter(s=>s.id!==id);render()}
-function renderSlip(){document.getElementById('count').textContent=slip.length;let box=document.getElementById('selections');document.getElementById('slipcalc').style.display=slip.length?'block':'none';if(!slip.length){box.innerHTML='<div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div>';return}box.innerHTML=slip.map(s=>`<div class="selection"><button class="remove" onclick="removePick(${s.id})">×</button><strong>${s.home} vs ${s.away}</strong><small>${s.pick==='1'?'Home win':s.pick==='X'?'Draw':'Away win'} · <b style="color:var(--gold)">${s.odd.toFixed(2)}</b></small></div>`).join('');calculate()}
+function renderSlip(){document.getElementById('count').textContent=slip.length;const mobileCount=document.getElementById('mobile-slip-count');if(mobileCount)mobileCount.textContent=slip.length;let box=document.getElementById('selections');document.getElementById('slipcalc').style.display=slip.length?'block':'none';if(!slip.length){box.innerHTML='<div class="empty">Your betslip is empty.<br><small>Select odds to add a match.</small></div>';return}box.innerHTML=slip.map(s=>`<div class="selection"><button class="remove" onclick="removePick(${s.id})">×</button><strong>${s.home} vs ${s.away}</strong><small>${s.pick==='1'?'Home win':s.pick==='X'?'Draw':'Away win'} · <b style="color:var(--gold)">${s.odd.toFixed(2)}</b></small></div>`).join('');calculate()}
 function calculate(){let stake=Number(document.getElementById('stake').value||0),odds=slip.reduce((a,s)=>a*s.odd,1);document.getElementById('totalodds').textContent=odds.toFixed(2);document.getElementById('return').textContent=money(stake*odds)}
-function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');if(id==='wallet')loadWallet();if(id==='mybets')loadBets();if(id==='admin')loadAdmin()}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));const target=document.getElementById(id);if(target)target.classList.add('active');document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');if(id==='wallet')loadWallet();if(id==='mybets')loadBets();if(id==='admin')loadAdmin();if(id==='favorites'){};if(id!=='sports')document.querySelector('.betslip')?.classList.remove('mobile-open')}
+
+function toggleSearch(){const box=document.getElementById('mobilesearch');box.classList.toggle('open');if(box.classList.contains('open'))document.getElementById('homesearch').focus();}
+function filterHomeSearch(q){const term=String(q||'').trim().toLowerCase();document.querySelectorAll('#sports .match').forEach(el=>{el.style.display=!term||el.textContent.toLowerCase().includes(term)?'':'none';});}
+function selectHomeTab(tab,el){document.querySelectorAll('.home-tab').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');if(tab==='sports'){document.querySelector('.mobile-home').style.display='none';document.querySelector('#sports>.hero').style.display='block';document.querySelector('#sports>.chips').style.display='flex';document.getElementById('matches').style.display='block';}else if(tab==='top'){document.querySelector('.mobile-home').style.display='block';document.querySelector('#sports>.hero').style.display='block';document.querySelector('#sports>.chips').style.display='flex';document.getElementById('matches').style.display='block';}else{document.querySelector('.mobile-home').style.display='block';document.querySelector('#sports>.hero').style.display='none';document.querySelector('#sports>.chips').style.display='none';document.getElementById('matches').style.display='none';const home=document.querySelector('.mobile-home');let note=document.getElementById('tab-placeholder');if(!note){note=document.createElement('div');note.id='tab-placeholder';note.className='event-row';home.appendChild(note);}note.textContent=tab==='esports'?'Esports listings will appear here when the SOOTY BET esports feed is connected.':tab==='casino'?'Casino games are not available in this preview.':'Sooty Games are coming soon.';}}
+function setBottomActive(el){document.querySelectorAll('.mobile-bottom button').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');}
+function toggleMobileSlip(el){const slipBox=document.querySelector('.betslip');slipBox.classList.toggle('mobile-open');setBottomActive(el);}
 function openModal(m){mode=m;document.getElementById('authswitchtext').textContent=m==='login'?'New to SOOTY BET?':'Already have an account?';document.getElementById('authswitch').textContent=m==='login'?'Create account':'Log in';document.getElementById('modaltitle').textContent=m==='login'?'Welcome back':'Create your account';document.getElementById('authbutton').textContent=m==='login'?'Log in':'Create account';document.getElementById('authhint').textContent=m==='login'?'Use your registered email/phone and password.':'Registration requires a valid email or international phone number and a password of at least 12 characters.';document.getElementById('autherror').textContent='';document.getElementById('modal').classList.add('show')}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 function switchAuthMode(){openModal(mode==='login'?'register':'login')}
@@ -265,9 +336,9 @@ async function submitAuth(){
 }
 function syncSession(){
  const saved=user||JSON.parse(localStorage.getItem('sooty_user')||'null');user=saved;
- document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';document.getElementById('balance').style.display=token?'inline-flex':'none';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';
+ document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';document.getElementById('balance').style.display='inline-flex';document.getElementById('balance').textContent=token?'₦ 0.00':'—— ₦';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';
  document.getElementById('accounttext').textContent=token?`Signed in as ${saved?.email||saved?.phone||'account'} · Status: ${saved?.status||'active'} · Role: ${saved?.role||'user'}`:'Log in or create an account to view your profile.';
- if(!token){document.getElementById('balance').textContent='₦ 0.00';document.getElementById('walletbal').textContent='₦0.00'}
+ if(!token){document.getElementById('balance').textContent='—— ₦';document.getElementById('walletbal').textContent='₦0.00'}
 }
 function savePayoutDetails(){const bank=document.getElementById("savedbank").value.trim();const name=document.getElementById("savedname").value.trim();const account=document.getElementById("savedaccount").value.trim();if(!bank||!name||!/^\d{10}$/.test(account)){document.getElementById("savedetailsmessage").textContent="Enter all details and a valid 10-digit account number.";return;}localStorage.setItem("sooty_payout_details",JSON.stringify({bank,name,account}));document.getElementById("savedetailsmessage").textContent="Details saved on this device.";}
 function loadPayoutDetails(){try{const d=JSON.parse(localStorage.getItem("sooty_payout_details")||"null");if(d){document.getElementById("savedbank").value=d.bank||"";document.getElementById("savedname").value=d.name||"";document.getElementById("savedaccount").value=d.account||"";document.getElementById("withdrawbank").value=d.bank||"";document.getElementById("withdrawname").value=d.name||"";document.getElementById("withdrawaccount").value=d.account||"";}}catch(e){}}
@@ -321,20 +392,3 @@ render();syncSession();loadPayoutDetails();checkApi();setInterval(refreshSports,
 
 <!-- deployment refresh: 2026-11-12 -->
 </body></html>
-/* Bold wallet balance at the left side of the header */
-.balance{font-weight:950;font-size:15px;letter-spacing:.25px;text-shadow:0 1px 2px #0008;white-space:nowrap}
-@media(max-width:680px){.top{justify-content:flex-start;gap:8px}.top>.balance{font-size:13px;padding:7px 9px;margin-left:auto}.top-actions{margin-left:auto}.top-actions .balance{display:none!important}}
-
-/* Refined signed-out and signed-in header states */
-.top-actions #loginbtn,.top-actions #joinbtn,.top-actions #logoutbtn,.top-actions #settingsbtn{border-radius:9px;min-height:38px;padding:9px 15px;font-weight:900;letter-spacing:.15px}
-.top-actions #loginbtn{background:#202a36;border:1px solid #52657a;color:#f2f6fb}
-.top-actions #joinbtn{background:linear-gradient(135deg,#f4c64f,#d99b22);border:1px solid #f7d77a;color:#17130a;box-shadow:0 3px 12px #d99b2233}
-.top-actions #logoutbtn{background:#202a36;border:1px solid #52657a;color:#f2f6fb}
-@media(max-width:680px){
- .top{gap:8px}
- .top-actions{gap:6px}
- .top-actions #loginbtn,.top-actions #joinbtn{display:inline-flex!important;align-items:center;justify-content:center;padding:8px 10px;font-size:11px;min-height:35px}
- .top-actions #settingsbtn{display:none!important}
- .top-actions #logoutbtn{padding:8px 10px;font-size:11px;min-height:35px}
- .top>.balance{margin-left:0}
-}
