@@ -203,24 +203,83 @@ app.get('/api/betslip-codes/:code',async(req,res)=>{
  } catch(e) { console.error('Betslip code lookup failed:',e.message);res.status(500).json({error:'Could not load that betslip right now.'}); }
 });
 
-app.get('/api/sports/live', (_req, res) => {
-  res.set('Cache-Control', 'no-store');
-  res.json({
-    matches: [],
-    updatedAt: new Date().toISOString(),
-    provider: 'TheSportsDB Free',
-    message: 'Live scores are not included in the free tier.'
-  });
+// Live and scheduled football data. Set API_FOOTBALL_KEY in Render to enable
+// the licensed API-Sports feed; never expose this key to the browser.
+const API_FOOTBALL_KEY = process.env.API_FOOTBALL_KEY || '';
+const footballCache = new Map();
+async function apiFootball(path, params = {}) {
+  if (!API_FOOTBALL_KEY) return null;
+  const url = new URL('https://v3.football.api-sports.io/' + path);
+  for (const [key, value] of Object.entries(params)) if (value !== undefined && value !== null) url.searchParams.set(key, String(value));
+  const response = await fetch(url, { headers: { 'x-apisports-key': API_FOOTBALL_KEY, accept: 'application/json' } });
+  if (!response.ok) throw new Error('Live football provider returned HTTP ' + response.status);
+  const body = await response.json();
+  if (body.errors && Object.keys(body.errors).length) throw new Error('Football provider rejected the request: ' + JSON.stringify(body.errors));
+  return body.response || [];
+}
+function mapApiFootballFixture(row) {
+  const f = row.fixture || {}, league = row.league || {}, teams = row.teams || {}, goals = row.goals || {};
+  const status = f.status || {};
+  return {
+    id: String(f.id), providerId: Number(f.id), league: league.name || 'Football',
+    country: league.country || '', home: teams.home?.name || 'Home', away: teams.away?.name || 'Away',
+    homeScore: goals.home == null ? null : Number(goals.home), awayScore: goals.away == null ? null : Number(goals.away),
+    status: status.short || 'NS', statusText: status.long || 'Scheduled',
+    elapsed: status.elapsed == null ? null : Number(status.elapsed),
+    kickoff: f.date || null, venue: f.venue?.name || '',
+    live: ['1H','HT','2H','ET','P','LIVE'].includes(status.short),
+    source: 'API-Football'
+  };
+}
+async function footballFixtureFeed(kind) {
+  const cacheKey = 'football:' + kind, cached = footballCache.get(cacheKey);
+  const ttl = kind === 'live' ? 15000 : 180000;
+  if (cached && Date.now() - cached.at < ttl) return cached.data;
+  if (!API_FOOTBALL_KEY) return null;
+  const rows = kind === 'live'
+    ? await apiFootball('fixtures', { live: 'all', timezone: 'Africa/Lagos' })
+    : await apiFootball('fixtures', { from: dateOffset(0), to: dateOffset(7), timezone: 'Africa/Lagos' });
+  const data = rows.map(mapApiFootballFixture);
+  footballCache.set(cacheKey, { at: Date.now(), data });
+  return data;
+}
+app.get('/api/sports/live', async (_req, res) => {
+  try {
+    const matches = await footballFixtureFeed('live');
+    res.set('Cache-Control', 'no-store');
+    if (matches) return res.json({ matches, updatedAt: new Date().toISOString(), provider: 'API-Football' });
+    return res.json({ matches: [], updatedAt: new Date().toISOString(), provider: 'Not configured', message: 'Add API_FOOTBALL_KEY to the backend service to enable verified live scores.' });
+  } catch (e) {
+    res.status(502).json({ error: e.message || 'Could not load live fixtures.' });
+  }
 });
 app.get('/api/sports/upcoming', async (_req, res) => {
   try {
-    // Three daily requests stay within TheSportsDB free schedule endpoint allowance.
-    const days = await Promise.all([0, 1, 2].map(offset => sportsDay(dateOffset(offset))));
-    const matches = days.flat().sort((a, b) => new Date(a.kickoff || 0) - new Date(b.kickoff || 0));
+    let matches = await footballFixtureFeed('upcoming'), provider = 'API-Football';
+    if (!matches) {
+      const days = await Promise.all([0, 1, 2].map(offset => sportsDay(dateOffset(offset))));
+      matches = days.flat().sort((a, b) => new Date(a.kickoff || 0) - new Date(b.kickoff || 0));
+      provider = 'TheSportsDB Free';
+    }
     res.set('Cache-Control', 'no-store');
-    res.json({ matches, updatedAt: new Date().toISOString(), provider: 'TheSportsDB Free' });
+    res.json({ matches, updatedAt: new Date().toISOString(), provider, liveOddsConfigured: Boolean(API_FOOTBALL_KEY) });
   } catch (e) {
-    res.status(e.status || 500).json({ error: e.message || 'Could not load upcoming fixtures.' });
+    res.status(502).json({ error: e.message || 'Could not load upcoming fixtures.' });
+  }
+});
+app.get('/api/sports/odds/:fixtureId', async (req, res) => {
+  if (!API_FOOTBALL_KEY) return res.status(503).json({ error: 'Live bookmaker odds are not configured. Add API_FOOTBALL_KEY to Render.' });
+  const fixtureId = Number(req.params.fixtureId);
+  if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ error: 'Invalid fixture ID.' });
+  try {
+    const [prematch, live] = await Promise.all([
+      apiFootball('odds', { fixture: fixtureId }),
+      apiFootball('odds/live', { fixture: fixtureId })
+    ]);
+    res.set('Cache-Control', 'no-store');
+    res.json({ fixtureId, prematch, live, updatedAt: new Date().toISOString(), provider: 'API-Football' });
+  } catch (e) {
+    res.status(502).json({ error: e.message || 'Could not load bookmaker odds.' });
   }
 });
 
