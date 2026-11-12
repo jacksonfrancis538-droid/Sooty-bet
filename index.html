@@ -591,8 +591,8 @@ function placeBet(){
  alert('Test bet ticket created: '+ref+'\nOpen My Bets / History to view or print your receipt.');
  showPage('mybets',null);loadBets();
 }
-function viewTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printTestTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake (test only)</span><b>'+money(t.stake)+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return (not payable)</span><b>'+money(t.potentialReturn)+'</b></div><p class="muted">Sandbox receipt only. No real wager, wallet debit, or cash payout occurred.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
-function printTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return}w.document.write('<html><head><title>SOOTY BET Test Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SOOTY BET</h1><small>TEST BET RECEIPT · SANDBOX ONLY</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+t.selections.map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('')+'<hr><div class="row"><span>Stake</span><b>'+money(t.stake)+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+money(t.potentialReturn)+'</b></div><div class="warn">TEST RECEIPT ONLY. No real money was wagered, debited, or paid.</div><script>window.onload=()=>window.print()<\/script></body></html>');w.document.close();}
+function viewTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const unit=t.unit==='points'?' points':'',stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printTestTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake (test only)</span><b>'+stakeText+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return (not payable)</span><b>'+returnText+'</b></div><p class="muted">Sandbox receipt only. No real wager, wallet debit, or cash payout occurred.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
+function printTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return}w.document.write('<html><head><title>SOOTY BET Test Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SOOTY BET</h1><small>TEST BET RECEIPT · SANDBOX ONLY</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+t.selections.map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('')+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">TEST RECEIPT ONLY. No real money was wagered, debited, or paid.</div><script>window.onload=()=>window.print()<\/script></body></html>');w.document.close();}
 let virtualSport='football',virtualMatch=null,virtualPoll=null,virtualFrame=null;
 const virtualNames={football:'Football',basketball:'Basketball',tennis:'Tennis',racing:'Horse Racing'};
 async function loadVirtuals(){
@@ -644,33 +644,40 @@ async function placeVirtualStake(id){
  if(!Number.isSafeInteger(stake)||stake<10){alert('Minimum practice stake is 10 points.');return;}
  const balance=getVirtualPoints();if(stake>balance){alert('Not enough practice points. Your balance is '+balance.toLocaleString('en-NG')+' points.');return;}
  const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]');
- if(pending.some(x=>x.matchId===id)){alert('You already have a practice stake on this game.');return;}
- pending.push({matchId:id,stake,odd:pick.odd,outcome:pick.outcome,createdAt:new Date().toISOString()});
+ const matchCard=input?.closest('.virtual-match-card');
+ const eventName=matchCard?.querySelector('.virtual-match-names')?.textContent?.trim()||('Virtual match #'+id);
+ const marketLabel=matchCard?.querySelector('.virtual-market.selected')?.textContent?.trim()||pick.outcome;
+ const reference='SBV-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+ const bet={reference,matchId:id,stake,odd:pick.odd,outcome:pick.outcome,createdAt:new Date().toISOString(),status:'OPEN · TEST'};
+ pending.push(bet);
  localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending));
+ const tickets=getTestTickets();tickets.unshift({reference,createdAt:bet.createdAt,stake,odds:pick.odd,potentialReturn:stake*pick.odd,status:'OPEN · TEST',mode:'VIRTUAL SANDBOX',unit:'points',selections:[{event:eventName,market:'Virtual market',selection:marketLabel,odds:pick.odd}]});saveTestTickets(tickets);
  localStorage.setItem('sooty_virtual_points',String(balance-stake));updateVirtualPointsUI();
  await startVirtualMatch(id);
 }
 function settleVirtualStake(match){
  if(!match||match.status!=='completed')return;
- const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]'),bet=pending.find(x=>x.matchId===match.id);
- if(!bet)return;
- const winner=match.result?.winner;
- const goals=Number(match.homeScore||0)+Number(match.awayScore||0);
- const home=Number(match.homeScore||0),away=Number(match.awayScore||0);
- let won=winner===bet.outcome;
- if(bet.outcome==='btts_yes')won=home>0&&away>0;
- else if(bet.outcome==='btts_no')won=home===0||away===0;
- else if(/^over_[0-9]+_[0-9]+$/.test(bet.outcome))won=goals>Number(bet.outcome.split('_')[1]+'.'+bet.outcome.split('_')[2]);
- else if(/^under_[0-9]+_[0-9]+$/.test(bet.outcome))won=goals<Number(bet.outcome.split('_')[1]+'.'+bet.outcome.split('_')[2]);
- else if(bet.outcome==='double_1x')won=home>=away;
- else if(bet.outcome==='double_x2')won=away>=home;
- else if(bet.outcome==='double_12')won=home!==away;
- const payout=won?Math.floor(bet.stake*bet.odd):0;
- if(payout)localStorage.setItem('sooty_virtual_points',String(getVirtualPoints()+payout));
+ const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]'),bets=pending.filter(x=>x.matchId===match.id);
+ if(!bets.length)return;
+ const winner=match.result?.winner,goals=Number(match.homeScore||0)+Number(match.awayScore||0),home=Number(match.homeScore||0),away=Number(match.awayScore||0);
+ let balance=getVirtualPoints();const tickets=getTestTickets();
+ for(const bet of bets){
+  let won=winner===bet.outcome;
+  if(bet.outcome==='btts_yes')won=home>0&&away>0;
+  else if(bet.outcome==='btts_no')won=home===0||away===0;
+  else if(/^over_[0-9]+_[0-9]+$/.test(bet.outcome))won=goals>Number(bet.outcome.split('_')[1]+'.'+bet.outcome.split('_')[2]);
+  else if(/^under_[0-9]+_[0-9]+$/.test(bet.outcome))won=goals<Number(bet.outcome.split('_')[1]+'.'+bet.outcome.split('_')[2]);
+  else if(bet.outcome==='double_1x')won=home>=away;
+  else if(bet.outcome==='double_x2')won=away>=home;
+  else if(bet.outcome==='double_12')won=home!==away;
+  const payout=won?Math.floor(bet.stake*bet.odd):0;balance+=payout;
+  const ticket=tickets.find(x=>x.reference===bet.reference);if(ticket){ticket.status=won?'WON · TEST':'LOST · TEST';ticket.payout=payout;}
+  const result=document.getElementById('virtual-result');
+  if(result)result.innerHTML+='<div class="virtual-final"><b>Practice ticket '+(won?'WON':'NOT WON')+'</b><div>'+bet.stake.toLocaleString('en-NG')+' points · '+escapeHTML(bet.outcome)+' @ '+bet.odd.toFixed(2)+' · '+(won?'Returned '+payout.toLocaleString('en-NG')+' points':'No points returned')+'</div></div>';
+ }
+ localStorage.setItem('sooty_virtual_points',String(balance));
  localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending.filter(x=>x.matchId!==match.id)));
- updateVirtualPointsUI();
- const result=document.getElementById('virtual-result');
- if(result)result.innerHTML+='<div class="virtual-final"><b>Practice stake '+(won?'WON':'NOT WON')+'</b><div>'+bet.stake.toLocaleString('en-NG')+' points · '+escapeHTML(bet.outcome)+' @ '+bet.odd.toFixed(2)+' · '+(won?'Returned '+payout.toLocaleString('en-NG')+' points':'No points returned')+'</div></div>';
+ saveTestTickets(tickets);updateVirtualPointsUI();
 }
 async function startVirtualMatch(id){
  try{const data=await api('/api/virtual/matches/'+id+'/start',{method:'POST'});virtualMatch=data.match;document.getElementById('virtual-stage').hidden=false;document.getElementById('virtual-stage').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('virtual-result').innerHTML='';renderVirtualMatch();startVirtualAnimation();if(virtualPoll)clearInterval(virtualPoll);virtualPoll=setInterval(pollVirtualMatch,1000);}
