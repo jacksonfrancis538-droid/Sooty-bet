@@ -309,7 +309,24 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .slip-code-load button{min-width:65px}.slip-code-help{display:block;margin-top:7px;color:#708196;font-size:10px;line-height:1.35}
 @media(max-width:680px){.betslip.mobile-open .slip-code-tools{background:#1c2a39;border-color:#354b61;color:#edf5ff}.betslip.mobile-open .slip-code-result{color:#b7c8da}.betslip.mobile-open .slip-code-value{color:#78beff}.betslip.mobile-open .slip-code-load input{background:#0e1722;border-color:#3c5268;color:#fff}.betslip.mobile-open .slip-code-help{color:#a2b3c5}}
 </style>
-</head>
+<style id="sortbet-account-upgrade">
+.auth-screen{align-items:flex-start;justify-content:center;padding:22px 14px;background:#f2f4f7;color:#151a21}
+.auth-screen:before{display:none}.auth-wrap{width:min(560px,100%)}.auth-back{color:#586575}
+.auth-card{background:#fff;color:#151a21;border:1px solid #d8dce2;border-radius:22px;padding:28px 30px;box-shadow:0 16px 44px #14223816}
+.auth-brand{font-size:34px;font-style:italic;letter-spacing:-1.4px;color:#fff;background:#0876d1;border-radius:12px;padding:12px;margin:0 auto;width:max-content;min-width:180px}
+.auth-brand span{color:#fff}.auth-subtitle{color:#586575;font-size:14px;margin:10px 0 20px}
+.auth-card label{color:#59616b;font-size:13px;margin:13px 0 7px}
+.auth-card .field{background:#f8fafc;border:1px solid #d3d8df;color:#151a21;min-height:54px;border-radius:12px;font-size:15px;padding:0 15px}
+.auth-card .field:focus{border-color:#0876d1;outline:3px solid #0876d122}
+.auth-login-btn{background:#0876d1;border-radius:30px;min-height:56px;margin-top:12px}
+.auth-switch{color:#59616b}.auth-switch button{color:#0876d1}
+.auth-forgot{color:#0876d1}.auth-help{font-size:12px;color:#697586;margin:5px 0 12px}
+.auth-terms{display:flex!important;align-items:flex-start;gap:9px;line-height:1.5;margin:18px 0!important}
+.auth-terms input{width:19px;height:19px;accent-color:#0876d1;flex:none}
+.auth-terms a{color:#0876d1;font-weight:700;text-decoration:none}
+[hidden]{display:none!important}
+@media(max-width:480px){.auth-screen{padding:12px 10px}.auth-card{padding:23px 18px}.auth-brand{font-size:29px}}
+</style></head>
 <body>
 <header class="top">
  <button class="deposit-shortcut" id="depositbtn" type="button" onclick="showPage('wallet',null)" aria-label="Open deposit"><span class="deposit-plus">+</span><span class="balance" id="balance">—— ₦</span></button>
@@ -442,7 +459,18 @@ button:disabled{opacity:.65;cursor:not-allowed}
  <button onclick="showPage('settings',this);setBottomActive(this)"><b>⠿</b><span>Menu</span></button>
 </nav>
 <footer class="footer">© 2026 SORTBET NG · Your Game. Your Odds. Your Victory. · 18+ · Please gamble responsibly.<br>Preview environment — not licensed for real-money betting.</footer>
-<section class="auth-screen" id="authscreen" aria-label="SORTBET NG account access"><div class="auth-wrap"><button class="auth-back" type="button" onclick="closeModal()">← Back to SORTBET NG</button><div class="auth-card"><div class="auth-brand">SORTBET NG</div><p class="auth-subtitle" id="authsubtitle">Welcome back. Log in to your account.</p><form onsubmit="event.preventDefault();submitAuth()"><label for="email">Email or Phone</label><input class="field" id="email" type="text" autocomplete="username" required placeholder="Enter your email or phone number"><label for="password">Password</label><input class="field" id="password" type="password" autocomplete="current-password" required placeholder="Enter your password"><button class="auth-forgot" type="button" onclick="showAuthNotice('Password reset is not connected yet. Please contact SORTBET NG support for help recovering access.')">Forgot password?</button><button class="auth-login-btn" id="authbutton" type="submit">Log in</button></form><p class="auth-message" id="autherror" role="alert"></p><div class="auth-notice" id="authnotice"></div><button class="auth-bio" type="button" onclick="showAuthNotice('Face ID or biometric sign-in is not enabled in this web version yet.')"><span class="auth-bio-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M9 10v2m6-2v2m-6 4q3 3 6 0"/></svg></span><span>Use Face ID / Biometrics</span></button><p class="auth-switch" id="authswitchtext">Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button></p><p class="auth-foot">SORTBET NG · 18+ · Please gamble responsibly</p></div></div></section>
+<section class="auth-screen" id="authscreen" aria-label="SORTBET NG account access"><div class="auth-wrap"><button class="auth-back" type="button" onclick="closeModal()">← Back to SORTBET NG</button><div class="auth-card"><div class="auth-brand"><span>SORT</span>BET NG</div><p class="auth-subtitle" id="authsubtitle">Welcome back. Log in to your account.</p><form id="authform" onsubmit="event.preventDefault();submitAuth()">
+<div id="register-fields" hidden>
+<label for="fullname">Full Name</label><input class="field" id="fullname" type="text" autocomplete="name" maxlength="120" placeholder="Your full name">
+<label for="register-email">Email Address</label><input class="field" id="register-email" type="email" autocomplete="email" maxlength="254" placeholder="your@email.com">
+<label for="country">Country</label><select class="field" id="country"><option value="NG">🇳🇬 Nigeria · NGN (₦)</option><option value="GH" disabled>🇬🇭 Ghana · Coming soon</option></select><p class="auth-help">Your wallet and transactions will be in Nigerian Naira (₦).</p>
+<label for="phone">Phone Number</label><input class="field" id="phone" type="tel" autocomplete="tel" placeholder="+234 801 234 5678">
+<label for="referral">Referral Code (optional)</label><input class="field" id="referral" type="text" maxlength="20" placeholder="Enter referral code">
+</div>
+<div id="login-fields"><label for="email">Email or Phone</label><input class="field" id="email" type="text" autocomplete="username" required placeholder="Enter your email or phone number"></div>
+<label for="password">Password</label><input class="field" id="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+<div id="confirm-wrap" hidden><label for="confirm-password">Confirm Password</label><input class="field" id="confirm-password" type="password" autocomplete="new-password" placeholder="Repeat your password"><label class="auth-terms"><input id="terms" type="checkbox"> <span>I agree to the <a href="#" onclick="showAuthNotice('Terms and Conditions will be published before public launch.');return false">Terms &amp; Conditions</a> and <a href="#" onclick="showAuthNotice('Privacy Policy will be published before public launch.');return false">Privacy Policy</a>.</span></label></div>
+<button class="auth-forgot" id="forgotbtn" type="button" onclick="showAuthNotice('Password recovery will be available after email verification is configured.')">Forgot password?</button><button class="auth-login-btn" id="authbutton" type="submit">Log in</button></form><p class="auth-message" id="autherror" role="alert"></p><div class="auth-notice" id="authnotice"></div><p class="auth-switch" id="authswitchtext">Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button></p><p class="auth-foot">SORTBET NG · 18+ · Please gamble responsibly</p></div></div></section>
 
 <section class="logout-confirm" id="logout-confirm" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title">
  <div class="logout-confirm-card">
@@ -590,24 +618,30 @@ function selectHomeTab(tab,el){document.querySelectorAll('.home-tab').forEach(x=
 function setBottomActive(el){document.querySelectorAll('.mobile-bottom button').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');}
 function toggleMobileSlip(el){const slipBox=document.querySelector('.betslip');slipBox.classList.toggle('mobile-open');setBottomActive(el);}
 function closeMobileSlip(){document.querySelector('.betslip')?.classList.remove('mobile-open');const nav=document.querySelector('.mobile-bottom .bottom-slip');if(nav)nav.classList.remove('active');}
-function openModal(m){mode=m;const login=m==='login';document.querySelector('.auth-back').style.display=token?'':'none';document.getElementById('authsubtitle').textContent=login?'Welcome back. Log in to your account.':'Create your SORTBET NG account.';document.getElementById('authbutton').textContent=login?'Log in':'Create account';document.getElementById('password').setAttribute('autocomplete',login?'current-password':'new-password');document.getElementById('password').placeholder=login?'Enter your password':'Create a password (12+ characters)';document.getElementById('password').minLength=login?1:12;document.getElementById('authswitchtext').innerHTML=login?'Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button>':'Already have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Log in</button>';document.getElementById('autherror').textContent='';document.getElementById('authnotice').classList.remove('show');document.getElementById('authnotice').textContent='';document.getElementById('authscreen').classList.add('show');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById('email').focus(),80)}
+function openModal(m){mode=m;const login=m==='login';document.querySelector('.auth-back').style.display=token?'':'none';document.getElementById('authsubtitle').textContent=login?'Welcome back. Log in to your account.':'Create your SORTBET NG account.';document.getElementById('login-fields').hidden=!login;document.getElementById('register-fields').hidden=login;document.getElementById('confirm-wrap').hidden=login;document.getElementById('email').required=login;['fullname','register-email','phone','confirm-password','terms'].forEach(id=>{const el=document.getElementById(id);if(el)el.required=!login&&id!=='terms'});document.getElementById('terms').required=!login;document.getElementById('forgotbtn').hidden=!login;document.getElementById('authbutton').textContent=login?'Log in':'Create Account';document.getElementById('password').setAttribute('autocomplete',login?'current-password':'new-password');document.getElementById('password').placeholder=login?'Enter your password':'Create a password (12+ characters)';document.getElementById('password').minLength=login?1:12;document.getElementById('authswitchtext').innerHTML=login?'Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button>':'Already have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Log in</button>';document.getElementById('autherror').textContent='';document.getElementById('authnotice').classList.remove('show');document.getElementById('authnotice').textContent='';document.getElementById('authscreen').classList.add('show');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById(login?'email':'fullname').focus(),80)}
 function closeModal(){if(!token)return;document.getElementById('authscreen').classList.remove('show');document.body.style.overflow=''}
 function showAuthNotice(message){const box=document.getElementById('authnotice');box.textContent=message;box.classList.add('show')}
 function switchAuthMode(){openModal(mode==='login'?'register':'login')}
 async function submitAuth(){
- const identifier=document.getElementById('email').value.trim(),password=document.getElementById('password').value;
- const button=document.getElementById('authbutton'),error=document.getElementById('autherror');button.disabled=true;button.textContent='Please wait…';error.textContent='';
+ const password=document.getElementById('password').value,button=document.getElementById('authbutton'),error=document.getElementById('autherror');button.disabled=true;button.textContent='Please wait…';error.textContent='';
  try{
   let payload;
-  if(mode==='login') payload=await api('/api/auth/login',{method:'POST',body:JSON.stringify({identifier,password})});
-  else {
-   const isEmail=identifier.includes('@');
-   if(!isEmail && !/^\+?[1-9]\d{7,14}$/.test(identifier)) throw new Error('Enter a valid email address or phone number with country code.');
-   payload=await api('/api/auth/register',{method:'POST',body:JSON.stringify({[isEmail?'email':'phone']:identifier,password})});
+  if(mode==='login'){
+   const identifier=document.getElementById('email').value.trim();
+   payload=await api('/api/auth/login',{method:'POST',body:JSON.stringify({identifier,password})});
+  }else{
+   const fullName=document.getElementById('fullname').value.trim(),email=document.getElementById('register-email').value.trim(),phone=document.getElementById('phone').value.trim().replace(/[\s()-]/g,''),confirmPassword=document.getElementById('confirm-password').value;
+   if(fullName.length<2)throw new Error('Enter your full name.');
+   if(!/^\S+@\S+\.\S+$/.test(email))throw new Error('Enter a valid email address.');
+   if(!/^\+?[1-9]\d{7,14}$/.test(phone))throw new Error('Enter a valid phone number with country code, e.g. +2348012345678.');
+   if(password.length<12)throw new Error('Your password must contain at least 12 characters.');
+   if(password!==confirmPassword)throw new Error('Your passwords do not match.');
+   if(!document.getElementById('terms').checked)throw new Error('Please accept the Terms & Conditions and Privacy Policy.');
+   payload=await api('/api/auth/register',{method:'POST',body:JSON.stringify({fullName,email,phone,country:document.getElementById('country').value,referralCode:document.getElementById('referral').value.trim(),password,acceptedTerms:true})});
   }
   token=payload.token;user=payload.user;localStorage.setItem('sooty_token',token);localStorage.setItem('sooty_user',JSON.stringify(user));closeModal();syncSession();await loadWallet();
-  if(mode==='register') alert('Account created. Your account is pending age and identity verification. Betting and payments remain disabled.');
- }catch(e){error.textContent=e.message;}finally{button.disabled=false;button.textContent=mode==='login'?'Log in':'Create account'}
+  if(mode==='register')alert('Welcome to SORTBET NG. Your account has been created and is awaiting required age and identity verification.');
+ }catch(e){error.textContent=e.message;}finally{button.disabled=false;button.textContent=mode==='login'?'Log in':'Create Account'}
 }
 function syncSession(){
  const saved=user||JSON.parse(localStorage.getItem('sooty_user')||'null');user=saved;
