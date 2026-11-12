@@ -345,7 +345,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
 </style></head>
 <body>
 <header class="top">
- <button class="deposit-shortcut" id="depositbtn" type="button" onclick="showPage('wallet',null)" aria-label="Open deposit"><span class="deposit-plus">+</span><span class="balance" id="balance">—— ₦</span></button>
+ <button class="deposit-shortcut" id="depositbtn" type="button" onclick="showPage('wallet',null)" aria-label="Open deposit"><span class="deposit-plus">+</span><span class="balance" id="balance">₦0.00</span></button>
  <div class="header-brand"><div class="brand"><span class="brand-blue">SORT</span><span class="brand-white">BET NG</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
  <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="search-toggle" type="button" onclick="toggleSearch()" aria-label="Search">⌕</button><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="requestLogout()">Log out</button></div>
 </header>
@@ -718,11 +718,11 @@ async function submitAuth(){
 }
 function syncSession(){
  const saved=user||JSON.parse(localStorage.getItem('sooty_user')||'null');user=saved;
- document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';const adminEntry=document.getElementById('adminmenuentry');if(adminEntry)adminEntry.style.display=token&&saved?.role==='admin'?'flex':'none';document.getElementById('balance').style.display='inline-flex';document.getElementById('balance').textContent=token?'Wallet: loading…':'Sign in';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';loadDemoWalletUI();
+ document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';const adminEntry=document.getElementById('adminmenuentry');if(adminEntry)adminEntry.style.display=token&&saved?.role==='admin'?'flex':'none';document.getElementById('balance').style.display='inline-flex';document.getElementById('balance').textContent='₦0.00';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';loadDemoWalletUI();
  loadAppSettings();
  if(token)loadWallet().catch(()=>{});
  document.getElementById('accounttext').textContent=token?`Signed in as ${saved?.email||saved?.phone||'account'} · Status: ${saved?.status||'active'} · Role: ${saved?.role||'user'}`:'Log in or create an account to view your profile.';
- if(!token){document.getElementById('balance').textContent='Practice: Sign in';document.getElementById('walletbal').textContent='₦0.00';document.getElementById('balance').textContent='Sign in';}
+ if(!token){document.getElementById('balance').textContent='₦0.00';document.getElementById('walletbal').textContent='₦0.00';}
 }
 
 const SOOTY_SETTINGS_KEY='sooty_app_settings';
@@ -739,12 +739,12 @@ function cancelLogout(){document.getElementById("logout-confirm").classList.remo
 function logoutNow(){cancelLogout();token=null;user=null;try{localStorage.removeItem('sooty_token');localStorage.removeItem('sooty_user')}catch(e){};document.getElementById('balance').textContent='₦0.00';document.getElementById('walletbal').textContent='₦0.00';document.getElementById('walletentries').textContent='Sign in to view your wallet.';document.getElementById('betsmessage').textContent='Sign in to load your bet history.';document.getElementById('betslist').textContent='No bets loaded';document.getElementById('withdrawhistory').textContent='Sign in to view withdrawal requests.';syncSession();showPage('sports',null);openModal('login');}
 async function loadWallet(){
  const box=document.getElementById('walletentries');
- if(!token){document.getElementById('walletbal').textContent='₦0.00';document.getElementById('balance').textContent='Sign in';if(box)box.textContent='Sign in to view your wallet transactions.';return;}
+ if(!token){document.getElementById('walletbal').textContent='₦0.00';document.getElementById('balance').textContent=money(getPracticeBalance());if(box)box.textContent='Sign in to view your wallet transactions.';return;}
  try{
   const data=await api('/api/wallet');
   const balance=Number(data.balanceKobo||0)/100;
   document.getElementById('walletbal').textContent=money(balance);
-  document.getElementById('balance').textContent='Wallet: '+money(balance);
+  document.getElementById('balance').textContent=money(balance);
   if(box){const rows=data.entries||[];box.innerHTML=rows.length?rows.map(x=>'<div class="wallet-entry"><div><b>'+escapeHTML(x.description||x.type)+'</b><small>'+escapeHTML(x.reference||'')+' · '+new Date(x.createdAt).toLocaleString('en-NG')+'</small></div><strong class="'+(Number(x.amountKobo)>=0?'credit':'debit')+'">'+(Number(x.amountKobo)<0?'−':'+')+money(Math.abs(Number(x.amountKobo))/100)+'</strong></div>').join(''):'<div class="empty">No wallet transactions yet.</div>';}
   await loadWithdrawalHistory();
  }catch(e){if(box)box.textContent=e.message;throw e;}
@@ -868,7 +868,7 @@ const PRACTICE_WALLET_PREFIX='sortbet_practice_wallet_v1:';
 function practiceWalletKey(){const u=user||JSON.parse(localStorage.getItem('sooty_user')||'null');const identity=u?.id??u?.email??u?.phone??'guest';return PRACTICE_WALLET_PREFIX+String(identity).toLowerCase().replace(/[^a-z0-9_-]/g,'_');}
 function getPracticeBalance(){if(!token)return 0;const key=practiceWalletKey();const raw=localStorage.getItem(key);if(raw===null){localStorage.setItem(key,'100000');return 100000;}const n=Number(raw);return Number.isSafeInteger(n)&&n>=0?n:0;}
 function setPracticeBalance(n){const amount=Math.max(0,Math.floor(Number(n)||0));localStorage.setItem(practiceWalletKey(),String(amount));loadDemoWalletUI();return amount;}
-function loadDemoWalletUI(){const amount=getPracticeBalance();const formatted=money(amount);const top=document.getElementById('balance');if(top)top.textContent=token?'Practice: '+formatted:'Practice: Sign in';const wallet=document.getElementById('walletbal');if(wallet)wallet.textContent=formatted;const detail=document.getElementById('practice-wallet-detail');if(detail)detail.textContent=formatted;}
+function loadDemoWalletUI(){const amount=getPracticeBalance();const formatted=money(amount);const top=document.getElementById('balance');if(top)top.textContent=formatted;const wallet=document.getElementById('walletbal');if(wallet)wallet.textContent=formatted;const detail=document.getElementById('practice-wallet-detail');if(detail)detail.textContent=formatted;}
 function resetPracticeWallet(){if(!token){alert('Please log in first to use your practice wallet.');openModal('login');return;}if(!confirm('Reset your simulated practice balance to ₦100,000? This does not add real money.'))return;setPracticeBalance(100000);const msg=document.getElementById('practice-wallet-message');if(msg)msg.textContent='Practice balance reset to ₦100,000. No real money was added.';}
 function placeBet(){
  if(slip.some(x=>x.isVirtual)){if(slip.some(x=>!x.isVirtual)){alert('Keep virtual and regular sports selections in separate practice tickets.');return;}placeVirtualAccumulator();return;}
