@@ -574,7 +574,6 @@ async function setWithdrawalStatus(id,status){
 function copyDepositAccount(){const account='8074134267';if(navigator.clipboard?.writeText){navigator.clipboard.writeText(account).then(()=>alert('Account number copied.')).catch(()=>alert('Account number: '+account));}else{alert('Account number: '+account);}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function placeBet(){alert('Bet placement is disabled. The displayed fixtures and odds are sample data, not a live offer. A licensed odds provider, server-side validation, eligibility checks and a tested settlement engine are required.');}
-async 
 let virtualSport='football',virtualMatch=null,virtualPoll=null,virtualFrame=null;
 const virtualNames={football:'Football',basketball:'Basketball',tennis:'Tennis',racing:'Horse Racing'};
 async function loadVirtuals(){
@@ -629,7 +628,7 @@ function startVirtualAnimation(){
  };draw();
 }
 
-function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
+async function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
 render();syncSession();if(!token)openModal('login');loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}setInterval(()=>{if(token)loadWallet()},15000);window.addEventListener('focus',()=>{if(token)loadWallet()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)loadWallet()});
 </script>
 
