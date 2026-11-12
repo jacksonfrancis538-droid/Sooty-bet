@@ -610,7 +610,7 @@ function renderVirtualMatch(){
 }
 function closeVirtualMatch(){if(virtualPoll)clearInterval(virtualPoll);virtualPoll=null;virtualMatch=null;document.getElementById('virtual-stage').hidden=true;if(virtualFrame)cancelAnimationFrame(virtualFrame);virtualFrame=null;}
 function startVirtualAnimation(){
- if(virtualFrame)cancelAnimationFrame(virtualFrame);const canvas=document.getElementById('virtual-canvas');if(!canvas)return;const ctx=canvas.getContext('2d);
+ if(virtualFrame)cancelAnimationFrame(virtualFrame);const canvas=document.getElementById('virtual-canvas');if(!canvas)return;const ctx=canvas.getContext('2d');
  const draw=()=>{if(!virtualMatch)return;const m=virtualMatch,w=canvas.width,h=canvas.height,t=Date.now()/700,elapsed=m.elapsedSeconds||0;ctx.clearRect(0,0,w,h);
  if(m.sport==='football'){
   ctx.fillStyle='#167447';ctx.fillRect(0,0,w,h);for(let x=0;x<10;x++){ctx.fillStyle=x%2?'#167447':'#1b8050';ctx.fillRect(x*90,0,90,h)}
