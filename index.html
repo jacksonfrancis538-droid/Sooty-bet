@@ -300,7 +300,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
 <body>
 <header class="top">
  <button class="deposit-shortcut" id="depositbtn" type="button" onclick="showPage('wallet',null)" aria-label="Open deposit"><span class="deposit-plus">+</span><span class="balance" id="balance">—— ₦</span></button>
- <div class="header-brand"><div class="brand">SORTBET NG</div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
+ <div class="header-brand"><div class="brand"><span class="brand-blue">SORT</span><span class="brand-white">BET NG</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
  <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="search-toggle" type="button" onclick="toggleSearch()" aria-label="Search">⌕</button><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="requestLogout()">Log out</button></div>
 </header>
 <div class="mobile-search" id="mobilesearch"><input id="homesearch" type="search" placeholder="Search teams or leagues" oninput="filterHomeSearch(this.value)"><button type="button" onclick="toggleSearch()">Close</button></div>
@@ -818,6 +818,13 @@ async function checkApi(){try{const h=await api('/health');document.getElementBy
 render();syncSession();updateVirtualPointsUI();if(!token)openModal('login');loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}setInterval(()=>{if(token)loadWallet()},15000);window.addEventListener('focus',()=>{if(token)loadWallet()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)loadWallet()});
 </script>
 
+<style>
+/* SORTBET NG split-colour wordmark */
+.header-brand .brand{font-family:Impact,"Arial Black", "Trebuchet MS",sans-serif;font-weight:900;font-size:25px;letter-spacing:1.5px;line-height:1;text-transform:uppercase;text-shadow:0 2px 8px #0005}
+.header-brand .brand .brand-blue{color:#43a5ff!important}
+.header-brand .brand .brand-white{color:#fff!important}
+@media(max-width:680px){.header-brand .brand{font-size:22px;letter-spacing:1.2px}}
+</style>
 <!-- deployment refresh: 2026-11-12 -->
 </body></html>
 
