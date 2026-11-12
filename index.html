@@ -303,7 +303,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
  <div class="header-brand"><div class="brand">SOOTY<span>BET</span></div><span class="tag">YOUR GAME. YOUR ODDS. YOUR VICTORY.</span></div>
  <div class="top-actions"><span id="sessionlabel" class="muted" style="font-size:11px"></span><button class="search-toggle" type="button" onclick="toggleSearch()" aria-label="Search">⌕</button><button class="btn ghost" id="settingsbtn" onclick="showPage('settings',null)">Settings</button><button class="btn ghost" id="loginbtn" onclick="openModal('login')">Log in</button><button class="btn primary" id="joinbtn" onclick="openModal('register')">Join now</button><button class="btn ghost" id="logoutbtn" style="display:none" onclick="requestLogout()">Log out</button></div>
 </header>
-<div class="mobile-search" id="mobilesearch"><input id="homesearch" type="search" placeholder="Search teams, leagues or games" oninput="filterHomeSearch(this.value)"><button type="button" onclick="toggleSearch()">Close</button></div>
+<div class="mobile-search" id="mobilesearch"><input id="homesearch" type="search" placeholder="Search teams or leagues" oninput="filterHomeSearch(this.value)"><button type="button" onclick="toggleSearch()">Close</button></div>
 <nav class="home-tabs" aria-label="Main navigation">
  <button class="home-tab active" data-home-tab="top" onclick="selectHomeTab('top',this)">Top</button>
  <button class="home-tab" data-home-tab="sports" onclick="selectHomeTab('sports',this)">Sports</button>
@@ -333,7 +333,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
      <article class="promo promo-team" role="button" tabindex="0" onclick="showPage('upcoming',null)"><span>FC BARCELONA</span><strong>Barça Formation</strong><small>Explore football fixtures</small></article>
      <article class="promo promo-paris" role="button" tabindex="0" onclick="showPage('upcoming',null)"><span>PARIS</span><strong>Paris Matchday</strong><small>Explore upcoming fixtures</small></article>
     </div>
-    <div class="mobile-section-head"><h2>Game zone <em>SOOTY GAMES</em></h2><button onclick="showPage('sports',null)">All ›</button></div>
+    <div class="mobile-section-head"><h2>Game zone <em>SOOTY GAMES</em></h2><button onclick="showPage('casino',null)">All ›</button></div>
     <div class="game-row"><button class="game-icon" onclick="openCasinoGame('coin')">🪙<small>Heads or Tails</small></button><button class="game-icon" onclick="openCasinoGame('dice')">🎲<small>3D Dice</small></button><button class="game-icon" onclick="openCasinoGame('roulette')">🎡<small>Roulette</small></button><button class="game-icon" onclick="openCasinoGame('slots')">🎰<small>3D Slots</small></button><button class="game-icon" onclick="openCasinoGame('crash')">🚀<small>Sky Rocket</small></button></div><div class="mobile-section-head"><h2>TOP-EVENTS</h2><button onclick="showPage('upcoming',null)">All ›</button></div>
     <div class="event-row" onclick="showPage('upcoming',null)"><span class="event-ball purple">⚽</span><b>UEFA Champions League</b><span>›</span></div>
     <div class="event-row" onclick="showPage('upcoming',null)"><span class="event-ball orange">⚽</span><b>Europa League</b><span>›</span></div>
