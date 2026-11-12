@@ -90,6 +90,14 @@ CREATE TABLE IF NOT EXISTS virtual_matches (
 CREATE INDEX IF NOT EXISTS virtual_matches_sport_status_idx ON virtual_matches(sport,status,scheduled_at);
 CREATE INDEX IF NOT EXISTS virtual_matches_completed_idx ON virtual_matches(completed_at DESC);
 
+CREATE TABLE IF NOT EXISTS betslip_codes (
+ code CHAR(5) PRIMARY KEY,
+ selections JSONB NOT NULL,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+ expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '30 days'
+);
+CREATE INDEX IF NOT EXISTS betslip_codes_expiry_idx ON betslip_codes(expires_at);
+
 `);
 
 const adminHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
@@ -155,6 +163,42 @@ function dateOffset(days) {
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().slice(0, 10);
 }
+app.post('/api/betslip-codes', async (req,res) => {
+ try {
+  const incoming=Array.isArray(req.body?.selections)?req.body.selections:[];
+  if(!incoming.length||incoming.length>20) return res.status(400).json({error:'A betslip must contain between 1 and 20 selections.'});
+  const selections=incoming.map(x=>({
+   id:cleanText(String(x.id??''),80),
+   home:cleanText(x.home,120),away:cleanText(x.away,120),
+   pick:cleanText(x.pick,80),pickLabel:cleanText(x.pickLabel,120),
+   market:cleanText(x.market,100),odd:Number(x.odd),
+   isVirtual:Boolean(x.isVirtual),matchId:Number.isSafeInteger(Number(x.matchId))?Number(x.matchId):null
+  }));
+  if(selections.some(x=>!x.home||!x.pick||!Number.isFinite(x.odd)||x.odd<=1||x.odd>10000))
+   return res.status(400).json({error:'One or more selections are invalid. Please refresh your betslip.'});
+  const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  for(let attempt=0;attempt<8;attempt++){
+   const bytes=crypto.randomBytes(5);
+   const code=Array.from(bytes,b=>alphabet[b%alphabet.length]).join('');
+   try {
+    await pool.query('INSERT INTO betslip_codes(code,selections) VALUES($1,$2)',[code,JSON.stringify(selections)]);
+    return res.status(201).json({code,expiresInDays:30});
+   } catch(e) { if(e.code!=='23505') throw e; }
+  }
+  return res.status(503).json({error:'Could not create a load code. Please try again.'});
+ } catch(e) { console.error('Betslip code creation failed:',e.message);res.status(500).json({error:'Could not create a betslip load code.'}); }
+});
+app.get('/api/betslip-codes/:code',async(req,res)=>{
+ const code=cleanText(req.params.code,5).toUpperCase();
+ if(!/^[A-HJ-NP-Z2-9]{5}$/.test(code)) return res.status(400).json({error:'Enter a valid 5-character betslip code.'});
+ try {
+  const result=await pool.query('SELECT selections FROM betslip_codes WHERE code=$1 AND expires_at>NOW()',[code]);
+  if(!result.rowCount) return res.status(404).json({error:'Betslip code not found or expired.'});
+  res.set('Cache-Control','no-store');
+  res.json({code,selections:result.rows[0].selections});
+ } catch(e) { console.error('Betslip code lookup failed:',e.message);res.status(500).json({error:'Could not load that betslip right now.'}); }
+});
+
 app.get('/api/sports/live', (_req, res) => {
   res.set('Cache-Control', 'no-store');
   res.json({
