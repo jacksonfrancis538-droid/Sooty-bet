@@ -55,6 +55,38 @@ body{background:#10151d;color:#f4f7fb;font-family:Arial,Helvetica,sans-serif}
 @media(max-width:1000px){.layout{grid-template-columns:175px minmax(0,1fr)}.betslip{grid-column:2}.side{top:74px}}
 @media(max-width:680px){.top{height:58px;padding:0 12px}.layout{display:block;padding:10px}.side{display:none}.betslip{position:static;margin-top:10px}.hero{padding:16px}.hero h1{font-size:23px}.top-actions{gap:5px}.top-actions .balance{font-size:10px}.panel{padding:11px}.mobile-tabs{display:flex}.stats{grid-template-columns:1fr 1fr}}
 
+
+/* Compact blue sportsbook presentation inspired by familiar betting layouts */
+:root{--bg:#edf2f7;--panel:#fff;--panel2:#f4f7fb;--line:#d5dee8;--gold:#f5c400;--gold2:#ffda3d;--muted:#718096;--white:#172b42;--green:#159b63;--red:#d94b55}
+body{background:#edf2f7;color:#172b42}
+.top{background:#07549a;border-bottom:0;box-shadow:0 2px 7px #1235;color:#fff}
+.brand,.brand span{color:#fff}.tag{color:#d8eaff}
+.balance{background:#06477f;border:1px solid #3c80b8;color:#ffe16b}
+.primary,.place{background:#f5c400;color:#16283b}
+.ghost{border-color:#8ab0d0;color:#fff}
+.sportsbar{background:#063e72;border-color:#0d5a99}
+.sportsbar-item{color:#d7e8f8}.sportsbar-item.active,.sportsbar-item:hover{color:#ffe16b;border-color:#f5c400;background:#0a4b84}
+.side,.betslip,.panel{background:#fff;border-color:#d5dee8;box-shadow:0 1px 4px #17324a12;border-radius:6px}
+.side h4,.section-head,.muted,.match-meta,.odd small{color:#708196}
+.navitem{color:#29445f;border-radius:4px}.navitem:hover,.navitem.active{background:#e7f1fb;color:#07549a}
+.hero{background:linear-gradient(110deg,#07549a,#0d6ab5);border:0;border-radius:6px;color:#fff}
+.hero p,.hero .eyebrow{color:#e5f2ff}.hero h1{color:#fff}
+.chip{background:#f2f6fa;border-color:#d5dee8;color:#36516c;border-radius:4px}
+.chip.active{background:#fff4c7;border-color:#e2b400;color:#5e4800}
+.panel-title{border-color:#e0e7ef}.match{border-color:#e3e9f0}
+.team{color:#203b56}.score{color:#07549a}
+.odd{background:#eef4f9;border:1px solid #d7e1eb;color:#1b3550;border-radius:4px}
+.odd b{color:#07549a}.odd:hover,.odd.selected{background:#fff4c7;border-color:#e2b400}
+.betslip{color:#203b56}.slip-head{border-color:#e0e7ef}
+.count{background:#f5c400;color:#172b42;border-radius:4px}
+.selection{border-color:#e0e7ef}.selection small{color:#708196}
+.stake,.field{background:#f7f9fc;border-color:#d5dee8;color:#172b42}
+.calc{color:#708196}.calc b{color:#173b60}
+.notice{background:#fff8dc;border-color:#ead78c;color:#66521a}
+.footer{background:#e5ebf2;border-color:#d5dee8;color:#61748a}
+.modal-card{background:#fff;border-color:#d5dee8;color:#172b42}
+.stat{background:#edf3f9}.stat b{color:#07549a}
+@media(max-width:680px){.top{background:#07549a}.betslip{background:#fff}}
 </style>
 </head>
 <body>
