@@ -402,10 +402,10 @@ async function submitAuth(){
 }
 function syncSession(){
  const saved=user||JSON.parse(localStorage.getItem('sooty_user')||'null');user=saved;
- document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';document.getElementById('balance').style.display='inline-flex';document.getElementById('balance').textContent=token?'₦ 0.00':'—— ₦';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';
+ document.getElementById('loginbtn').style.display=token?'none':'';document.getElementById('joinbtn').style.display=token?'none':'';document.getElementById('logoutbtn').style.display=token?'':'none';document.getElementById('settingsbtn').style.display=token?'':'none';document.getElementById('balance').style.display='inline-flex';document.getElementById('balance').textContent='₦0.00';document.getElementById('sessionlabel').textContent=token?(saved?.email||saved?.phone||'Signed in'):'';
  loadAppSettings();
  document.getElementById('accounttext').textContent=token?`Signed in as ${saved?.email||saved?.phone||'account'} · Status: ${saved?.status||'active'} · Role: ${saved?.role||'user'}`:'Log in or create an account to view your profile.';
- if(!token){document.getElementById('balance').textContent='—— ₦';document.getElementById('walletbal').textContent='₦0.00'}
+ if(!token){document.getElementById('balance').textContent='₦0.00';document.getElementById('walletbal').textContent='₦0.00'}
 }
 
 const SOOTY_SETTINGS_KEY='sooty_app_settings';
@@ -462,7 +462,7 @@ function copyDepositAccount(){const account='8074134267';if(navigator.clipboard?
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function placeBet(){alert('Bet placement is disabled. The displayed fixtures and odds are sample data, not a live offer. A licensed odds provider, server-side validation, eligibility checks and a tested settlement engine are required.');}
 async function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
-render();syncSession();loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}
+render();syncSession();loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}setInterval(()=>{if(token)loadWallet()},15000);window.addEventListener('focus',()=>{if(token)loadWallet()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)loadWallet()});
 </script>
 
 <!-- deployment refresh: 2026-11-12 -->
