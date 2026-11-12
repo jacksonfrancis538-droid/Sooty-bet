@@ -286,6 +286,15 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .logout-confirm-actions button{flex:1;min-height:46px;border-radius:9px;font-weight:800}
 .logout-cancel{background:#20344b;color:#e5effa;border:1px solid #38516d}
 .logout-yes{background:#0879df;color:#fff}
+
+/* SOOTY BET Virtual Sports */
+.virtual-page{color:#203b56}.virtual-hero{background:linear-gradient(120deg,#073e70,#0c6db4);color:#fff;border-radius:9px;padding:20px;margin-bottom:13px}
+.virtual-hero h2{margin:0 0 5px;font-size:24px}.virtual-hero p{margin:0;color:#d8eaff;font-size:12px}
+.virtual-tabs{display:flex;gap:7px;overflow:auto;margin:12px 0;padding-bottom:4px}.virtual-tabs button{white-space:nowrap;background:#eaf1f8;border:1px solid #d5e0eb;color:#29445f;border-radius:6px;padding:10px 14px;font-weight:800}.virtual-tabs button.active{background:#07549a;border-color:#07549a;color:#fff}
+.virtual-match-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 2px;border-top:1px solid #e1e8ef}.virtual-match-card:first-child{border-top:0}.virtual-match-meta{font-size:10px;color:#718096;margin-bottom:4px}.virtual-match-names{font-weight:800;color:#203b56}.virtual-match-status{font-size:10px;font-weight:900;color:#07804d;margin-top:4px}.virtual-play{background:#07549a;color:#fff;border-radius:5px;padding:10px 15px;font-weight:800;white-space:nowrap}
+.virtual-stage{margin-top:14px;background:#10253b;border-radius:10px;padding:14px;color:#fff}.virtual-stage-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.virtual-scoreline{display:flex;justify-content:center;align-items:center;gap:15px;font-size:17px;font-weight:900;text-align:center}.virtual-scoreline strong{font-size:27px;color:#ffdb72;white-space:nowrap}.virtual-clock{font-size:11px;color:#a9c4df;text-align:center;margin:5px 0 12px}.virtual-canvas-wrap{width:100%;overflow:hidden;border-radius:8px;background:#14633e}#virtual-canvas{width:100%;height:auto;display:block}.virtual-event-feed{max-height:180px;overflow:auto;margin-top:10px;border-top:1px solid #2e4962;padding-top:8px}.virtual-event{font-size:11px;color:#d6e4f2;padding:5px 2px;border-bottom:1px solid #263f56}.virtual-event.goal{color:#ffdc75;font-weight:900}.virtual-proof{font-size:10px;color:#9db6ce;overflow-wrap:anywhere;margin-top:12px}.virtual-final{padding:12px;background:#183b34;border:1px solid #2d795e;border-radius:7px;margin-top:10px;color:#d9ffef}.virtual-history-row{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid #e1e8ef;font-size:11px}.virtual-race-runners{display:flex;flex-direction:column;gap:6px;margin-top:12px}.virtual-runner{height:24px;border-radius:4px;background:#213b54;position:relative;overflow:hidden}.virtual-runner span{position:absolute;left:8px;top:3px;font-size:11px;color:#fff;z-index:1}.virtual-runner i{display:block;height:100%;background:linear-gradient(90deg,#1a9c68,#76dba6);width:0}
+@media(max-width:680px){.virtual-hero{padding:16px}.virtual-hero h2{font-size:21px}.virtual-match-card{align-items:flex-start}.virtual-match-names{font-size:12px}.virtual-play{padding:9px 11px;font-size:11px}.virtual-stage{padding:10px}.virtual-scoreline{font-size:13px;gap:8px}.virtual-scoreline strong{font-size:22px}}
+
 </style>
 </head>
 <body>
@@ -305,7 +314,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
 <div class="sportsbar"><div class="sportsbar-inner"><span class="sportsbar-label">SPORTS</span><span class="sportsbar-item active">⚽ Football</span><span class="sportsbar-item">🏀 Basketball</span><span class="sportsbar-item">🎾 Tennis</span><span class="sportsbar-item">🏐 Volleyball</span><span class="sportsbar-item">🏓 Table Tennis</span><span class="sportsbar-item">🎮 Esports</span><span class="sportsbar-item">🥊 Boxing</span><span class="sportsbar-item">🏒 Hockey</span></div></div>
 <div class="layout">
  <aside class="side"><h4>Menu</h4>
-  <div class="navitem active" onclick="showPage('sports',this)">⚽ Sports</div><div class="navitem" onclick="showPage('live',this)">🔴 Live betting</div><div class="navitem" onclick="showPage('upcoming',this)">📅 Upcoming</div><div class="navitem" onclick="showPage('mybets',this)">🎟 My bets</div><div class="navitem" onclick="showPage('wallet',this)">👛 Deposit / Withdraw</div><div class="navitem" onclick="showPage('account',this)">👤 My account</div><div class="navitem" onclick="showPage('settings',this)">⚙ Settings</div><div class="navitem" onclick="showPage('admin',this)">⚙ Admin preview</div>
+  <div class="navitem active" onclick="showPage('sports',this)">⚽ Sports</div><div class="navitem" onclick="showPage('virtuals',this);loadVirtuals()">🎮 Virtual Sports</div><div class="navitem" onclick="showPage('live',this)">🔴 Live betting</div><div class="navitem" onclick="showPage('upcoming',this)">📅 Upcoming</div><div class="navitem" onclick="showPage('mybets',this)">🎟 My bets</div><div class="navitem" onclick="showPage('wallet',this)">👛 Deposit / Withdraw</div><div class="navitem" onclick="showPage('account',this)">👤 My account</div><div class="navitem" onclick="showPage('settings',this)">⚙ Settings</div><div class="navitem" onclick="showPage('admin',this)">⚙ Admin preview</div>
   <h4 style="margin-top:24px">Sports</h4><div class="navitem">⚽ Football</div><div class="navitem">🏀 Basketball</div><div class="navitem">🎾 Tennis</div><div class="navitem">🏐 Volleyball</div><div class="navitem">🎮 Esports</div>
  </aside>
  <main>
@@ -318,7 +327,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
      <button class="sport-cat active" onclick="showPage('sports',null)"><b>⚽</b><span>Football</span></button><button class="sport-cat" onclick="showPage('upcoming',null)"><b>🎾</b><span>Tennis</span></button><button class="sport-cat"><b>🏀</b><span>Basketball</span></button><button class="sport-cat"><b>🏒</b><span>Ice Hockey</span></button><button class="sport-cat"><b>🏐</b><span>Volleyball</span></button><button class="sport-cat"><b>🏓</b><span>Table Tennis</span></button>
     </div>
     <div class="promo-row">
-     <article class="promo promo-virtual"><span>VIRTUAL SPORT</span><strong>GR</strong><small>⚽  ✨  🪙</small></article>
+     <article class="promo promo-virtual" role="button" tabindex="0" onclick="showPage('virtuals',null);loadVirtuals()" onkeydown="if(event.key==='Enter'){showPage('virtuals',null);loadVirtuals()}"><span>VIRTUAL SPORTS</span><strong>PLAY</strong><small>⚽ 🏀 🎾 🏇 · Play now</small></article>
      <article class="promo promo-bonus"><span>FIRST DEPOSIT OFFER</span><strong>300% Bonus</strong><small>Promotional concept · terms apply</small></article>
      <article class="promo promo-team"><span>FC BARCELONA</span><strong>Barça Formation</strong><small>Explore football action</small></article>
      <article class="promo promo-paris"><span>PARIS</span><strong>Paris Matchday</strong><small>Explore upcoming fixtures</small></article>
@@ -335,6 +344,26 @@ button:disabled{opacity:.65;cursor:not-allowed}
   </section>
   <section id="live" class="page"><div class="panel"><div class="panel-title"><h3>Live sports centre</h3><span class="live">● LIVE SCORES</span></div><p class="muted">Live scores require a premium data feed. Free fixtures are shown below.</p><div id="livelist"></div></div></section>
   <section id="upcoming" class="page"><div class="panel"><h3>Upcoming football</h3><p class="muted">Scheduled fixtures shown in Nigeria time. Odds are not enabled until a separate approved odds feed is connected.</p><div id="upcominglist"></div></div></section>
+
+  <section id="virtuals" class="page virtual-page">
+   <div class="virtual-hero"><div class="eyebrow">SOOTY BET ORIGINALS</div><h2>Virtual Sports Arena</h2><p>Play simulated sports matches with server-generated results, animated action and a permanent results history. No stakes or real-money betting.</p></div>
+   <div class="virtual-tabs" id="virtual-tabs">
+    <button class="active" data-sport="football" onclick="selectVirtualSport('football',this)">⚽ Football</button>
+    <button data-sport="basketball" onclick="selectVirtualSport('basketball',this)">🏀 Basketball</button>
+    <button data-sport="tennis" onclick="selectVirtualSport('tennis',this)">🎾 Tennis</button>
+    <button data-sport="racing" onclick="selectVirtualSport('racing',this)">🏇 Horse Racing</button>
+   </div>
+   <div class="panel"><div class="panel-title"><h3 id="virtual-list-title">Available virtual football</h3><button class="btn ghost" type="button" onclick="loadVirtuals()">↻ Refresh</button></div><div id="virtual-fixtures"><div class="empty">Loading virtual fixtures…</div></div></div>
+   <div class="virtual-stage" id="virtual-stage" hidden>
+    <div class="virtual-stage-head"><b id="virtual-league">SOOTY VIRTUAL</b><button class="btn ghost" type="button" onclick="closeVirtualMatch()">Back to matches</button></div>
+    <div class="virtual-scoreline"><span id="virtual-home">Home</span><strong><span id="virtual-hscore">0</span> - <span id="virtual-ascore">0</span></strong><span id="virtual-away">Away</span></div>
+    <div class="virtual-clock" id="virtual-clock">Ready to play</div>
+    <div class="virtual-canvas-wrap"><canvas id="virtual-canvas" width="900" height="500" aria-label="Animated virtual sports match"></canvas></div>
+    <div class="virtual-race-runners" id="virtual-runners" hidden></div>
+    <div class="virtual-event-feed" id="virtual-events"></div><div class="virtual-proof" id="virtual-proof"></div><div id="virtual-result"></div>
+   </div>
+   <div class="panel" style="margin-top:13px"><div class="panel-title"><h3>Completed results</h3><button class="btn ghost" type="button" onclick="loadVirtualHistory()">↻</button></div><div id="virtual-history"><div class="empty">Loading results…</div></div></div>
+  </section>
   <section id="favorites" class="page"><div class="panel"><h3>Favorites</h3><p class="muted">Your favorite teams and events will appear here when favorites are enabled.</p></div></section>
   <section id="mybets" class="page"><div class="panel"><h3>My bets</h3><p class="muted" id="betsmessage">Sign in to load your bet history.</p><div id="betslist" class="empty">No bets loaded</div></div></section>
   <section id="wallet" class="page"><div class="panel"><h3>My wallet</h3><div class="stats"><div class="stat"><b id="walletbal">₦0.00</b><small>Available balance</small></div><div class="stat"><b>₦0.00</b><small>Total deposits</small></div><div class="stat"><b>₦0.00</b><small>Total withdrawals</small></div></div><div class="panel" style="margin-top:16px;background:#1b1e23"><h3>Manual bank transfer details</h3><p class="muted">Minimum deposit: <b style="color:var(--gold)">₦5,000</b>. If you have been instructed by SOOTY BET support to make a transfer, use these account details:</p><div class="calc"><span>Bank</span><b>OPay</b></div><div class="calc"><span>Account name</span><b>Blessing Okpeahior</b></div><div class="calc"><span>Account number</span><b id="depositaccount">8074134267</b></div><button class="btn primary" type="button" onclick="copyDepositAccount()">Copy account number</button><p class="muted" style="font-size:11px;margin-top:12px">Keep your transfer receipt and contact support for verification. Never share your PIN or password.</p></div><div class="panel" style="margin-top:16px;background:#1b1e23"><h3>Request a manual withdrawal</h3><p class="muted">Enter the bank account that belongs to you. Requests are reviewed by the SOOTY BET admin. Approved payments are sent manually.</p><form onsubmit="event.preventDefault();submitWithdrawal()"><label class="muted">Amount (₦)</label><input class="field" id="withdrawamount" type="number" min="100" step="1" required placeholder="Amount to withdraw"><label class="muted">Bank name</label><input class="field" id="withdrawbank" required maxlength="80" placeholder="e.g. Opay, Access Bank"><label class="muted">Account name</label><input class="field" id="withdrawname" required maxlength="100" placeholder="Name on your bank account"><label class="muted">10-digit account number</label><input class="field" id="withdrawaccount" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="0123456789"><button class="place" id="withdrawsubmit" type="submit">Submit withdrawal request</button></form><p id="withdrawmessage" class="muted" style="font-size:12px"></p></div><div id="withdrawhistory" class="muted" style="margin-top:16px"></div><div id="walletentries" class="muted" style="margin-top:16px"></div><div class="notice">Manual process only: submitting a request does not send money. Your available wallet balance is reserved while the request is pending. Admin must approve it, transfer funds through the bank, then mark it paid. Rejected requests return to your wallet. Keep your bank details accurate.</div></div></section>
@@ -388,7 +417,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
 </div>
 <nav class="mobile-bottom" aria-label="Bottom navigation">
  <button class="active" onclick="showPage('sports',this);setBottomActive(this)"><b>🔥</b><span>Popular</span></button>
- <button onclick="showPage('favorites',this);setBottomActive(this)"><b>☆</b><span>Favorites</span></button>
+ <button onclick="showPage('virtuals',this);setBottomActive(this);loadVirtuals()"><b>🎮</b><span>Virtuals</span></button>
  <button class="bottom-slip" onclick="toggleMobileSlip(this)"><b>▤</b><span>Bet slip <i id="mobile-slip-count">0</i></span></button>
  <button onclick="showPage('mybets',this);setBottomActive(this)"><b>◷</b><span>History</span></button>
  <button onclick="showPage('settings',this);setBottomActive(this)"><b>⠿</b><span>Menu</span></button>
@@ -544,7 +573,62 @@ async function setWithdrawalStatus(id,status){
 function copyDepositAccount(){const account='8074134267';if(navigator.clipboard?.writeText){navigator.clipboard.writeText(account).then(()=>alert('Account number copied.')).catch(()=>alert('Account number: '+account));}else{alert('Account number: '+account);}}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function placeBet(){alert('Bet placement is disabled. The displayed fixtures and odds are sample data, not a live offer. A licensed odds provider, server-side validation, eligibility checks and a tested settlement engine are required.');}
-async function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
+async 
+let virtualSport='football',virtualMatch=null,virtualPoll=null,virtualFrame=null;
+const virtualNames={football:'Football',basketball:'Basketball',tennis:'Tennis',racing:'Horse Racing'};
+async function loadVirtuals(){
+ const box=document.getElementById('virtual-fixtures');if(!box)return;
+ document.getElementById('virtual-list-title').textContent='Available virtual '+virtualNames[virtualSport].toLowerCase();
+ box.innerHTML='<div class="empty">Loading server-generated matches…</div>';
+ try{const data=await api('/api/virtual/matches?sport='+encodeURIComponent(virtualSport));
+ box.innerHTML=data.matches.length?data.matches.map(m=>'<div class="virtual-match-card"><div><div class="virtual-match-meta">'+escapeHTML(m.league)+' · '+escapeHTML(m.status.toUpperCase())+'</div><div class="virtual-match-names">'+escapeHTML(m.home)+' <span style="color:#8193a6">vs</span> '+escapeHTML(m.away)+'</div><div class="virtual-match-status">'+(m.status==='live'?'● LIVE NOW':'READY TO PLAY')+'</div></div><button class="virtual-play" onclick="startVirtualMatch('+m.id+')">'+(m.status==='live'?'Watch':'Play')+' →</button></div>').join(''):'<div class="empty">No matches available. Refresh in a moment.</div>';
+ }catch(e){box.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}await loadVirtualHistory();
+}
+function selectVirtualSport(sport,el){virtualSport=sport;document.querySelectorAll('#virtual-tabs button').forEach(b=>b.classList.toggle('active',b===el||b.dataset.sport===sport));closeVirtualMatch();loadVirtuals();}
+async function loadVirtualHistory(){
+ const box=document.getElementById('virtual-history');if(!box)return;
+ try{const data=await api('/api/virtual/history');const rows=(data.matches||[]).filter(m=>m.sport===virtualSport);
+ box.innerHTML=rows.length?rows.slice(0,20).map(m=>'<div class="virtual-history-row"><span><b>'+escapeHTML(m.home)+' vs '+escapeHTML(m.away)+'</b><br><span class="muted">'+escapeHTML(m.league)+' · '+new Date(m.completedAt).toLocaleString('en-NG')+'</span></span><b>'+(m.sport==='racing'?escapeHTML(m.result?.winner||'Finished'):m.homeScore+' - '+m.awayScore)+'</b></div>').join(''):'<div class="empty">No completed '+virtualNames[virtualSport].toLowerCase()+' matches yet.</div>';
+ }catch(e){box.textContent=e.message}
+}
+async function startVirtualMatch(id){
+ try{const data=await api('/api/virtual/matches/'+id+'/start',{method:'POST'});virtualMatch=data.match;document.getElementById('virtual-stage').hidden=false;document.getElementById('virtual-stage').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('virtual-result').innerHTML='';renderVirtualMatch();startVirtualAnimation();if(virtualPoll)clearInterval(virtualPoll);virtualPoll=setInterval(pollVirtualMatch,1000);}
+ catch(e){alert(e.message)}
+}
+async function pollVirtualMatch(){if(!virtualMatch)return;try{const data=await api('/api/virtual/matches/'+virtualMatch.id);virtualMatch=data.match;renderVirtualMatch();if(virtualMatch.status==='completed'){clearInterval(virtualPoll);virtualPoll=null;await loadVirtualHistory();await loadVirtuals();}}catch(e){document.getElementById('virtual-clock').textContent=e.message}}
+function renderVirtualMatch(){
+ const m=virtualMatch;if(!m)return;
+ document.getElementById('virtual-league').textContent=m.league;
+ document.getElementById('virtual-home').textContent=m.sport==='racing'?'Race field':m.home;
+ document.getElementById('virtual-away').textContent=m.sport==='racing'?'Finish line':m.away;
+ document.getElementById('virtual-hscore').textContent=m.sport==='racing'?'🏁':m.homeScore;
+ document.getElementById('virtual-ascore').textContent=m.sport==='racing'?'':m.awayScore;
+ document.getElementById('virtual-clock').textContent=m.status==='completed'?'FULL TIME':m.status==='scheduled'?'Ready to play':(m.sport==='football'?'Minute ':'Game clock ')+Math.min(m.durationSeconds,m.elapsedSeconds)+' / '+m.durationSeconds;
+ document.getElementById('virtual-events').innerHTML=(m.events||[]).slice().reverse().map(e=>'<div class="virtual-event '+(e.type==='goal'?'goal':'')+'">'+String(e.second).padStart(2,'0')+'s · '+escapeHTML(e.text)+'</div>').join('')||'<div class="virtual-event">The match is underway. Waiting for the first event…</div>';
+ document.getElementById('virtual-proof').textContent='Fair-play commitment (SHA-256): '+m.seedHash+(m.seedReveal?' · Revealed seed: '+m.seedReveal:' · Seed revealed after final whistle.');
+ if(m.status==='completed'){const result=m.sport==='racing'?(m.result?.finish||[]).map(x=>x.position+'. '+x.name).join(' · '):m.result?.summary||m.homeScore+' - '+m.awayScore;document.getElementById('virtual-result').innerHTML='<div class="virtual-final"><b>FINAL RESULT</b><div>'+escapeHTML(result)+'</div><small>Completed result saved to Virtual Sports history.</small></div>';}
+}
+function closeVirtualMatch(){if(virtualPoll)clearInterval(virtualPoll);virtualPoll=null;virtualMatch=null;document.getElementById('virtual-stage').hidden=true;if(virtualFrame)cancelAnimationFrame(virtualFrame);virtualFrame=null;}
+function startVirtualAnimation(){
+ if(virtualFrame)cancelAnimationFrame(virtualFrame);const canvas=document.getElementById('virtual-canvas');if(!canvas)return;const ctx=canvas.getContext('2d);
+ const draw=()=>{if(!virtualMatch)return;const m=virtualMatch,w=canvas.width,h=canvas.height,t=Date.now()/700,elapsed=m.elapsedSeconds||0;ctx.clearRect(0,0,w,h);
+ if(m.sport==='football'){
+  ctx.fillStyle='#167447';ctx.fillRect(0,0,w,h);for(let x=0;x<10;x++){ctx.fillStyle=x%2?'#167447':'#1b8050';ctx.fillRect(x*90,0,90,h)}
+  ctx.strokeStyle='#e5f6e9';ctx.lineWidth=4;ctx.strokeRect(18,18,w-36,h-36);ctx.beginPath();ctx.moveTo(w/2,18);ctx.lineTo(w/2,h-18);ctx.stroke();ctx.beginPath();ctx.arc(w/2,h/2,75,0,Math.PI*2);ctx.stroke();ctx.strokeRect(18,155,125,190);ctx.strokeRect(w-143,155,125,190);
+  for(let team=0;team<2;team++)for(let i=0;i<6;i++){const baseX=team===0?170+(i%3)*105:730-(i%3)*105,baseY=95+Math.floor(i/3)*285,x=baseX+Math.sin(t+i*1.7+elapsed*.13)*24,y=baseY+Math.cos(t*.8+i)*19;ctx.beginPath();ctx.fillStyle=team===0?'#f5d34e':'#e9f1ff';ctx.arc(x,y,17,0,Math.PI*2);ctx.fill();ctx.fillStyle='#172b42';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.fillText(String(i+1),x,y+4)}
+  const bx=w/2+Math.sin(t*1.3+elapsed*.2)*210,by=h/2+Math.cos(t*1.1)*125;ctx.beginPath();ctx.fillStyle='#fff';ctx.arc(bx,by,10,0,Math.PI*2);ctx.fill();
+ }else if(m.sport==='basketball'){
+  ctx.fillStyle='#c77b3d';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#fff0dc';ctx.lineWidth=5;ctx.strokeRect(25,25,w-50,h-50);ctx.beginPath();ctx.moveTo(w/2,25);ctx.lineTo(w/2,h-25);ctx.stroke();ctx.beginPath();ctx.arc(w/2,h/2,85,0,Math.PI*2);ctx.stroke();for(let team=0;team<2;team++)for(let i=0;i<5;i++){ctx.beginPath();ctx.fillStyle=team?'#f4f5ff':'#1e344d';ctx.arc((team?690:210)+Math.sin(t+i)*45,90+i*75,18,0,Math.PI*2);ctx.fill()}ctx.beginPath();ctx.fillStyle='#f4a23c';ctx.arc(w/2+Math.sin(t)*130,h/2+Math.cos(t)*70,13,0,Math.PI*2);ctx.fill();
+ }else if(m.sport==='tennis'){
+  ctx.fillStyle='#236f4b';ctx.fillRect(0,0,w,h);ctx.fillStyle='#477fca';ctx.fillRect(110,45,w-220,h-90);ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.strokeRect(110,45,w-220,h-90);ctx.beginPath();ctx.moveTo(w/2,45);ctx.lineTo(w/2,h-45);ctx.moveTo(110,h/2);ctx.lineTo(w-110,h/2);ctx.stroke();ctx.fillStyle='#f4d74e';ctx.beginPath();ctx.arc(w/2+Math.sin(t)*170,h/2+Math.cos(t)*110,9,0,Math.PI*2);ctx.fill();for(const x of [240,660]){ctx.fillStyle='#f3f5fb';ctx.fillRect(x+Math.sin(t)*10,220,14,85)}
+ }else{
+  ctx.fillStyle='#5b3b2c';ctx.fillRect(0,0,w,h);for(let lane=0;lane<6;lane++){const y=45+lane*68;ctx.strokeStyle='#e7d2b7';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(20,y+38);ctx.lineTo(w-20,y+38);ctx.stroke();ctx.fillStyle='#f4e7d6';ctx.font='13px Arial';ctx.fillText('LANE '+(lane+1),28,y+23);ctx.font='25px Arial';ctx.fillText('🏇',30+((elapsed*14+lane*105)%760),y+32)}
+ }
+ ctx.textAlign='left';ctx.fillStyle='#fff';ctx.font='bold 18px Arial';ctx.fillText(m.status==='completed'?'FINISHED':'SOOTY VIRTUAL',28,h-28);virtualFrame=requestAnimationFrame(draw);
+ };draw();
+}
+
+function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
 render();syncSession();if(!token)openModal('login');loadPayoutDetails();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}setInterval(()=>{if(token)loadWallet()},15000);window.addEventListener('focus',()=>{if(token)loadWallet()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)loadWallet()});
 </script>
 
