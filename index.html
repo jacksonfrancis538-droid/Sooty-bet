@@ -620,7 +620,7 @@ async function setWithdrawalStatus(id,status){
  catch(e){alert(e.message)}
 }
 
-function copyDepositAccount(){const account='8074134267';if(navigator.clipboard?.writeText){navigator.clipboard.writeText(account).then(()=>alert('Account number copied.')).catch(()=>alert('Account number: '+account));}else{alert('Account number: '+account);}}
+function copyDepositAccount(){alert('Real-money deposits are disabled in testing mode.');}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function getTestTickets(){try{return JSON.parse(localStorage.getItem('sooty_test_tickets_v1')||'[]')}catch(e){return[]}}
 function saveTestTickets(rows){localStorage.setItem('sooty_test_tickets_v1',JSON.stringify(rows))}
