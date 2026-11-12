@@ -604,7 +604,9 @@ function getVirtualPoints(){const n=Number(localStorage.getItem('sooty_virtual_p
 function updateVirtualPointsUI(){const el=document.getElementById('virtual-points-balance');if(el)el.textContent=getVirtualPoints().toLocaleString('en-NG');}
 function selectVirtualPick(id,button){const card=button.closest('.virtual-match-card');card.querySelectorAll('.virtual-market').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');selectedVirtualPicks[id]={outcome:button.dataset.market,odd:Number(button.querySelector('b').textContent)};}
 async function placeVirtualStake(id){
- const input=document.getElementById('virtual-stake-'+id),stake=Math.floor(Number(input?.value||0)),pick=selectedVirtualPicks[id];
+ const input=document.getElementById('virtual-stake-'+id),stake=Math.floor(Number(input?.value||0));
+ let pick=selectedVirtualPicks[id];
+ if(!pick){const chosen=input?.closest('.virtual-match-card')?.querySelector('.virtual-market.selected');if(chosen)pick={outcome:chosen.dataset.market,odd:Number(chosen.querySelector('b').textContent)};}
  if(!pick){alert('Choose an outcome first.');return;}
  if(!Number.isSafeInteger(stake)||stake<10){alert('Minimum practice stake is 10 points.');return;}
  const balance=getVirtualPoints();if(stake>balance){alert('Not enough practice points. Your balance is '+balance.toLocaleString('en-NG')+' points.');return;}
