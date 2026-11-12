@@ -425,6 +425,7 @@ async function api(path, options={}){
  try { response=await fetch(API_BASE+path,{...options,headers}); }
  catch(e){ throw new Error('Cannot reach SOOTY BET API. Check that the backend is running and API URL/CORS are configured.'); }
  const data=await response.json().catch(()=>({}));
+ if(response.status===401 && token){logoutNow();throw new Error('Your saved session has expired. Please log in again.');}
  if(!response.ok) throw new Error(data.error||('Request failed ('+response.status+')'));
  return data;
 }
