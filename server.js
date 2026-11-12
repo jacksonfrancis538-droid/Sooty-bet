@@ -21,6 +21,9 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
 });
+// Render terminates TLS at its proxy; trust the single platform proxy so
+// rate limiting can identify clients correctly from X-Forwarded-For.
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN ? process.env.FRONTEND_ORIGIN.split(',') : true }));
 app.use(express.json({ limit: '20kb' }));
