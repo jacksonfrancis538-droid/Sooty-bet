@@ -378,7 +378,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
     <div class="settings-row"><span class="settings-icon">▦</span><span class="settings-copy"><b>Share the app via QR code</b><small>QR sharing will be available when the app download page is configured</small></span><span class="settings-status">Coming soon</span></div>
     <div class="settings-row"><span class="settings-icon">ⓘ</span><span class="settings-copy"><b>You are using the latest version of the app</b><small>SOOTYBET Preview · Version 1.0.0</small></span><span class="settings-status">Preview</span></div>
     <button class="settings-row" onclick="clearSootyCache()"><span class="settings-icon">♲</span><span class="settings-copy"><b>Clear cache</b><small>Clear saved app preferences on this device</small></span><strong>›</strong></button>
-    <button class="settings-row settings-logout" id="settingslogout" onclick="logout()"><span class="settings-icon">⇥</span><span class="settings-copy"><b>Log out of account</b><small>Sign out on this device</small></span><strong>›</strong></button>
+    <button class="settings-row settings-logout" id="settingslogout" onclick="requestLogout()"><span class="settings-icon">⇥</span><span class="settings-copy"><b>Log out of account</b><small>Sign out on this device</small></span><strong>›</strong></button>
    </div>
   </section>
   <section id="admin" class="page"><div class="panel"><h3>SOOTY BET Admin</h3><p class="muted">Restricted to the configured administrator account.</p><div class="stats"><div class="stat"><b id="adminusers">—</b><small>Registered users</small></div><div class="stat"><b id="adminbets">—</b><small>Recorded bets</small></div><div class="stat"><b id="adminpending">—</b><small>Pending withdrawals</small></div></div><p class="muted" id="adminmessage">Sign in with the admin email to load requests.</p></div><div class="panel"><div class="panel-title"><h3>Age verification requests</h3><button class="btn ghost" onclick="loadAdminVerification()">Refresh</button></div><p class="muted" style="font-size:12px">Only approve after checking a valid official identity document through a secure verification process. Do not ask users to post identity documents in public chat.</p><div id="adminverification" class="muted">Admin sign-in required.</div></div><div class="panel"><div class="panel-title"><h3>Withdrawal requests</h3><button class="btn ghost" onclick="loadAdminWithdrawals()">Refresh</button></div><div id="adminwithdrawals" class="muted">Admin sign-in required.</div></div></section>
@@ -405,7 +405,8 @@ button:disabled{opacity:.65;cursor:not-allowed}
   </div>
  </div>
 </section>
-\n<script>
+
+<script>
 // Configure this URL to match the deployed API. For local development: http://localhost:4000
 const API_BASE = 'https://sooty-bet-api.onrender.com';
 const fixtures=[
