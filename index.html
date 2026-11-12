@@ -222,4 +222,6 @@ function placeBet(){alert('Bet placement is disabled. The displayed fixtures and
 async function checkApi(){try{const h=await api('/health');document.getElementById('sessionlabel').title='API status: '+h.mode;}catch(e){document.getElementById('sessionlabel').title=e.message}}
 render();syncSession();checkApi();setInterval(refreshSports,60000);if(token){loadWallet();loadWithdrawalHistory()}
 </script>
+
+<!-- deployment refresh: 2026-11-12 -->
 </body></html>
