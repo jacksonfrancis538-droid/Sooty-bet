@@ -238,12 +238,12 @@ function publicVirtualMatch(row,now=new Date()) {
  const started=row.started_at?new Date(row.started_at):null;
  const elapsed=started?Math.max(0,Math.floor((now-started)/1000)):0;
  const visibleEvents=row.status==='scheduled'?[]:(row.events||[]).filter(e=>e.second<=elapsed);
- const lastScore=[...visibleEvents].reverse().find(e=>Number.isInteger(e.homeScore)||Number.isInteger(e.awayScore));
+ const lastScore=[...visibleEvents].reverse().find(e=>Number.isInteger(e.homeScore)||Number.isInteger(e.awayScore)||Number.isInteger(e.homeSets)||Number.isInteger(e.awaySets));
  const completed=row.status==='completed';
  return {
   id:row.id,code:row.match_code,sport:row.sport,league:row.league,home:row.home,away:row.away,
   participants:row.participants||[],status:row.status,durationSeconds:row.duration_seconds,elapsedSeconds:Math.min(elapsed,row.duration_seconds),
-  homeScore:completed?row.home_score:(lastScore?.homeScore??0),awayScore:completed?row.away_score:(lastScore?.awayScore??0),
+  homeScore:completed?row.home_score:(lastScore?.homeScore??lastScore?.homeSets??0),awayScore:completed?row.away_score:(lastScore?.awayScore??lastScore?.awaySets??0),
   events:visibleEvents,seedHash:row.seed_hash,seedReveal:completed?row.seed_secret:null,
   result:completed?row.result:null,scheduledAt:row.scheduled_at,startedAt:row.started_at,completedAt:row.completed_at
  };
