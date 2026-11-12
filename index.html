@@ -597,8 +597,56 @@ function copyDepositAccount(){const account='8074134267';if(navigator.clipboard?
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function getTestTickets(){try{return JSON.parse(localStorage.getItem('sooty_test_tickets_v1')||'[]')}catch(e){return[]}}
 function saveTestTickets(rows){localStorage.setItem('sooty_test_tickets_v1',JSON.stringify(rows))}
+async function placeVirtualAccumulator(){
+ const picks=slip.filter(x=>x.isVirtual);
+ if(!picks.length){alert('Add virtual selections first.');return;}
+ if(new Set(picks.map(x=>String(x.matchId))).size!==picks.length){alert('Choose only one market per virtual match.');return;}
+ const stake=Math.floor(Number(document.getElementById('stake')?.value||0));
+ if(!Number.isSafeInteger(stake)||stake<10){alert('Minimum virtual accumulator stake is 10 practice points.');return;}
+ const balance=getVirtualPoints();if(stake>balance){alert('Not enough practice points. Balance: '+balance.toLocaleString('en-NG'));return;}
+ const odds=picks.reduce((a,x)=>a*Number(x.odd||1),1),potentialReturn=Math.floor(stake*odds);
+ const ref='SBVA-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+ const legs=picks.map(x=>({matchId:x.matchId,outcome:x.pick,odd:Number(x.odd),event:x.home,selection:x.pickLabel}));
+ if(!confirm('CONFIRM VIRTUAL ACCUMULATOR\n\nSelections: '+legs.length+'\nStake: '+stake.toLocaleString('en-NG')+' practice points\nTotal odds: '+odds.toFixed(2)+'\nPotential return: '+potentialReturn.toLocaleString('en-NG')+' points\n\nPractice points only — no cash involved. Start all selected virtual games?'))return;
+ const ticket={reference:ref,createdAt:new Date().toISOString(),stake,odds,potentialReturn,status:'OPEN · TEST',mode:'VIRTUAL ACCUMULATOR',unit:'points',selections:legs.map(x=>({event:x.event,market:'Virtual market',selection:x.selection,odds:x.odd}))};
+ const tickets=getTestTickets();tickets.unshift(ticket);saveTestTickets(tickets);
+ localStorage.setItem('sooty_virtual_points',String(balance-stake));updateVirtualPointsUI();
+ slip=[];document.getElementById('stake').value='';renderSlip();closeMobileSlip();
+ showPage('mybets',null);loadBets();
+ try{
+  await Promise.all(legs.map(x=>api('/api/virtual/matches/'+x.matchId+'/start',{method:'POST'})));
+  let results=[];
+  for(let attempt=0;attempt<240;attempt++){
+   results=await Promise.all(legs.map(async leg=>{const d=await api('/api/virtual/matches/'+leg.matchId);return {...leg,match:d.match};}));
+   if(results.every(x=>x.match?.status==='completed'))break;
+   await new Promise(resolve=>setTimeout(resolve,1000));
+  }
+  if(!results.length||!results.every(x=>x.match?.status==='completed'))throw new Error('Selected virtual games are still running. Ticket remains open; check back shortly.');
+  const won=results.every(x=>virtualLegWon(x.match,x.outcome));
+  const payout=won?potentialReturn:0;
+  if(won){const now=getVirtualPoints();localStorage.setItem('sooty_virtual_points',String(now+payout));}
+  const updated=getTestTickets(),saved=updated.find(x=>x.reference===ref);
+  if(saved){saved.status=won?'WON · TEST':'LOST · TEST';saved.payout=payout;saved.settledAt=new Date().toISOString();saved.results=results.map(x=>({event:x.event,outcome:x.outcome,homeScore:x.match.homeScore,awayScore:x.match.awayScore,winner:x.match.result?.winner}));saveTestTickets(updated);}
+  updateVirtualPointsUI();await loadBets();alert('Virtual accumulator '+(won?'WON':'LOST')+' · '+(won?payout.toLocaleString('en-NG')+' practice points returned':'No points returned')+'\nTicket: '+ref);
+ }catch(e){alert('Virtual accumulator ticket '+ref+' is saved and remains open. '+e.message);}
+}
+function virtualLegWon(match,outcome){
+ if(!match||match.status!=='completed')return false;
+ const winner=match.result?.winner,home=Number(match.homeScore||0),away=Number(match.awayScore||0),goals=home+away;
+ if(outcome==='home')return winner==='home'||winner===match.home||home>away;
+ if(outcome==='away')return winner==='away'||winner===match.away||away>home;
+ if(outcome==='draw')return winner==='draw'||home===away;
+ if(outcome==='btts_yes')return home>0&&away>0;
+ if(outcome==='btts_no')return home===0||away===0;
+ if(/^over_[0-9]+_[0-9]+$/.test(outcome))return goals>Number(outcome.split('_')[1]+'.'+outcome.split('_')[2]);
+ if(/^under_[0-9]+_[0-9]+$/.test(outcome))return goals<Number(outcome.split('_')[1]+'.'+outcome.split('_')[2]);
+ if(outcome==='double_1x')return home>=away;
+ if(outcome==='double_x2')return away>=home;
+ if(outcome==='double_12')return home!==away;
+ return winner===outcome||winner===match.result?.winner&&outcome===winner;
+}
 function placeBet(){
- if(slip.some(x=>x.isVirtual)){alert('Virtual selections appear in the combined odds preview. Use the Virtual practice stake button on each match to place practice bets; virtual points remain separate from sports test stakes.');return;}
+ if(slip.some(x=>x.isVirtual)){if(slip.some(x=>!x.isVirtual)){alert('Keep virtual and regular sports selections in separate practice tickets.');return;}placeVirtualAccumulator();return;}
  const stake=Number(document.getElementById('stake')?.value||0);
  if(!slip.length){alert('Add at least one selection to your betslip.');return}
  if(!Number.isFinite(stake)||stake<100){alert('For this test, enter a stake of at least ₦100.');return}
