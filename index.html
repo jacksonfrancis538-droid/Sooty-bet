@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>SORTBET NG — Your Game. Your Odds. Your Victory.</title>
 <style>
 :root{--bg:#090a0c;--panel:#14161a;--panel2:#1b1e23;--line:#292d34;--gold:#e8b83f;--gold2:#ffd66b;--muted:#9299a5;--white:#f5f6f8;--green:#36c98a;--red:#fa6b70}
@@ -350,6 +350,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
+<meta name="apple-touch-fullscreen" content="yes">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="/icons/sortbet-icon.svg">
 <link rel="apple-touch-icon" href="/icons/sortbet-icon.svg">
@@ -1263,6 +1264,10 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<style id="sortbet-no-zoom-fullscreen">
+html,body{width:100%;max-width:100%;overflow-x:hidden;touch-action:pan-x pan-y}
+@media(display-mode:standalone){html,body{min-height:100%;min-height:100dvh;width:100%;overscroll-behavior:none}}
+</style>
 <style id="sortbet-installed-app-polish">
 html{min-height:100%;background:#091525;-webkit-text-size-adjust:100%;overscroll-behavior-y:contain}
 body{min-height:100dvh;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:contain}
