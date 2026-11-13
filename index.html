@@ -555,7 +555,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
 <div id="login-fields"><label for="email">Email or Phone</label><input class="field" id="email" type="text" autocomplete="username" required placeholder="Enter your email or phone number"></div>
 <label for="password">Password</label><input class="field" id="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
 <div id="confirm-wrap" hidden><label for="confirm-password">Confirm Password</label><input class="field" id="confirm-password" type="password" autocomplete="new-password" placeholder="Repeat your password"><label class="auth-terms"><input id="terms" type="checkbox"> <span>I agree to the <a href="#" onclick="showAuthNotice('Terms and Conditions will be published before public launch.');return false">Terms &amp; Conditions</a> and <a href="#" onclick="showAuthNotice('Privacy Policy will be published before public launch.');return false">Privacy Policy</a>.</span></label></div>
-<button class="auth-forgot" id="forgotbtn" type="button" onclick="showAuthNotice('Password recovery will be available after email verification is configured.')">Forgot password?</button><button class="auth-login-btn" id="authbutton" type="submit">Log in</button></form><p class="auth-message" id="autherror" role="alert"></p><div class="auth-notice" id="authnotice"></div><p class="auth-switch" id="authswitchtext">Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button></p><p class="auth-foot">SORTBET NG · 18+ · Please gamble responsibly</p></div></div></section>
+<button class="auth-forgot" id="forgotbtn" type="button" onclick="requestPasswordReset()">Forgot password?</button><button class="auth-login-btn" id="authbutton" type="submit">Log in</button></form><p class="auth-message" id="autherror" role="alert"></p><div class="auth-notice" id="authnotice"></div><p class="auth-switch" id="authswitchtext">Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button></p><p class="auth-foot">SORTBET NG · 18+ · Please gamble responsibly</p></div></div></section>
 
 <section class="logout-confirm" id="logout-confirm" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title">
  <div class="logout-confirm-card">
@@ -713,6 +713,26 @@ function closeMobileSlip(){document.querySelector('.betslip')?.classList.remove(
 function openModal(m){mode=m;syncFloatingOddsVisibility();const login=m==='login';document.querySelector('.auth-back').style.display=token?'':'none';document.getElementById('authsubtitle').textContent=login?'Welcome back. Log in to your account.':'Create your SORTBET NG account.';document.getElementById('login-fields').hidden=!login;document.getElementById('register-fields').hidden=login;document.getElementById('confirm-wrap').hidden=login;document.getElementById('email').required=login;['fullname','register-email','phone','confirm-password','terms'].forEach(id=>{const el=document.getElementById(id);if(el)el.required=!login&&id!=='terms'});document.getElementById('terms').required=!login;document.getElementById('forgotbtn').hidden=!login;document.getElementById('authbutton').textContent=login?'Log in':'Create Account';document.getElementById('password').setAttribute('autocomplete',login?'current-password':'new-password');document.getElementById('password').placeholder=login?'Enter your password':'Create a password (12+ characters)';document.getElementById('password').minLength=login?1:12;document.getElementById('authswitchtext').innerHTML=login?'Don’t have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Register</button>':'Already have an account? <button type="button" onclick="switchAuthMode()" id="authswitch">Log in</button>';document.getElementById('autherror').textContent='';document.getElementById('authnotice').classList.remove('show');document.getElementById('authnotice').textContent='';document.getElementById('authscreen').classList.add('show');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById(login?'email':'fullname').focus(),80)}
 function closeModal(){if(!token)return;document.getElementById('authscreen').classList.remove('show');document.body.style.overflow='';syncFloatingOddsVisibility();}
 function showAuthNotice(message){const box=document.getElementById('authnotice');box.textContent=message;box.classList.add('show')}
+async function requestPasswordReset(){
+ const email=prompt('Enter the email address registered to your SORTBET NG account:');
+ if(email===null)return;
+ if(!/^\\S+@\\S+\\.\\S+$/.test(email.trim())){showAuthNotice('Enter a valid email address.');return;}
+ const btn=document.getElementById('forgotbtn');btn.disabled=true;btn.textContent='Sending…';
+ try{const result=await api('/api/auth/forgot-password',{method:'POST',body:JSON.stringify({email:email.trim()})});showAuthNotice(result.message||'If an account exists for that email, a reset link will be sent shortly.');}
+ catch(e){showAuthNotice(e.message);}
+ finally{btn.disabled=false;btn.textContent='Forgot password?';}
+}
+async function completePasswordResetFromLink(){
+ const params=new URLSearchParams(location.search),resetToken=params.get('reset_token');if(!resetToken)return;
+ openModal('login');
+ const next=prompt('Create your new password (at least 12 characters):');
+ if(next===null)return;
+ const confirm=prompt('Confirm your new password:');
+ if(confirm===null)return;
+ if(next.length<12||next!==confirm){showAuthNotice('Passwords must match and contain at least 12 characters.');return;}
+ try{const result=await api('/api/auth/reset-password',{method:'POST',body:JSON.stringify({token:resetToken,password:next})});history.replaceState({},'',location.pathname);showAuthNotice(result.message||'Password reset successful. You can now log in.');}
+ catch(e){showAuthNotice(e.message);}
+}
 function switchAuthMode(){openModal(mode==='login'?'register':'login')}
 async function submitAuth(){
  const password=document.getElementById('password').value,button=document.getElementById('authbutton'),error=document.getElementById('autherror');button.disabled=true;button.textContent='Please wait…';error.textContent='';
@@ -1281,3 +1301,4 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent;touch-action:ma
 .ticket-selection .remove{position:absolute;right:5px;top:6px}
 @media(max-width:680px){.ticket-guide{padding:11px}.ticket-guide span{font-size:12px}.ticket-selection{padding:14px 28px 14px 11px!important}.ticket-selection strong{font-size:15px!important}.ticket-match-state{font-size:12px}.ticket-pick{font-size:12px!important}}
 </style>
+<script-placeholder-do-not-use>
