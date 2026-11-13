@@ -1218,6 +1218,8 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(() => {});
   });
 }
+
+if(location.search.includes('reset_token=')){setTimeout(completePasswordResetFromLink,250);}
 </script>
 <style id="sortbet-no-zoom-fullscreen">
 html,body{width:100%;max-width:100%;overflow-x:hidden;touch-action:auto!important}
@@ -1301,4 +1303,3 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent;touch-action:ma
 .ticket-selection .remove{position:absolute;right:5px;top:6px}
 @media(max-width:680px){.ticket-guide{padding:11px}.ticket-guide span{font-size:12px}.ticket-selection{padding:14px 28px 14px 11px!important}.ticket-selection strong{font-size:15px!important}.ticket-match-state{font-size:12px}.ticket-pick{font-size:12px!important}}
 </style>
-<script-placeholder-do-not-use>
