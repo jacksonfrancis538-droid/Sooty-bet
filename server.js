@@ -484,14 +484,16 @@ app.post('/api/auth/reset-password', async (req,res) => {
   const q=await pool.query("SELECT id,user_id FROM password_reset_tokens WHERE token_hash=$1 AND used_at IS NULL AND expires_at>NOW() LIMIT 1",[tokenHash]);
   if(!q.rowCount) return res.status(400).json({error:'This reset link is invalid or expired. Please request a new one.'});
   const hash=await bcrypt.hash(password,12);
-  await pool.query('BEGIN');
+  const client=await pool.connect();
   try {
-   const locked=await pool.query("SELECT id,user_id FROM password_reset_tokens WHERE id=$1 AND used_at IS NULL AND expires_at>NOW() FOR UPDATE",[q.rows[0].id]);
+   await client.query('BEGIN');
+   const locked=await client.query("SELECT id,user_id FROM password_reset_tokens WHERE id=$1 AND used_at IS NULL AND expires_at>NOW() FOR UPDATE",[q.rows[0].id]);
    if(!locked.rowCount) throw new Error('RESET_TOKEN_USED');
-   await pool.query('UPDATE users SET password_hash=$1 WHERE id=$2',[hash,locked.rows[0].user_id]);
-   await pool.query('UPDATE password_reset_tokens SET used_at=NOW() WHERE user_id=$1 AND used_at IS NULL',[locked.rows[0].user_id]);
-   await pool.query('COMMIT');
-  } catch(e){await pool.query('ROLLBACK');throw e;}
+   await client.query('UPDATE users SET password_hash=$1 WHERE id=$2',[hash,locked.rows[0].user_id]);
+   await client.query('UPDATE password_reset_tokens SET used_at=NOW() WHERE user_id=$1 AND used_at IS NULL',[locked.rows[0].user_id]);
+   await client.query('COMMIT');
+  } catch(e){await client.query('ROLLBACK');throw e;}
+  finally{client.release();}
   res.set('Cache-Control','no-store');res.json({message:'Your password has been reset. You can now log in with your new password.'});
  } catch(e){if(e.message==='RESET_TOKEN_USED')return res.status(400).json({error:'This reset link has already been used. Please request a new one.'});console.error('Password reset failed:',e.message);res.status(500).json({error:'Could not reset your password.'});}
 });
