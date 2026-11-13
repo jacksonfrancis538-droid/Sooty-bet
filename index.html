@@ -446,11 +446,14 @@ button:disabled{opacity:.65;cursor:not-allowed}
 <div class="panel-title"><h3>My Wallet</h3><span class="tag">NGN · ₦</span></div>
 <div class="wallet-balance-card"><small>Available balance</small><strong id="walletbal">₦0.00</strong><span>Account wallet · SORTBET NG</span></div>
 <div class="wallet-actions"><button class="btn primary" type="button" onclick="document.getElementById('deposit-methods').scrollIntoView({behavior:'smooth'})">＋ Deposit</button><button class="btn ghost" type="button" onclick="document.getElementById('withdraw-form').scrollIntoView({behavior:'smooth'})">↗ Withdraw</button></div>
-<div class="wallet-section" id="deposit-methods"><h3>Deposit funds</h3><p class="muted">Choose a payment method. Secure payment processing will appear here once the merchant account and provider credentials are connected.</p>
-<div class="payment-method"><span class="payment-icon">▤</span><div><b>Bank Transfer</b><small>Local Nigerian bank transfer</small></div><span class="payment-status">Setup pending</span></div>
-<div class="payment-method"><span class="payment-icon">₦</span><div><b>Card &amp; USSD</b><small>Debit card and USSD payments</small></div><span class="payment-status">Setup pending</span></div>
-<div class="payment-method"><span class="payment-icon">↗</span><div><b>Mobile Money</b><small>Supported payment channels</small></div><span class="payment-status">Setup pending</span></div>
-<div class="notice">Deposits will only be credited after a verified payment-provider confirmation. Do not transfer money to personal accounts.</div></div>
+<div class="wallet-section" id="deposit-methods"><h3>Deposit funds</h3><p class="muted">Choose how you would like to fund your SORTBET wallet. Payment instructions will appear here when approved business payment services are connected.</p>
+<label class="deposit-amount-label" for="depositamount">Deposit amount (₦)</label><input class="field" id="depositamount" type="number" min="100" max="1000000" step="1" placeholder="Enter amount">
+<div class="payment-method"><span class="payment-icon">▤</span><div><b>OPay Business Bank Transfer</b><small>Dedicated business account details generated for your deposit</small></div><span class="payment-status">Not connected</span></div>
+<div class="payment-method"><span class="payment-icon">₿</span><div><b>Cryptocurrency</b><small>Supported coin, network and wallet address shown after setup</small></div><span class="payment-status">Not connected</span></div>
+<div class="deposit-instructions" id="depositinstructions"><b>Payment instructions unavailable</b><p class="muted">SORTBET has not connected an approved OPay business collection service or verified crypto payment provider yet. No transfer should be made to a personal account or an unverified wallet address.</p></div>
+<button class="btn primary" id="depositgenerate" type="button" disabled>Generate payment details</button>
+<button class="btn ghost" id="depositconfirm" type="button" disabled>I've made payment</button>
+<p class="muted" id="depositmessage" role="status">Deposits are currently inactive. Your wallet will only be credited after an independently verified payment confirmation.</p></div>
 <div class="wallet-section" id="withdraw-form"><h3>Withdraw funds</h3><p class="muted">Withdrawals are reserved from your available balance and reviewed before payment.</p>
 <div class="withdraw-grid"><label>Amount (₦)<input class="field" id="withdrawamount" type="number" min="100" max="1000000" step="1" placeholder="Enter amount"></label><label>Bank name<input class="field" id="withdrawbank" type="text" maxlength="80" placeholder="Select or enter bank"></label><label>Account name<input class="field" id="withdrawname" type="text" maxlength="100" placeholder="Account holder name"></label><label>10-digit account number<input class="field" id="withdrawaccount" type="text" inputmode="numeric" maxlength="10" placeholder="0123456789"></label></div>
 <button class="btn primary" id="withdrawsubmit" type="button" onclick="submitWithdrawal()">Submit withdrawal request</button><p id="withdrawmessage" class="muted" role="status"></p></div>
@@ -864,7 +867,7 @@ async function setWithdrawalStatus(id,status){
  catch(e){alert(e.message)}
 }
 
-function copyDepositAccount(){alert('Deposits are unavailable until the required licensing and payment approvals are complete.');}
+function copyDepositAccount(){alert('Deposits are not active. OPay business collection and verified crypto payment services must be approved and connected first.');}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 // One-time cleanup: remove open tickets and unfinished virtual slips, preserving settled history.
 try{if(!localStorage.getItem('sortbet_open_bets_cleared_v2')){const oldRows=JSON.parse(localStorage.getItem('sortbet_bet_tickets_v2')||'[]');const legacyRows=JSON.parse(localStorage.getItem('sooty_test_tickets_v1')||'[]');const source=oldRows.length?oldRows:legacyRows;const settled=Array.isArray(source)?source.filter(t=>!/open|pending/i.test(String(t.status||''))):[];localStorage.setItem('sortbet_bet_tickets_v2',JSON.stringify(settled));localStorage.removeItem('sooty_test_tickets_v1');localStorage.removeItem('sooty_virtual_bets');localStorage.setItem('sortbet_open_bets_cleared_v2','done');}}catch(e){}
