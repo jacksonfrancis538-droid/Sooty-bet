@@ -288,11 +288,18 @@ app.get('/api/sports/odds/:fixtureId', async (req, res) => {
 
 
 const VIRTUAL_TEAMS = {
- football: [['Lagos City FC','Abuja United'],['Port Harcourt Stars','Kano Warriors'],['Jos Mountain FC','Ibadan Athletic'],['Enugu Rangers','Kaduna Royals'],['Benin City FC','Ilorin Town'],['Calabar Mariners','Sokoto Eagles']],
- basketball: [['Lagos Titans','Abuja Hoopers'],['Kano Flyers','Rivers Dunkers'],['Jos Peaks','Ibadan Flames'],['Enugu Storm','Kaduna Kings']],
- tennis: [['Ayo Okafor','Tunde Bello'],['Chika Nwosu','Emeka Obi'],['Zara James','Musa Danjuma'],['Ife Adeyemi','David Udo']],
+ football: [['ARS','CHE'],['MCI','LIV'],['MUN','TOT'],['NEW','ARS'],['RMA','BAR'],['ATM','BAY'],['PSG','INT'],['MIL','JUV'],['DOR','CHE'],['LIV','RMA'],['BAR','MCI'],['BAY','MUN']],
+ basketball: [['LAL','BOS'],['GSW','CHI'],['MIA','NYK'],['PHX','DAL']],
+ tennis: [['ALC','SIN'],['DJK','MED'],['SWA','GAF'],['RUB','TSI']],
  racing: [['Virtual Grand Prix','Virtual Grand Prix']]
 };
+const VIRTUAL_FOOTBALL_CLUBS = ['ARS','CHE','MCI','LIV','MUN','TOT','NEW','RMA','BAR','ATM','BAY','PSG','INT','MIL','JUV','DOR'];
+function virtualClubName(row,side) {
+ const raw=String(row[side]||'');
+ if(VIRTUAL_FOOTBALL_CLUBS.includes(raw))return raw;
+ const digest=crypto.createHash('sha256').update(String(row.match_code||row.id)+':'+side+':'+raw).digest();
+ return VIRTUAL_FOOTBALL_CLUBS[digest.readUInt16BE(0)%VIRTUAL_FOOTBALL_CLUBS.length];
+}
 const RACE_RUNNERS = ['Thunderbolt','Blue Comet','Desert Flame','Silver Arrow','Midnight Star','Golden Dash'];
 function makeSeedRandom(seed) {
  let counter=0;
@@ -354,7 +361,7 @@ function publicVirtualMatch(row,now=new Date()) {
  const odds={home:Number((1.55+market[0]/100).toFixed(2)),draw:Number((2.8+market[1]/50).toFixed(2)),away:Number((1.65+market[2]/100).toFixed(2))};
  const runnerOdds=(row.participants||[]).map((runner,index)=>({name:runner.name,odd:Number((2.1+market[(index+3)%market.length]/35).toFixed(2))}));
  return {
-  id:row.id,code:row.match_code,sport:row.sport,league:row.league,home:row.home,away:row.away,odds,runnerOdds,
+  id:row.id,code:row.match_code,sport:row.sport,league:row.league,home:row.sport==='football'?virtualClubName(row,'home'):row.home,away:row.sport==='football'?virtualClubName(row,'away'):row.away,odds,runnerOdds,
   participants:row.participants||[],status:row.status,durationSeconds:row.duration_seconds,elapsedSeconds:Math.min(elapsed,row.duration_seconds),
   homeScore:completed?row.home_score:(lastScore?.homeScore??lastScore?.homeSets??0),awayScore:completed?row.away_score:(lastScore?.awayScore??lastScore?.awaySets??0),
   events:visibleEvents,seedHash:row.seed_hash,seedReveal:completed?row.seed_secret:null,
