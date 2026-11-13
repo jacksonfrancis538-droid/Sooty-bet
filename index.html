@@ -775,7 +775,22 @@ async function loadWallet(){
 let activeBetTab='open';
 function selectBetTab(tab){activeBetTab=tab==='history'?'history':'open';const a=document.getElementById('openbets-tab'),b=document.getElementById('bethistory-tab');if(a&&b){a.classList.toggle('active',activeBetTab==='open');b.classList.toggle('active',activeBetTab==='history');a.setAttribute('aria-selected',String(activeBetTab==='open'));b.setAttribute('aria-selected',String(activeBetTab==='history'));}loadBets();}
 function showBetHelp(){alert('Cashout lets you settle an eligible open bet before the event finishes. It will become available when live odds and sportsbook cashout services are connected.');}
+let syncingVirtualTickets=false;
+async function syncPendingVirtualTickets(){
+ if(syncingVirtualTickets)return;
+ const pending=(()=>{try{return JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]')}catch(e){return[]}})();
+ if(!pending.length)return;
+ syncingVirtualTickets=true;
+ try{
+  const ids=[...new Set(pending.map(x=>String(x.matchId)))];
+  for(const id of ids){
+   try{const data=await api('/api/virtual/matches/'+encodeURIComponent(id));if(data.match?.status==='completed')settleVirtualStake(data.match);}
+   catch(e){/* Keep unsettled tickets open until a verified result is available. */}
+  }
+ }finally{syncingVirtualTickets=false;}
+}
 async function loadBets(){
+ await syncPendingVirtualTickets();
  const all=getTestTickets().slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
  const isOpen=t=>/open|pending/i.test(String(t.status||'')),open=all.filter(isOpen),history=all.filter(t=>!isOpen(t)),rows=activeBetTab==='open'?open:history;
  const count=document.getElementById('openbets-count');if(count)count.textContent=open.length;
@@ -1010,7 +1025,7 @@ function settleVirtualStake(match){
   else if(bet.outcome==='double_x2')won=away>=home;
   else if(bet.outcome==='double_12')won=home!==away;
   const payout=won?Math.floor(bet.stake*bet.odd):0;balance+=payout;
-  const ticket=tickets.find(x=>x.reference===bet.reference);if(ticket){ticket.status=won?'WON · TEST':'LOST · TEST';ticket.payout=payout;}
+  const ticket=tickets.find(x=>x.reference===bet.reference);if(ticket){ticket.status=won?'WON':'LOST';ticket.payout=payout;ticket.settledAt=new Date().toISOString();ticket.results={homeScore:match.homeScore,awayScore:match.awayScore,winner:match.result?.winner};}
   const result=document.getElementById('virtual-result');
   if(result)result.innerHTML+='<div class="virtual-final"><b>Virtual ticket '+(won?'WON':'NOT WON')+'</b><div>'+bet.stake.toLocaleString('en-NG')+' · '+escapeHTML(bet.outcome)+' @ '+bet.odd.toFixed(2)+' · '+(won?'Returned '+payout.toLocaleString('en-NG')+' returned':'No return')+'</div></div>';
  }
