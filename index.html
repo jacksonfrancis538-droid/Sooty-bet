@@ -403,7 +403,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
   <section id="upcoming" class="page"><div class="panel"><div class="panel-title"><h3 id="upcoming-title">Upcoming football</h3><button class="chip" type="button" onclick="openCompetition('all')">All competitions</button></div><p class="muted" id="competition-note">Scheduled fixtures shown in Nigeria time. Odds are not enabled until a separate approved odds feed is connected.</p><div id="upcominglist"></div></div></section>
 
   <section id="virtuals" class="page virtual-page">
-   <div class="virtual-hero"><div class="eyebrow">SORTBET NG ORIGINALS</div><h2>Virtual Sports Arena</h2><p>Server-generated virtual fixtures with multiple selections supported in one accumulator.</p><div class="virtual-points">Shared wallet balance: <b id="virtual-points-balance">₦0</b></div></div>
+   <div class="virtual-hero"><div class="eyebrow">SORTBET NG ORIGINALS</div><h2>Virtual Sports Arena</h2><p>Server-generated virtual fixtures with multiple selections supported in one accumulator.</p></div>
    <div class="virtual-tabs" id="virtual-tabs">
     <button class="active" data-sport="football" onclick="selectVirtualSport('football',this)">⚽ Football</button>
     <button data-sport="basketball" onclick="selectVirtualSport('basketball',this)">🏀 Basketball</button>
@@ -881,7 +881,7 @@ const PRACTICE_WALLET_PREFIX='sortbet_practice_wallet_v1:';
 function practiceWalletKey(){const u=user||JSON.parse(localStorage.getItem('sooty_user')||'null');const identity=u?.id??u?.email??u?.phone??'guest';return PRACTICE_WALLET_PREFIX+String(identity).toLowerCase().replace(/[^a-z0-9_-]/g,'_');}
 function getPracticeBalance(){if(!token)return 0;const key=practiceWalletKey();const raw=localStorage.getItem(key);if(raw===null){localStorage.setItem(key,'100000');return 100000;}const n=Number(raw);return Number.isSafeInteger(n)&&n>=0?n:0;}
 function setPracticeBalance(n){const amount=Math.max(0,Math.floor(Number(n)||0));localStorage.setItem(practiceWalletKey(),String(amount));loadDemoWalletUI();return amount;}
-function loadDemoWalletUI(){const amount=getPracticeBalance();const formatted=money(amount);const virtual=document.getElementById('virtual-points-balance');if(virtual)virtual.textContent=formatted;const casino=document.getElementById('casino-balance');if(casino)casino.textContent=formatted;const top=document.getElementById('balance');if(top)top.textContent=formatted;const wallet=document.getElementById('walletbal');if(wallet)wallet.textContent=formatted;const detail=document.getElementById('practice-wallet-detail');if(detail)detail.textContent=formatted;}
+function loadDemoWalletUI(){const amount=getPracticeBalance();const formatted=money(amount);const casino=document.getElementById('casino-balance');if(casino)casino.textContent=formatted;const top=document.getElementById('balance');if(top)top.textContent=formatted;const wallet=document.getElementById('walletbal');if(wallet)wallet.textContent=formatted;const detail=document.getElementById('practice-wallet-detail');if(detail)detail.textContent=formatted;}
 function resetPracticeWallet(){if(!token){alert('Please log in first to view your wallet.');openModal('login');return;}if(!confirm('Reset the local launch-preview wallet balance to ₦100,000? This does not process a deposit.'))return;setPracticeBalance(100000);const msg=document.getElementById('practice-wallet-message');if(msg)msg.textContent='Local wallet preview balance updated.';}
 function placeBet(){
  if(slip.some(x=>x.isVirtual)){if(slip.some(x=>!x.isVirtual)){alert('Virtual and sports selections must be placed as separate tickets for now.');return;}placeVirtualAccumulator();return;}
@@ -952,7 +952,7 @@ async function loadVirtualHistory(){
 }
 let selectedVirtualPicks={};
 function getVirtualPoints(){return getPracticeBalance();}
-function updateVirtualPointsUI(){const value=money(getVirtualPoints());const el=document.getElementById('virtual-points-balance');if(el)el.textContent=value;const casino=document.getElementById('casino-balance');if(casino)casino.textContent=value;}
+function updateVirtualPointsUI(){const value=money(getVirtualPoints());const casino=document.getElementById('casino-balance');if(casino)casino.textContent=value;}
 function selectVirtualPick(id,button){
  const card=button.closest('.virtual-match-card');
  card.querySelectorAll('.virtual-market').forEach(x=>x.classList.remove('selected'));
