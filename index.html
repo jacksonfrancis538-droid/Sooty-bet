@@ -1105,6 +1105,13 @@ async function loadMeProfile(){
 .market-odd b{font-size:12px}
 @media(max-width:680px){.market-options{grid-template-columns:repeat(2,minmax(0,1fr))}.market-odd{min-height:45px}}
 </style><button id="sortbet-odds-float" type="button" aria-label="Open betslip"><strong id="float-odds">0.00</strong><small>MY BETS</small><em id="float-count">0</em></button>
+
+<style id="sortbet-mobile-tap-recovery">
+/* Keep installed-app gestures and restore reliable taps across the whole interface. */
+html,body{touch-action:auto!important}
+button,a,[role="button"],[onclick],.navitem,.chip,.sport-cat,.home-tab,.sportsbar-item,.match-open,.virtual-match-open,.market-odd,.odd,.casino-card{pointer-events:auto!important;touch-action:manipulation!important}
+#sortbet-odds-float{touch-action:none!important}
+</style>
 </body>
 <style id="sortbet-hd-polish">
 :root{--sb-blue:#0876d1;--sb-blue-deep:#06477f;--sb-ink:#101a27;--sb-gold:#f5c400;--sb-radius:12px}
@@ -1265,7 +1272,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <style id="sortbet-no-zoom-fullscreen">
-html,body{width:100%;max-width:100%;overflow-x:hidden;touch-action:pan-x pan-y}
+html,body{width:100%;max-width:100%;overflow-x:hidden;touch-action:auto!important}
 @media(display-mode:standalone){html,body{min-height:100%;min-height:100dvh;width:100%;overscroll-behavior:none}}
 </style>
 <style id="sortbet-installed-app-polish">
