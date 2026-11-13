@@ -840,7 +840,7 @@ async function placeVirtualAccumulator(){
  const ref='SBVA-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
  const legs=picks.map(x=>({matchId:x.matchId,outcome:x.pick,odd:Number(x.odd),event:x.home,selection:x.pickLabel}));
  if(!confirm('CONFIRM VIRTUAL ACCUMULATOR\n\nSelections: '+legs.length+'\nStake: '+money(stake)+'\nTotal odds: '+odds.toFixed(2)+'\nPotential return: '+money(potentialReturn)+'\n\nStart all selected virtual games?'))return;
- const ticket={reference:ref,createdAt:new Date().toISOString(),stake,odds,potentialReturn,status:'OPEN · TEST',mode:'VIRTUAL ACCUMULATOR',unit:'points',selections:legs.map(x=>({event:x.event,market:'Virtual market',selection:x.selection,odds:x.odd}))};
+ const ticket={reference:ref,createdAt:new Date().toISOString(),stake,odds,potentialReturn,status:'OPEN · TEST',mode:'VIRTUAL ACCUMULATOR',unit:'practice-naira',selections:legs.map(x=>({event:x.event,market:'Virtual market',selection:x.selection,odds:x.odd}))};
  const tickets=getTestTickets();tickets.unshift(ticket);saveTestTickets(tickets);
  setPracticeBalance(balance-stake);updateVirtualPointsUI();
  slip=[];document.getElementById('stake').value='';renderSlip();closeMobileSlip();
@@ -882,14 +882,14 @@ function practiceWalletKey(){const u=user||JSON.parse(localStorage.getItem('soot
 function getPracticeBalance(){if(!token)return 0;const key=practiceWalletKey();const raw=localStorage.getItem(key);if(raw===null){localStorage.setItem(key,'100000');return 100000;}const n=Number(raw);return Number.isSafeInteger(n)&&n>=0?n:0;}
 function setPracticeBalance(n){const amount=Math.max(0,Math.floor(Number(n)||0));localStorage.setItem(practiceWalletKey(),String(amount));loadDemoWalletUI();return amount;}
 function loadDemoWalletUI(){const amount=getPracticeBalance();const formatted=money(amount);const virtual=document.getElementById('virtual-points-balance');if(virtual)virtual.textContent=formatted;const casino=document.getElementById('casino-balance');if(casino)casino.textContent=formatted;const top=document.getElementById('balance');if(top)top.textContent=formatted;const wallet=document.getElementById('walletbal');if(wallet)wallet.textContent=formatted;const detail=document.getElementById('practice-wallet-detail');if(detail)detail.textContent=formatted;}
-function resetPracticeWallet(){if(!token){alert('Please log in first to use your practice wallet.');openModal('login');return;}if(!confirm('Reset your simulated practice balance to ₦100,000? This does not add real money.'))return;setPracticeBalance(100000);const msg=document.getElementById('practice-wallet-message');if(msg)msg.textContent='Practice balance reset to ₦100,000. No real money was added.';}
+function resetPracticeWallet(){if(!token){alert('Please log in first to view your wallet.');openModal('login');return;}if(!confirm('Reset the local launch-preview wallet balance to ₦100,000? This does not process a deposit.'))return;setPracticeBalance(100000);const msg=document.getElementById('practice-wallet-message');if(msg)msg.textContent='Local wallet preview balance updated.';}
 function placeBet(){
  if(slip.some(x=>x.isVirtual)){if(slip.some(x=>!x.isVirtual)){alert('Keep virtual and regular sports selections in separate practice tickets.');return;}placeVirtualAccumulator();return;}
  const stake=Number(document.getElementById('stake')?.value||0);
  if(!slip.length){alert('Add at least one selection to your betslip.');return}
  if(!Number.isFinite(stake)||stake<100){alert('Enter a stake of at least ₦100.');return}
  if(stake>1000000){alert('Stake limit is ₦1,000,000.');return}
- if(!token){alert('Please log in first to use your practice wallet.');openModal('login');return}
+ if(!token){alert('Please log in first to use your wallet.');openModal('login');return}
  const balance=getPracticeBalance();if(stake>balance){alert('Insufficient wallet balance: '+money(balance));return}
  const odds=slip.reduce((a,x)=>a*Number(x.odd||1),1);
  const selections=slip.map(x=>({event:x.home+' vs '+x.away,market:x.market||'Match result',selection:x.pickLabel||(x.pick==='1'?'Home win':x.pick==='X'?'Draw':'Away win'),odds:Number(x.odd)}));
@@ -901,11 +901,11 @@ function placeBet(){
  alert('Practice bet placed: '+ref+'\nYour simulated balance is now '+money(getPracticeBalance())+'.');
  showPage('mybets',null);loadBets();
 }
-function viewTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const unit=t.unit==='points'?' points':t.unit==='practice-naira'?' simulated funds':'',stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake),returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printTestTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake (test only)</span><b>'+stakeText+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return (not payable)</span><b>'+returnText+'</b></div><p class="muted">Sandbox receipt only. No real wager, wallet debit, or cash payout occurred.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
+function viewTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const unit=t.unit==='points'?'':t.unit==='practice-naira'?'':'',stakeText=money(t.stake),returnText=money(t.potentialReturn);const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printTestTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake (test only)</span><b>'+stakeText+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return (not payable)</span><b>'+returnText+'</b></div><p class="muted">Sandbox receipt only. No real wager, wallet debit, or cash payout occurred.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
 function printTestTicket(ref){
  const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;
- const stakeText=t.unit==='points'?Number(t.stake).toLocaleString('en-NG')+' points':money(t.stake);
- const returnText=t.unit==='points'?Number(t.potentialReturn).toLocaleString('en-NG')+' points':money(t.potentialReturn);
+ const stakeText=money(t.stake);
+ const returnText=money(t.potentialReturn);
  const rows=(t.selections||[]).map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('');
  const html='<!doctype html><html><head><meta charset="utf-8"><title>SORTBET NG Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SORTBET NG</h1><small>BET RECEIPT</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+rows+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">Receipt details are for your records.</div><script>window.onload=()=>window.print()<\\/script><button id="sortbet-odds-float" type="button" aria-label="Open betslip"><strong id="float-odds">0.00</strong><small>MY BETS</small><em id="float-count">0</em></button></body></html>';
  const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return;}
@@ -951,8 +951,8 @@ async function loadVirtualHistory(){
  }catch(e){box.textContent=e.message}
 }
 let selectedVirtualPicks={};
-function getVirtualPoints(){const n=Number(localStorage.getItem('sooty_virtual_points'));return Number.isFinite(n)&&n>=0?n:10000;}
-function updateVirtualPointsUI(){const el=document.getElementById('virtual-points-balance');if(el)el.textContent=getVirtualPoints().toLocaleString('en-NG');}
+function getVirtualPoints(){return getPracticeBalance();}
+function updateVirtualPointsUI(){const value=money(getVirtualPoints());const el=document.getElementById('virtual-points-balance');if(el)el.textContent=value;const casino=document.getElementById('casino-balance');if(casino)casino.textContent=value;}
 function selectVirtualPick(id,button){
  const card=button.closest('.virtual-match-card');
  card.querySelectorAll('.virtual-market').forEach(x=>x.classList.remove('selected'));
@@ -980,8 +980,8 @@ async function placeVirtualStake(id){
  const bet={reference,matchId:id,stake,odd:pick.odd,outcome:pick.outcome,createdAt:new Date().toISOString(),status:'OPEN · TEST'};
  pending.push(bet);
  localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending));
- const tickets=getTestTickets();tickets.unshift({reference,createdAt:bet.createdAt,stake,odds:pick.odd,potentialReturn:stake*pick.odd,status:'OPEN · TEST',mode:'VIRTUAL SANDBOX',unit:'points',selections:[{event:eventName,market:'Virtual market',selection:marketLabel,odds:pick.odd}]});saveTestTickets(tickets);
- localStorage.setItem('sooty_virtual_points',String(balance-stake));updateVirtualPointsUI();
+ const tickets=getTestTickets();tickets.unshift({reference,createdAt:bet.createdAt,stake,odds:pick.odd,potentialReturn:stake*pick.odd,status:'OPEN · TEST',mode:'VIRTUAL SPORTS',unit:'practice-naira',selections:[{event:eventName,market:'Virtual market',selection:marketLabel,odds:pick.odd}]});saveTestTickets(tickets);
+ setPracticeBalance(balance-stake);updateVirtualPointsUI();
  await startVirtualMatch(id);
 }
 function settleVirtualStake(match){
@@ -1004,7 +1004,7 @@ function settleVirtualStake(match){
   const result=document.getElementById('virtual-result');
   if(result)result.innerHTML+='<div class="virtual-final"><b>Practice ticket '+(won?'WON':'NOT WON')+'</b><div>'+bet.stake.toLocaleString('en-NG')+' points · '+escapeHTML(bet.outcome)+' @ '+bet.odd.toFixed(2)+' · '+(won?'Returned '+payout.toLocaleString('en-NG')+' points':'No points returned')+'</div></div>';
  }
- localStorage.setItem('sooty_virtual_points',String(balance));
+ setPracticeBalance(balance);
  localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending.filter(x=>x.matchId!==match.id)));
  saveTestTickets(tickets);updateVirtualPointsUI();
 }
