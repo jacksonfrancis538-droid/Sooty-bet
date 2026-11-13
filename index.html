@@ -907,7 +907,7 @@ function printTestTicket(ref){
  const stakeText=money(t.stake);
  const returnText=money(t.potentialReturn);
  const rows=(t.selections||[]).map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('');
- const html='<!doctype html><html><head><meta charset="utf-8"><title>SORTBET NG Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SORTBET NG</h1><small>BET RECEIPT</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+rows+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">Receipt details are for your records.</div><script>window.onload=()=>window.print()<\\/script><button id="sortbet-odds-float" type="button" aria-label="Open betslip"><strong id="float-odds">0.00</strong><small>MY BETS</small><em id="float-count">0</em></button></body></html>';
+ const html='<!doctype html><html><head><meta charset="utf-8"><title>SORTBET NG Receipt</title><style>body{font:14px Arial;padding:28px;color:#111}h1{margin-bottom:4px}hr{margin:18px 0}small{color:#555}.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #ddd}.warn{margin-top:22px;padding:12px;background:#fff2cc}</style></head><body><h1>SORTBET NG</h1><small>BET RECEIPT</small><hr><b>'+escapeHTML(t.reference)+'</b><div class="row"><span>Date</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div><div class="row"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div>'+rows+'<hr><div class="row"><span>Stake</span><b>'+stakeText+'</b></div><div class="row"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="row"><span>Potential return</span><b>'+returnText+'</b></div><div class="warn">Receipt details are for your records.</div><script>window.onload=()=>window.print()<\\/script></body></html>';
  const w=window.open('','_blank','width=700,height=800');if(!w){alert('Allow pop-ups to print the receipt.');return;}
  w.document.open();w.document.write(html);w.document.close();
 }
@@ -1078,7 +1078,8 @@ async function loadMeProfile(){
 .market-odd small{font-size:10px!important;white-space:normal;line-height:1.15;min-height:22px;display:block}
 .market-odd b{font-size:12px}
 @media(max-width:680px){.market-options{grid-template-columns:repeat(2,minmax(0,1fr))}.market-odd{min-height:45px}}
-</style></body>
+</style><button id="sortbet-odds-float" type="button" aria-label="Open betslip"><strong id="float-odds">0.00</strong><small>MY BETS</small><em id="float-count">0</em></button>
+</body>
 <style id="sortbet-hd-polish">
 :root{--sb-blue:#0876d1;--sb-blue-deep:#06477f;--sb-ink:#101a27;--sb-gold:#f5c400;--sb-radius:12px}
 html{scroll-behavior:smooth;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
