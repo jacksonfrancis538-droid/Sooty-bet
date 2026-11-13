@@ -511,7 +511,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
    <div class="settings-group"><h3>ABOUT THE APP</h3>
     <button class="settings-row" onclick="shareOddstarApp()"><span class="settings-icon">↗</span><span class="settings-copy"><b>Share the app</b><small>Share the SORTBET NG website link</small></span><strong>›</strong></button>
     <div class="settings-row"><span class="settings-icon">▦</span><span class="settings-copy"><b>Share the app via QR code</b><small>QR sharing will be available when the app download page is configured</small></span><span class="settings-status">Coming soon</span></div>
-    <div class="settings-row"><span class="settings-icon">ⓘ</span><span class="settings-copy"><b>You are using the latest version of the app</b><small>SORTBET NG · Version 1.0.0</small></span><span class="settings-status">Preview</span></div>
+    <div class="settings-row"><span class="settings-icon">ⓘ</span><span class="settings-copy"><b>You are using the latest version of the app</b><small>SORTBET NG · Version 1.0.0</small></span><span class="settings-status">Current</span></div>
     <button class="settings-row" onclick="clearSootyCache()"><span class="settings-icon">♲</span><span class="settings-copy"><b>Clear cache</b><small>Clear saved app preferences on this device</small></span><strong>›</strong></button>
     <button class="settings-row settings-logout" id="settingslogout" onclick="requestLogout()"><span class="settings-icon">⇥</span><span class="settings-copy"><b>Log out of account</b><small>Sign out on this device</small></span><strong>›</strong></button>
    </div>
@@ -534,7 +534,7 @@ button:disabled{opacity:.65;cursor:not-allowed}
  <div class="slip-code-load"><input id="betslip-code-input" type="text" maxlength="5" autocomplete="off" placeholder="Enter code e.g. ER2T3" aria-label="Betslip load code"><button type="button" onclick="loadBetslipCode()">Load</button></div>
  <small class="slip-code-help">Share the code so another person can load these selections. Codes expire after 30 days.</small>
 </div>
-<div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm bet</button><div class="notice">SANDBOX ONLY · Creates a test ticket. No real money is charged or paid.</div></div><div class="notice">Sample odds only. Not a live bookmaker offer.</div></aside>
+<div id="slipcalc" style="display:none"><label class="muted" for="stake">Stake amount (₦)</label><input class="stake" id="stake" type="number" min="0" placeholder="Enter stake" oninput="calculate()"><div class="calc"><span>Total odds</span><b id="totalodds">1.00</b></div><div class="calc"><span>Potential return</span><b id="return">₦0.00</b></div><button class="place" onclick="placeBet()">Confirm bet</button><div class="notice">Bet placement is currently unavailable. It will be enabled after required licensing and verified odds, wallet and settlement services are approved.</div></div><div class="notice">Displayed odds are indicative until the approved live odds feed is connected.</div></aside>
 </div>
 <nav class="mobile-bottom" aria-label="Bottom navigation">
  <button class="active" onclick="showPage('sports',this);setBottomActive(this)"><b>◈</b><span>Home</span></button>
@@ -792,14 +792,14 @@ async function syncPendingVirtualTickets(){
 }
 async function loadBets(){
  await syncPendingVirtualTickets();
- const all=getTestTickets().slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+ const all=getBetTickets().slice().sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
  const isOpen=t=>/open|pending/i.test(String(t.status||'')),open=all.filter(isOpen),history=all.filter(t=>!isOpen(t)),rows=activeBetTab==='open'?open:history;
  const count=document.getElementById('openbets-count');if(count)count.textContent=open.length;
  const message=document.getElementById('betsmessage'),list=document.getElementById('betslist'),header=document.getElementById('bets-header-balance');
  if(header&&token){try{const w=await api('/api/wallet');header.textContent=money(Number(w.balanceKobo||0)/100);}catch(e){header.textContent='₦—';}}
  if(!token){message.innerHTML='⚽<h3>Sign in to see your bets</h3><p>Your staked slips appear here once you are signed in.</p><button class="bets-signin" onclick="openModal(\'login\')">Sign in</button>';list.innerHTML='';return;}
  message.textContent=rows.length?(activeBetTab==='open'?'Your open bets':'Your bet history'):'';
- list.innerHTML=rows.length?rows.map(t=>'<article class="bet-ticket-card"><div class="bet-ticket-head"><b>'+escapeHTML(t.reference)+'</b><span class="bet-status '+(isOpen(t)?'open':'settled')+'">'+escapeHTML(t.status)+'</span></div><small>'+new Date(t.createdAt).toLocaleString('en-NG')+'</small><div class="bet-ticket-summary"><span>'+t.selections.length+' selection'+(t.selections.length===1?'':'s')+'</span><span>Odds <b>'+Number(t.odds).toFixed(2)+'</b></span></div>'+t.selections.map(x=>'<div class="bet-ticket-leg"><b>'+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="bet-ticket-summary"><span>Stake</span><b>'+money(t.stake)+'</b></div><div class="bet-ticket-summary"><span>'+(isOpen(t)?'Potential return':'Payout')+'</span><b>'+money(t.payout??t.potentialReturn??0)+'</b></div><button class="ticket-detail-btn" type="button" onclick="viewTestTicket(\''+escapeHTML(t.reference)+'\')">View bet details</button></article>').join(''):'<div class="bets-empty"><div>⚽</div><h3>'+(activeBetTab==='open'?'No open bets':'No bet history yet')+'</h3><p>'+(activeBetTab==='open'?'Your active tickets will appear here.':'Settled tickets will appear here after your bets are completed.')+'</p></div>';
+ list.innerHTML=rows.length?rows.map(t=>'<article class="bet-ticket-card"><div class="bet-ticket-head"><b>'+escapeHTML(t.reference)+'</b><span class="bet-status '+(isOpen(t)?'open':'settled')+'">'+escapeHTML(t.status)+'</span></div><small>'+new Date(t.createdAt).toLocaleString('en-NG')+'</small><div class="bet-ticket-summary"><span>'+t.selections.length+' selection'+(t.selections.length===1?'':'s')+'</span><span>Odds <b>'+Number(t.odds).toFixed(2)+'</b></span></div>'+t.selections.map(x=>'<div class="bet-ticket-leg"><b>'+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="bet-ticket-summary"><span>Stake</span><b>'+money(t.stake)+'</b></div><div class="bet-ticket-summary"><span>'+(isOpen(t)?'Potential return':'Payout')+'</span><b>'+money(t.payout??t.potentialReturn??0)+'</b></div><button class="ticket-detail-btn" type="button" onclick="viewBetTicket(\''+escapeHTML(t.reference)+'\')">View bet details</button></article>').join(''):'<div class="bets-empty"><div>⚽</div><h3>'+(activeBetTab==='open'?'No open bets':'No bet history yet')+'</h3><p>'+(activeBetTab==='open'?'Your active tickets will appear here.':'Settled tickets will appear here after your bets are completed.')+'</p></div>';
 }
 async function loadAdminVerification(){
  const box=document.getElementById('adminverification');if(!token){box.textContent='Admin sign-in required.';return}
@@ -849,45 +849,13 @@ async function setWithdrawalStatus(id,status){
  catch(e){alert(e.message)}
 }
 
-function copyDepositAccount(){alert('Real-money deposits are disabled in testing mode.');}
+function copyDepositAccount(){alert('Deposits are unavailable until the required licensing and payment approvals are complete.');}
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-// One-time cleanup of old locally stored practice/test tickets at the user's request.
-try{if(!localStorage.getItem('sortbet_ticket_cleanup_v1')){localStorage.removeItem('sooty_test_tickets_v1');localStorage.setItem('sortbet_ticket_cleanup_v1','done');}}catch(e){}
-function getTestTickets(){try{return JSON.parse(localStorage.getItem('sooty_test_tickets_v1')||'[]')}catch(e){return[]}}
-function saveTestTickets(rows){localStorage.setItem('sooty_test_tickets_v1',JSON.stringify(rows))}
-async function placeVirtualAccumulator(){
- const picks=slip.filter(x=>x.isVirtual);
- if(!picks.length){alert('Add virtual selections first.');return;}
- if(new Set(picks.map(x=>String(x.matchId))).size!==picks.length){alert('Choose only one market per virtual match.');return;}
- const stake=Math.floor(Number(document.getElementById('stake')?.value||0));
- if(!Number.isSafeInteger(stake)||stake<10){alert('Minimum virtual accumulator stake is ₦10.');return;}
- const balance=getVirtualPoints();if(stake>balance){alert('Insufficient wallet balance: '+money(balance));return;}
- const odds=picks.reduce((a,x)=>a*Number(x.odd||1),1),potentialReturn=Math.floor(stake*odds);
- const ref='SBVA-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
- const legs=picks.map(x=>({matchId:x.matchId,outcome:x.pick,odd:Number(x.odd),event:x.home,selection:x.pickLabel}));
- if(!confirm('CONFIRM VIRTUAL ACCUMULATOR\n\nSelections: '+legs.length+'\nStake: '+money(stake)+'\nTotal odds: '+odds.toFixed(2)+'\nPotential return: '+money(potentialReturn)+'\n\nStart all selected virtual games?'))return;
- const ticket={reference:ref,createdAt:new Date().toISOString(),stake,odds,potentialReturn,status:'OPEN',mode:'VIRTUAL ACCUMULATOR',unit:'practice-naira',selections:legs.map(x=>({event:x.event,market:'Virtual market',selection:x.selection,odds:x.odd}))};
- const tickets=getTestTickets();tickets.unshift(ticket);saveTestTickets(tickets);
- setPracticeBalance(balance-stake);updateVirtualPointsUI();
- slip=[];document.getElementById('stake').value='';renderSlip();closeMobileSlip();
- showPage('mybets',null);loadBets();
- try{
-  await Promise.all(legs.map(x=>api('/api/virtual/matches/'+x.matchId+'/start',{method:'POST'})));
-  let results=[];
-  for(let attempt=0;attempt<240;attempt++){
-   results=await Promise.all(legs.map(async leg=>{const d=await api('/api/virtual/matches/'+leg.matchId);return {...leg,match:d.match};}));
-   if(results.every(x=>x.match?.status==='completed'))break;
-   await new Promise(resolve=>setTimeout(resolve,1000));
-  }
-  if(!results.length||!results.every(x=>x.match?.status==='completed'))throw new Error('Selected virtual games are still running. Ticket remains open; check back shortly.');
-  const won=results.every(x=>virtualLegWon(x.match,x.outcome));
-  const payout=won?potentialReturn:0;
-  if(won){const now=getVirtualPoints();setPracticeBalance(now+payout);}
-  const updated=getTestTickets(),saved=updated.find(x=>x.reference===ref);
-  if(saved){saved.status=won?'WON':'LOST';saved.payout=payout;saved.settledAt=new Date().toISOString();saved.results=results.map(x=>({event:x.event,outcome:x.outcome,homeScore:x.match.homeScore,awayScore:x.match.awayScore,winner:x.match.result?.winner}));saveTestTickets(updated);}
-  updateVirtualPointsUI();await loadBets();alert('Virtual accumulator '+(won?'WON':'LOST')+' · '+(won?money(payout)+' returned':'No return')+'\nTicket: '+ref);
- }catch(e){alert('Virtual accumulator ticket '+ref+' is saved and remains open. '+e.message);}
-}
+// One-time cleanup: remove open tickets and unfinished virtual slips, preserving settled history.
+try{if(!localStorage.getItem('sortbet_open_bets_cleared_v2')){const oldRows=JSON.parse(localStorage.getItem('sortbet_bet_tickets_v2')||'[]');const legacyRows=JSON.parse(localStorage.getItem('sooty_test_tickets_v1')||'[]');const source=oldRows.length?oldRows:legacyRows;const settled=Array.isArray(source)?source.filter(t=>!/open|pending/i.test(String(t.status||''))):[];localStorage.setItem('sortbet_bet_tickets_v2',JSON.stringify(settled));localStorage.removeItem('sooty_test_tickets_v1');localStorage.removeItem('sooty_virtual_bets');localStorage.setItem('sortbet_open_bets_cleared_v2','done');}}catch(e){}
+function getBetTickets(){try{return JSON.parse(localStorage.getItem('sortbet_bet_tickets_v2')||'[]')}catch(e){return[]}}
+function saveBetTickets(rows){localStorage.setItem('sortbet_bet_tickets_v2',JSON.stringify(rows))}
+async function placeVirtualAccumulator(){alert('Virtual betting is currently unavailable. It will be enabled after required licensing and verified wallet and settlement services are approved.');}
 function virtualLegWon(match,outcome){
  if(!match||match.status!=='completed')return false;
  const winner=match.result?.winner,home=Number(match.homeScore||0),away=Number(match.awayScore||0),goals=home+away;
@@ -909,27 +877,10 @@ function getPracticeBalance(){if(!token)return 0;const key=practiceWalletKey();c
 function setPracticeBalance(n){const amount=Math.max(0,Math.floor(Number(n)||0));localStorage.setItem(practiceWalletKey(),String(amount));loadDemoWalletUI();return amount;}
 function loadDemoWalletUI(){const amount=getPracticeBalance();const formatted=money(amount);const casino=document.getElementById('casino-balance');if(casino)casino.textContent=formatted;const top=document.getElementById('balance');if(top)top.textContent=formatted;const wallet=document.getElementById('walletbal');if(wallet)wallet.textContent=formatted;const detail=document.getElementById('practice-wallet-detail');if(detail)detail.textContent=formatted;}
 function resetPracticeWallet(){if(!token){alert('Please log in first to view your wallet.');openModal('login');return;}if(!confirm('Reset the local launch-preview wallet balance to ₦100,000? This does not process a deposit.'))return;setPracticeBalance(100000);const msg=document.getElementById('practice-wallet-message');if(msg)msg.textContent='Local wallet preview balance updated.';}
-function placeBet(){
- if(slip.some(x=>x.isVirtual)){if(slip.some(x=>!x.isVirtual)){alert('Virtual and sports selections must be placed as separate tickets for now.');return;}placeVirtualAccumulator();return;}
- const stake=Number(document.getElementById('stake')?.value||0);
- if(!slip.length){alert('Add at least one selection to your betslip.');return}
- if(!Number.isFinite(stake)||stake<100){alert('Enter a stake of at least ₦100.');return}
- if(stake>1000000){alert('Stake limit is ₦1,000,000.');return}
- if(!token){alert('Please log in first to use your wallet.');openModal('login');return}
- const balance=getPracticeBalance();if(stake>balance){alert('Insufficient wallet balance: '+money(balance));return}
- const odds=slip.reduce((a,x)=>a*Number(x.odd||1),1);
- const selections=slip.map(x=>({event:x.home+' vs '+x.away,market:x.market||'Match result',selection:x.pickLabel||(x.pick==='1'?'Home win':x.pick==='X'?'Draw':'Away win'),odds:Number(x.odd)}));
- const ref='SB-'+new Date().toISOString().replace(/[-:TZ.]/g,'').slice(0,14)+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
- const ticket={reference:ref,createdAt:new Date().toISOString(),stake,odds,potentialReturn:stake*odds,status:'OPEN',mode:'SPORTS',unit:'practice-naira',selections};
- if(!confirm('CONFIRM BET\n\nStake: '+money(stake)+'\nTotal odds: '+odds.toFixed(2)+'\nPotential return: '+money(ticket.potentialReturn)+'\n\nContinue?'))return;
- const rows=getTestTickets();rows.unshift(ticket);saveTestTickets(rows);setPracticeBalance(balance-stake);
- slip=[];document.getElementById('stake').value='';renderSlip();
- alert('Bet recorded: '+ref+'\nWallet balance: '+money(getPracticeBalance())+'.');
- showPage('mybets',null);loadBets();
-}
-function viewTestTicket(ref){const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;const stakeText=money(t.stake),returnText=money(t.potentialReturn);const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printTestTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake</span><b>'+stakeText+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return</span><b>'+returnText+'</b></div><p class="muted">Launch-preview receipt. Cash wagering and payouts are not enabled yet.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
-function printTestTicket(ref){
- const t=getTestTickets().find(x=>x.reference===ref);if(!t)return;
+function placeBet(){alert('Bet placement is currently unavailable. It will be enabled after required licensing and verified odds, wallet and settlement services are approved.');}
+function viewBetTicket(ref){const t=getBetTickets().find(x=>x.reference===ref);if(!t)return;const stakeText=money(t.stake),returnText=money(t.potentialReturn);const detail=document.getElementById('ticket-detail');detail.innerHTML='<div class="panel" style="margin-top:14px;border-color:var(--gold)"><div class="panel-title"><h3>Bet receipt · '+escapeHTML(t.reference)+'</h3><button class="btn ghost" onclick="printBetTicket(\''+escapeHTML(t.reference)+'\')">Print receipt</button></div><div class="calc"><span>Status</span><b>'+escapeHTML(t.status)+'</b></div><div class="calc"><span>Placed</span><b>'+new Date(t.createdAt).toLocaleString('en-NG')+'</b></div>'+t.selections.map((x,i)=>'<div class="selection"><b>'+ (i+1)+'. '+escapeHTML(x.event)+'</b><small>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+' · Odds '+Number(x.odds).toFixed(2)+'</small></div>').join('')+'<div class="calc"><span>Stake</span><b>'+stakeText+'</b></div><div class="calc"><span>Total odds</span><b>'+Number(t.odds).toFixed(2)+'</b></div><div class="calc"><span>Potential return</span><b>'+returnText+'</b></div><p class="muted">This record is retained for your reference. Cash wagering and payouts are not enabled.</p></div>';detail.scrollIntoView({behavior:'smooth',block:'start'});}
+function printBetTicket(ref){
+ const t=getBetTickets().find(x=>x.reference===ref);if(!t)return;
  const stakeText=money(t.stake);
  const returnText=money(t.potentialReturn);
  const rows=(t.selections||[]).map((x,i)=>'<hr><b>'+(i+1)+'. '+escapeHTML(x.event)+'</b><div class="row"><span>'+escapeHTML(x.market)+' · '+escapeHTML(x.selection)+'</span><b>'+Number(x.odds).toFixed(2)+'</b></div>').join('');
@@ -991,31 +942,13 @@ function selectVirtualPick(id,button){
  if(existing>=0)slip[existing]=entry;else slip.push(entry);
  renderSlip();
 }
-async function placeVirtualStake(id){
- const input=document.getElementById('virtual-stake-'+id),stake=Math.floor(Number(input?.value||0));
- let pick=selectedVirtualPicks[id];
- if(!pick){const chosen=input?.closest('.virtual-match-card')?.querySelector('.virtual-market.selected');if(chosen)pick={outcome:chosen.dataset.market,odd:Number(chosen.querySelector('b').textContent)};}
- if(!pick){alert('Choose an outcome first.');return;}
- if(!Number.isSafeInteger(stake)||stake<10){alert('Minimum stake is ₦10.');return;}
- const balance=getVirtualPoints();if(stake>balance){alert('Insufficient wallet balance: '+money(balance));return;}
- const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]');
- const matchCard=input?.closest('.virtual-match-card');
- const eventName=matchCard?.querySelector('.virtual-match-names')?.textContent?.trim()||('Virtual match #'+id);
- const marketLabel=matchCard?.querySelector('.virtual-market.selected')?.textContent?.trim()||pick.outcome;
- const reference='SBV-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
- const bet={reference,matchId:id,stake,odd:pick.odd,outcome:pick.outcome,createdAt:new Date().toISOString(),status:'OPEN · TEST'};
- pending.push(bet);
- localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending));
- const tickets=getTestTickets();tickets.unshift({reference,createdAt:bet.createdAt,stake,odds:pick.odd,potentialReturn:stake*pick.odd,status:'OPEN · TEST',mode:'VIRTUAL SPORTS',unit:'practice-naira',selections:[{event:eventName,market:'Virtual market',selection:marketLabel,odds:pick.odd}]});saveTestTickets(tickets);
- setPracticeBalance(balance-stake);updateVirtualPointsUI();
- await startVirtualMatch(id);
-}
+async function placeVirtualStake(id){alert('Virtual betting is currently unavailable. It will be enabled after required licensing and verified wallet and settlement services are approved.');}
 function settleVirtualStake(match){
  if(!match||match.status!=='completed')return;
  const pending=JSON.parse(localStorage.getItem('sooty_virtual_bets')||'[]'),bets=pending.filter(x=>x.matchId===match.id);
  if(!bets.length)return;
  const winner=match.result?.winner,goals=Number(match.homeScore||0)+Number(match.awayScore||0),home=Number(match.homeScore||0),away=Number(match.awayScore||0);
- let balance=getVirtualPoints();const tickets=getTestTickets();
+ let balance=getVirtualPoints();const tickets=getBetTickets();
  for(const bet of bets){
   let won=winner===bet.outcome;
   if(bet.outcome==='btts_yes')won=home>0&&away>0;
@@ -1032,7 +965,7 @@ function settleVirtualStake(match){
  }
  setPracticeBalance(balance);
  localStorage.setItem('sooty_virtual_bets',JSON.stringify(pending.filter(x=>x.matchId!==match.id)));
- saveTestTickets(tickets);updateVirtualPointsUI();
+ saveBetTickets(tickets);updateVirtualPointsUI();
 }
 async function startVirtualMatch(id){
  try{const data=await api('/api/virtual/matches/'+id+'/start',{method:'POST'});virtualMatch=data.match;document.getElementById('virtual-stage').hidden=false;document.getElementById('virtual-stage').scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('virtual-result').innerHTML='';renderVirtualMatch();startVirtualAnimation();if(virtualPoll)clearInterval(virtualPoll);virtualPoll=setInterval(pollVirtualMatch,1000);}
