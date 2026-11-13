@@ -72,6 +72,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS country TEXT NOT NULL DEFAULT 'NG';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMPTZ;
+CREATE TABLE IF NOT EXISTS password_reset_tokens (id BIGSERIAL PRIMARY KEY,user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,token_hash TEXT NOT NULL UNIQUE,expires_at TIMESTAMPTZ NOT NULL,used_at TIMESTAMPTZ,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS password_reset_user_idx ON password_reset_tokens(user_id,created_at DESC);
 
 CREATE TABLE IF NOT EXISTS virtual_matches (
  id BIGSERIAL PRIMARY KEY,
@@ -453,6 +455,45 @@ app.post('/api/auth/register', async (req,res) => {
   const u=q.rows[0];
   res.status(201).json({token:tokenFor(u),user:{id:u.id,email:u.email,phone:u.phone,fullName:u.full_name,country:u.country,role:u.role,status:u.status}});
  } catch(e) { res.status(e.code==='23505'?409:500).json({error:e.code==='23505'?'That email or phone is already registered.':'Could not create account.'}); }
+});
+app.post('/api/auth/forgot-password', async (req,res) => {
+ const email=cleanText(req.body.email,254).toLowerCase();
+ const generic={message:'If an account exists for that email, a password reset link will be sent shortly.'};
+ if(!/^\\S+@\\S+\\.\\S+$/.test(email)) return res.status(200).json(generic);
+ if(!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM) return res.status(503).json({error:'Password recovery email is not configured yet. Please contact SORTBET support.'});
+ try {
+  const q=await pool.query('SELECT id,email,full_name FROM users WHERE lower(email)=$1 LIMIT 1',[email]);
+  if(q.rowCount){
+   const raw=crypto.randomBytes(32).toString('base64url');
+   const tokenHash=crypto.createHash('sha256').update(raw).digest('hex');
+   await pool.query("UPDATE password_reset_tokens SET used_at=NOW() WHERE user_id=$1 AND used_at IS NULL",[q.rows[0].id]);
+   await pool.query("INSERT INTO password_reset_tokens(user_id,token_hash,expires_at) VALUES($1,$2,NOW()+INTERVAL '30 minutes')",[q.rows[0].id,tokenHash]);
+   const resetUrl='https://sooty-bet.onrender.com/?reset_token='+encodeURIComponent(raw);
+   const mail=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+process.env.RESEND_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({from:process.env.EMAIL_FROM,to:[email],subject:'Reset your SORTBET NG password',html:'<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#172538"><h2>Reset your SORTBET NG password</h2><p>We received a request to reset your password. This link expires in 30 minutes and can only be used once.</p><p><a href="'+resetUrl+'" style="display:inline-block;background:#0879df;color:#fff;padding:13px 20px;border-radius:8px;text-decoration:none">Reset password</a></p><p>If you did not request this, you can ignore this email.</p></div>'})});
+   if(!mail.ok){const body=await mail.text();console.error('Password reset email failed:',mail.status,body.slice(0,300));return res.status(502).json({error:'Could not send the reset email. Please try again later.'});}
+  }
+  res.set('Cache-Control','no-store');res.json(generic);
+ } catch(e){console.error('Password reset request failed:',e.message);res.status(500).json({error:'Could not process the password reset request.'});}
+});
+app.post('/api/auth/reset-password', async (req,res) => {
+ const raw=typeof req.body.token==='string'?req.body.token:'';
+ const password=typeof req.body.password==='string'?req.body.password:'';
+ if(raw.length<30 || raw.length>200 || password.length<12) return res.status(400).json({error:'Use a valid reset link and a password with at least 12 characters.'});
+ try {
+  const tokenHash=crypto.createHash('sha256').update(raw).digest('hex');
+  const q=await pool.query("SELECT id,user_id FROM password_reset_tokens WHERE token_hash=$1 AND used_at IS NULL AND expires_at>NOW() LIMIT 1",[tokenHash]);
+  if(!q.rowCount) return res.status(400).json({error:'This reset link is invalid or expired. Please request a new one.'});
+  const hash=await bcrypt.hash(password,12);
+  await pool.query('BEGIN');
+  try {
+   const locked=await pool.query("SELECT id,user_id FROM password_reset_tokens WHERE id=$1 AND used_at IS NULL AND expires_at>NOW() FOR UPDATE",[q.rows[0].id]);
+   if(!locked.rowCount) throw new Error('RESET_TOKEN_USED');
+   await pool.query('UPDATE users SET password_hash=$1 WHERE id=$2',[hash,locked.rows[0].user_id]);
+   await pool.query('UPDATE password_reset_tokens SET used_at=NOW() WHERE user_id=$1 AND used_at IS NULL',[locked.rows[0].user_id]);
+   await pool.query('COMMIT');
+  } catch(e){await pool.query('ROLLBACK');throw e;}
+  res.set('Cache-Control','no-store');res.json({message:'Your password has been reset. You can now log in with your new password.'});
+ } catch(e){if(e.message==='RESET_TOKEN_USED')return res.status(400).json({error:'This reset link has already been used. Please request a new one.'});console.error('Password reset failed:',e.message);res.status(500).json({error:'Could not reset your password.'});}
 });
 app.post('/api/auth/login', async (req,res) => {
  try {
