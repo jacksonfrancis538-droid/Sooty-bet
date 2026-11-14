@@ -26,7 +26,7 @@ const pool = new Pool({
 app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({ origin: process.env.FRONTEND_ORIGIN ? process.env.FRONTEND_ORIGIN.split(',') : true }));
-app.use(express.json({ limit: '20kb' }));
+app.use(express.json({ limit: '20kb', verify: (req, _res, buf) => { req.rawBody = Buffer.from(buf); } }));
 app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 20 }));
 app.use('/api/withdrawals', rateLimit({ windowMs: 60 * 60 * 1000, limit: 8 }));
 
@@ -65,6 +65,17 @@ CREATE TABLE IF NOT EXISTS wallet_ledger (
  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS withdrawals_status_created_idx ON withdrawals(status, created_at DESC);
+ CREATE TABLE IF NOT EXISTS paystack_transactions (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL REFERENCES users(id),
+  reference TEXT NOT NULL UNIQUE,
+  amount_kobo BIGINT NOT NULL CHECK (amount_kobo > 0),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','success','failed')),
+  gateway_status TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  paid_at TIMESTAMPTZ
+ );
+ CREATE INDEX IF NOT EXISTS paystack_transactions_user_idx ON paystack_transactions(user_id,created_at DESC);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_reviewed_at TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_note TEXT;
@@ -507,6 +518,84 @@ app.post('/api/auth/login', async (req,res) => {
   res.json({token:tokenFor(u),user:{id:u.id,email:u.email,phone:u.phone,role:u.role,status:u.status}});
  } catch { res.status(500).json({error:'Login failed.'}); }
 });
+
+const paystackEnabled = () => process.env.PAYSTACK_PAYMENTS_ENABLED === 'true';
+async function paystackRequest(path, options={}) {
+ if(!process.env.PAYSTACK_SECRET_KEY) { const e=new Error('Paystack is not configured.');e.status=503;throw e; }
+ const response=await fetch('https://api.paystack.co'+path,{...options,headers:{Authorization:'Bearer '+process.env.PAYSTACK_SECRET_KEY,'Content-Type':'application/json',...(options.headers||{})}});
+ const body=await response.json().catch(()=>({}));
+ if(!response.ok || body.status!==true) { const e=new Error(body.message||'Paystack request failed.');e.status=502;throw e; }
+ return body.data;
+}
+async function settlePaystackReference(reference, verified) {
+ if(!verified || verified.status!=='success' || verified.currency!=='NGN') throw new Error('PAYSTACK_PAYMENT_NOT_SUCCESSFUL');
+ const client=await pool.connect();
+ try {
+  await client.query('BEGIN');
+  const q=await client.query('SELECT * FROM paystack_transactions WHERE reference=$1 FOR UPDATE',[reference]);
+  if(!q.rowCount) throw new Error('PAYSTACK_REFERENCE_NOT_FOUND');
+  const payment=q.rows[0];
+  if(String(verified.amount)!==String(payment.amount_kobo) || String(verified.metadata?.user_id||'')!==String(payment.user_id)) throw new Error('PAYSTACK_PAYMENT_MISMATCH');
+  if(payment.status==='success') { await client.query('COMMIT');return {credited:true,alreadyCredited:true,amountKobo:payment.amount_kobo}; }
+  await client.query("UPDATE paystack_transactions SET status='success',gateway_status=$2,paid_at=NOW() WHERE id=$1",[payment.id,verified.gateway_response||'success']);
+  await client.query('UPDATE users SET balance_kobo=balance_kobo+$1 WHERE id=$2',[payment.amount_kobo,payment.user_id]);
+  await client.query('INSERT INTO wallet_ledger(user_id,type,amount_kobo,reference,description) VALUES($1,\'deposit\',$2,$3,\'Paystack deposit verified\')',[payment.user_id,payment.amount_kobo,payment.reference]);
+  await client.query('COMMIT');
+  return {credited:true,alreadyCredited:false,amountKobo:payment.amount_kobo};
+ } catch(e) { await client.query('ROLLBACK');throw e; }
+ finally { client.release(); }
+}
+app.post('/api/payments/paystack/initialize',auth,async(req,res)=>{
+ if(!paystackEnabled()) return res.status(503).json({error:'Paystack deposits are not enabled yet. SORTBET will activate deposits after the required approvals.'});
+ const amount=Number(req.body.amount);
+ if(!Number.isSafeInteger(amount)||amount<100||amount>1000000) return res.status(400).json({error:'Enter an amount between ₦100 and ₦1,000,000.'});
+ if(!process.env.PAYSTACK_SECRET_KEY) return res.status(503).json({error:'Paystack is not configured yet.'});
+ try {
+  const u=await pool.query('SELECT email FROM users WHERE id=$1',[req.auth.sub]);
+  if(!u.rowCount||!u.rows[0].email) return res.status(400).json({error:'A valid account email is required for Paystack checkout.'});
+  const reference='SBP-'+Date.now().toString(36).toUpperCase()+'-'+crypto.randomBytes(6).toString('hex').toUpperCase();
+  const amountKobo=String(Math.round(amount*100));
+  await pool.query("INSERT INTO paystack_transactions(user_id,reference,amount_kobo) VALUES($1,$2,$3)",[req.auth.sub,reference,amountKobo]);
+  const data=await paystackRequest('/transaction/initialize',{method:'POST',body:JSON.stringify({email:u.rows[0].email,amount:amountKobo,currency:'NGN',reference,callback_url:'https://sooty-bet.onrender.com/?paystack=callback',metadata:{user_id:String(req.auth.sub),custom_fields:[{display_name:'SORTBET account',variable_name:'sortbet_user_id',value:String(req.auth.sub)}]}})});
+  res.set('Cache-Control','no-store');res.json({authorizationUrl:data.authorization_url,reference:data.reference});
+ } catch(e) {
+  console.error('Paystack initialization failed:',e.message);
+  res.status(e.status||500).json({error:e.status===503?e.message:'Could not start Paystack checkout. Please try again.'});
+ }
+});
+app.get('/api/payments/paystack/verify',auth,async(req,res)=>{
+ const reference=cleanText(req.query.reference,100);
+ if(!reference) return res.status(400).json({error:'Missing Paystack transaction reference.'});
+ try {
+  const data=await paystackRequest('/transaction/verify/'+encodeURIComponent(reference));
+  const result=await settlePaystackReference(reference,data);
+  const owner=await pool.query('SELECT user_id FROM paystack_transactions WHERE reference=$1',[reference]);
+  if(!owner.rowCount||String(owner.rows[0].user_id)!==String(req.auth.sub)) return res.status(404).json({error:'Payment reference not found.'});
+  res.set('Cache-Control','no-store');res.json({message:result.alreadyCredited?'Payment was already credited.':'Payment verified and wallet credited.',...result});
+ } catch(e) {
+  if(e.message==='PAYSTACK_PAYMENT_NOT_SUCCESSFUL') return res.status(409).json({error:'Paystack has not confirmed a successful payment yet.'});
+  if(e.message==='PAYSTACK_PAYMENT_MISMATCH') return res.status(400).json({error:'Payment details did not match this deposit.'});
+  if(e.message==='PAYSTACK_REFERENCE_NOT_FOUND') return res.status(404).json({error:'Payment reference not found.'});
+  console.error('Paystack verification failed:',e.message);res.status(e.status||500).json({error:'Could not verify this payment yet. Please refresh your wallet shortly.'});
+ }
+});
+app.post('/api/payments/paystack/webhook',async(req,res)=>{
+ const signature=req.headers['x-paystack-signature'];
+ if(!process.env.PAYSTACK_SECRET_KEY||!signature||!req.rawBody) return res.sendStatus(401);
+ const expected=crypto.createHmac('sha512',process.env.PAYSTACK_SECRET_KEY).update(req.rawBody).digest('hex');
+ const a=Buffer.from(String(signature));const b=Buffer.from(expected);
+ if(a.length!==b.length||!crypto.timingSafeEqual(a,b)) return res.sendStatus(401);
+ if(req.body?.event!=='charge.success'||!req.body?.data?.reference) return res.sendStatus(200);
+ try {
+  const data=await paystackRequest('/transaction/verify/'+encodeURIComponent(req.body.data.reference));
+  await settlePaystackReference(req.body.data.reference,data);
+  res.sendStatus(200);
+ } catch(e) {
+  if(e.message==='PAYSTACK_PAYMENT_NOT_SUCCESSFUL') return res.sendStatus(200);
+  console.error('Paystack webhook processing failed:',e.message);res.sendStatus(500);
+ }
+});
+
 app.get('/api/wallet',auth,async(req,res)=>{
  const q=await pool.query('SELECT balance_kobo FROM users WHERE id=$1',[req.auth.sub]);
  const entries=await pool.query('SELECT type,amount_kobo,reference,description,created_at FROM wallet_ledger WHERE user_id=$1 ORDER BY created_at DESC LIMIT 30',[req.auth.sub]);
