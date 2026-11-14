@@ -567,10 +567,10 @@ app.get('/api/payments/paystack/verify',auth,async(req,res)=>{
  const reference=cleanText(req.query.reference,100);
  if(!reference) return res.status(400).json({error:'Missing Paystack transaction reference.'});
  try {
-  const data=await paystackRequest('/transaction/verify/'+encodeURIComponent(reference));
-  const result=await settlePaystackReference(reference,data);
   const owner=await pool.query('SELECT user_id FROM paystack_transactions WHERE reference=$1',[reference]);
   if(!owner.rowCount||String(owner.rows[0].user_id)!==String(req.auth.sub)) return res.status(404).json({error:'Payment reference not found.'});
+  const data=await paystackRequest('/transaction/verify/'+encodeURIComponent(reference));
+  const result=await settlePaystackReference(reference,data);
   res.set('Cache-Control','no-store');res.json({message:result.alreadyCredited?'Payment was already credited.':'Payment verified and wallet credited.',...result});
  } catch(e) {
   if(e.message==='PAYSTACK_PAYMENT_NOT_SUCCESSFUL') return res.status(409).json({error:'Paystack has not confirmed a successful payment yet.'});
